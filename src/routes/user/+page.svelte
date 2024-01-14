@@ -1,13 +1,61 @@
 <script>
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
+	import { Checkbox, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell, TableSearch, Pagination } from 'flowbite-svelte';
+
+	$: activeUrl = $page.url.searchParams.get('page');
+
+	/**
+	 * @type {any[]}
+	 */
+	let pages = [
+		{ name: 1, href: '/components/pagination?page=1' },
+		{ name: 2, href: '/components/pagination?page=2' },
+		{ name: 3, href: '/components/pagination?page=3' },
+		{ name: 4, href: '/components/pagination?page=4' },
+		{ name: 5, href: '/components/pagination?page=5' }
+	];
+
+	$: {
+		pages.forEach((page) => {
+			let splitUrl = page.href.split('?');
+			let queryString = splitUrl.slice(1).join('?');
+			const hrefParams = new URLSearchParams(queryString);
+			let hrefValue = hrefParams.get('page');
+			if (hrefValue === activeUrl) {
+				page.active = true;
+			} else {
+				page.active = false;
+			}
+		});
+		pages = pages;
+	}
+
+	const previous = () => {
+		alert('Previous btn clicked. Make a call to your server to fetch data.');
+	};
+	const next = () => {
+		alert('Next btn clicked. Make a call to your server to fetch data.');
+	};
 
 	let pageSize = 5;
-	let page = 1;
+	let pageNum = 1;
+	/**
+	 * @typedef User
+	 * @property {number} id
+	 * @property {string} email
+	 * @property {string} provider
+	 * @property {string} make
+	 */
+	/**
+	 * @type {User[]}
+	 */
 	let tableData = [];
+	let searchTerm = '';
 
 	async function getList() {
 		const params = new URLSearchParams();
-		params.append('page', '' + page);
+		params.append('page', '' + pageNum);
 		params.append('limit', '' + pageSize);
 		const res = await fetch(`/api/users?${params.toString()}`, {
 			method: 'get',
@@ -23,122 +71,52 @@
 	 * 删除用户
 	 * @param {number} id
 	 */
-	async function handleDelete(id) {
-		const res = await fetch(`/api/users/${id}`, {
-			method: 'delete',
-			headers: {
-				Authorization: `Bearer ${localStorage.getItem('token')}`
-			}
-		});
-		if (res.ok) {
-			getList();
-		}
-	}
+	// async function handleDelete(id) {
+	// 	const res = await fetch(`/api/users/${id}`, {
+	// 		method: 'delete',
+	// 		headers: {
+	// 			Authorization: `Bearer ${localStorage.getItem('token')}`
+	// 		}
+	// 	});
+	// 	if (res.ok) {
+	// 		getList();
+	// 	}
+	// }
 
 	onMount(() => {
 		getList();
 	});
 </script>
 
-<div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-	<div class="flex items-center justify-between pb-4 bg-white dark:bg-gray-900">
-		<div>
-			<button
-				id="dropdownActionButton"
-				data-dropdown-toggle="dropdownAction"
-				class="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-				type="button"
-			>
-				<span class="sr-only">Action button</span>
-				Action
-				<svg class="w-2.5 h-2.5 ml-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-					<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
-				</svg>
-			</button>
-			<!-- Dropdown menu -->
-			<div id="dropdownAction" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
-				<ul class="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownActionButton">
-					<li>
-						<a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Reward</a>
-					</li>
-					<li>
-						<a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Promote</a>
-					</li>
-					<li>
-						<a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Activate account</a>
-					</li>
-				</ul>
-				<div class="py-1">
-					<a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Delete User</a>
-				</div>
-			</div>
-		</div>
-		<label for="table-search" class="sr-only">Search</label>
-		<div class="relative">
-			<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-				<svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-					<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-				</svg>
-			</div>
-			<input
-				type="text"
-				id="table-search-users"
-				class="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-				placeholder="Search for users"
-			/>
-		</div>
-	</div>
-	<table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-		<thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-			<tr>
-				<th scope="col" class="p-4">
-					<div class="flex items-center">
-						<input
-							id="checkbox-all-search"
-							type="checkbox"
-							class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-						/>
-						<label for="checkbox-all-search" class="sr-only">checkbox</label>
-					</div>
-				</th>
-				<th scope="col" class="px-6 py-3"> Name </th>
-				<th scope="col" class="px-6 py-3"> Provider </th>
-				<th scope="col" class="px-6 py-3"> Status </th>
-				<th scope="col" class="px-6 py-3"> Action </th>
-			</tr>
-		</thead>
-		<tbody>
-			{#each tableData as item}
-				<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-					<td class="w-4 p-4">
-						<div class="flex items-center">
-							<input
-								id="checkbox-table-search-1"
-								type="checkbox"
-								class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-							/>
-							<label for="checkbox-table-search-1" class="sr-only">checkbox</label>
-						</div>
-					</td>
-					<th scope="row" class="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-						<img class="w-10 h-10 rounded-full" src={item.phone} alt="avatar" />
-						<div class="pl-3">
-							<div class="text-base font-semibold">{item.firstName} {item.lastName}</div>
-							<div class="font-normal text-gray-500">{item.email}</div>
-						</div>
-					</th>
-					<td class="px-6 py-4"> {item.provider} </td>
-					<td class="px-6 py-4">
-						<div class="flex items-center">
-							<div class="h-2.5 w-2.5 rounded-full bg-green-500 mr-2" />
-							{item.deletedAt}
-						</div>
-					</td>
-					<td class="px-6 py-4">
-						<a on:click={handleDelete(item.id)} href="#" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Delete user</a>
-					</td>
-				</tr>
-			{/each}
-		</tbody>
-	</table>
-</div>
+<TableSearch striped={true} shadow placeholder="Search by maker name" hoverable={true} bind:inputValue={searchTerm}>
+	<TableHead>
+		<TableHeadCell class="!p-4">
+			<Checkbox />
+		</TableHeadCell>
+		<TableHeadCell>ID</TableHeadCell>
+		<TableHeadCell>Email</TableHeadCell>
+		<TableHeadCell>Type</TableHeadCell>
+		<TableHeadCell>Status</TableHeadCell>
+		<TableHeadCell>
+			<span class="sr-only">Edit</span>
+		</TableHeadCell>
+	</TableHead>
+	<TableBody tableBodyClass="divide-y">
+		{#each tableData as item}
+			<TableBodyRow>
+				<TableBodyCell class="!p-4">
+					<Checkbox />
+				</TableBodyCell>
+				<TableBodyCell>{item.id}</TableBodyCell>
+				<TableBodyCell>{item.email}</TableBodyCell>
+				<TableBodyCell>{item.provider}</TableBodyCell>
+				<TableBodyCell>{item.make}</TableBodyCell>
+				<TableBodyCell>
+					<a href="/tables" class="font-medium text-primary-600 hover:underline dark:text-primary-500">Edit</a>
+				</TableBodyCell>
+			</TableBodyRow>
+		{/each}
+	</TableBody>
+</TableSearch>
+
+<Pagination {pages} on:previous={previous} on:next={next} />

@@ -1,10 +1,16 @@
 <script>
-	import { page } from '$app/stores';
+	import { navigating, page } from '$app/stores';
+	import Nav from '$lib/components/Nav.svelte';
+	import PreloadingIndicator from '$lib/components/PreloadingIndicator.svelte';
 	import '../app.css';
 </script>
 
-<svelte:head>
-	<title>{$page.data.title}</title>
-</svelte:head>
+{#if $navigating}
+	<PreloadingIndicator />
+{/if}
 
-<slot />
+<Nav />
+
+<main>
+	<slot />
+</main>
