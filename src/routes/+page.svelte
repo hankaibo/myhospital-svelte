@@ -15,12 +15,15 @@
 	import { Heading, List, Li, A } from 'flowbite-svelte';
 	import { CloseSolid } from 'flowbite-svelte-icons';
 	import 'ol/ol.css';
+	import '$lib/ol/contextmenu.css';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
 
 	/**	@type {import('ol/Map').default} */
 	let map;
+	/** @type {import('ol/View').default} */
+	let view;
 	/**	@type {import('ol/interaction/Modify').default}	*/
 	let modify;
 	/**	@type {import('ol/interaction/Draw').default}	*/
@@ -41,8 +44,8 @@
 	 * @property {string} address
 	 * @property {string} zipCode
 	 * @property {string} introduction
-	 * @property {number} lng
-	 * @property {number} lat
+	 * @property {number} [lng]
+	 * @property {number} [lat]
 	 */
 	/** @type {Hospital} */
 	let hospital;
@@ -54,6 +57,7 @@
 	let beforeMarkList = [];
 	/** @type {number} */
 	let beforeRadius = 0;
+	/** @type {import('ol/Feature').default} */
 	let deleteFeature;
 
 	/** @type {Array<import('ol/Feature').default>} */
@@ -70,6 +74,7 @@
 	rasterLayer.set('name', 'rasterLayer');
 
 	// 矢量图层
+	/** @type {import('ol/source/Vector').default} */
 	const vectorSource = new VectorSource({
 		wrapX: true
 	});
@@ -88,6 +93,7 @@
 	vectorLayer.set('name', 'vectorLayer');
 
 	// 聚合图层
+	/** @type {import('ol/source/Vector').default} */
 	const markerVectorSource = new VectorSource();
 	const clusterSource = new Cluster({
 		distance: 40,
@@ -187,17 +193,19 @@
 		const content = document.getElementById('popup-content');
 		const closer = document.getElementById('popup-closer');
 
+		view = new View({
+			center: fromLonLat([116.397507, 39.908708]),
+			zoom: 13,
+			minZoom: 8,
+			maxZoom: 18,
+			constrainResolution: true,
+			extent
+		});
+
 		map = new Map({
 			target: 'map',
 			layers: [rasterLayer, vectorLayer, clusterLayer, a19VectorLayer],
-			view: new View({
-				center: fromLonLat([116.397507, 39.908708]),
-				zoom: 13,
-				minZoom: 8,
-				maxZoom: 18,
-				constrainResolution: true,
-				extent
-			}),
+			view,
 			overlays: [
 				new Overlay({
 					id: 'popup',
@@ -262,7 +270,10 @@
 			map.addInteraction(select);
 			select.on('select', (e) => {
 				if (e.selected.length) {
-					// hospitalList = markerVectorSource.getFeatures().filter((item)=>e.selected[0].getGeometry()?.intersectsCoordinate(item.getGeometry().getCoordinates())).map(it=>({...it.getProperties()});
+					hospitalList = markerVectorSource
+						.getFeatures()
+						.filter((item) => e.selected[0].getGeometry()?.intersectsCoordinate(item.getGeometry().getCoordinates()))
+						.map((it) => ({ ...it.getProperties() }));
 				} else {
 					hospitalList = [];
 				}
@@ -271,58 +282,13 @@
 	}
 
 	/**
-	 *
-	 * @param {import('ol/Feature').default} feature
-	 */
-	function handleCircleBefore(feature) {
-		/** @type {import('ol/geom/Circle').default} */
-		const geometryCircle = /** @type {import('ol/geom/Circle')} */ feature.getGeometry();
-		beforeCenter = geometryCircle.getCenter();
-		beforeRadius = geometryCircle.getRadius();
-		beforeMarkList = markerVectorSource.getFeatures().filter((item) => geometryCircle.intersectsCoordinate(item.getGeometry().getCoordinates()));
-	}
-
-	/**
-	 *
-	 * @param {import('ol/Feature').default} feature
-	 */
-	function handleCircleAfter(feature) {
-		const geometryCircle = feature.getGeometry();
-		const center = geometryCircle.getCenter();
-		const radius = geometryCircle.getRadius();
-		// drag
-		if (beforeCenter.toString() !== center.toString()) {
-			beforeMarkList.forEach((item) => {
-				if (!geometryCircle.intersectsCoordinate(item.getGeometry().getCoordinates())) {
-					removeMarker(item);
-				}
-			});
-			handleFetch({
-				type: 'Circle',
-				center: toLonLat(center),
-				radius
-			});
-		} else if (radius > beforeRadius) {
-			handleFetch({
-				type: 'Circle',
-				center: toLonLat(center),
-				radius
-			});
-		} else {
-			beforeMarkList.forEach((item) => {
-				if (!geometryCircle.intersectsCoordinate(item.getGeometry().getCoordinates())) {
-					removeMarker(item);
-				}
-			});
-		}
-	}
-
-	/**
-	 * 添加地图事件
+	 * 为地图绑定事件
+	 * 1，点击 marker 显示医院详情
+	 * 2，鼠标移入 marker 变为手型
 	 */
 	function addEvent() {
 		map.on('click', (evt) => {
-			const selectedFeature = map.forEachFeatureAtPixel(evt.pixel, (feature) => feature, {
+						const selectedFeature = map.forEachFeatureAtPixel(evt.pixel, (feature) => feature, {
 				layerFilter: (layer) => ['clusterLayer', 'a19VectorLayer'].includes(layer.get('name'))
 			});
 			if (!selectedFeature) {
@@ -335,18 +301,27 @@
 					hospital = {
 						...selectedFeature.get('features')[0].getProperties()
 					};
-					const coordinates1 = evt.coordinate;
-					const coordinates = selectedFeature.getGeometry().getCoordinates();
+					const coordinates = evt.coordinate;
+					// const coordinates = selectedFeature.getGeometry().getCoordinates();
 					map.getOverlayById('popup').setPosition(coordinates);
 				} else {
 					window.alert('聚合元素不可以显示详情，请重新选择。');
 				}
 			} else {
 				evt.stopPropagation();
+				const { id, name, code, type, district, level, zipCode, address, introduction } = selectedFeature.getProperties();
 				hospital = {
-					...selectedFeature.getProperties()
+					id,
+					name,
+					code,
+					type,
+					district,
+					level,
+					zipCode,
+					address,
+					introduction
 				};
-				const coordinates = selectedFeature.getGeometry().getCoordinates();
+				const coordinates = evt.coordinate;
 				map.getOverlayById('popup').setPosition(coordinates);
 			}
 		});
@@ -367,26 +342,44 @@
 	 * 右键菜单
 	 */
 	function handleContextMenu() {
-		const contextmenu = new ContextMenu({
-			width: 170,
-			defaultItems: true,
-			items: [
-				{
-					text: '删除',
-					classname: 'some-style-class',
-					callback: deleteDraw
+		const contextmenuItems = [
+			{
+				text: '定位中心到此',
+				classname: 'text-bold',
+				icon: '/center.png',
+				/**
+				 *
+				 * @param {import('ol/coordinate')} obj
+				 */
+				callback(obj) {
+					view.animate({
+						duration: 700,
+						center: obj.coordinate
+					});
 				}
-			]
+			}
+		];
+		const contextmenu = new ContextMenu({
+			width: 180,
+			items: contextmenuItems
 		});
 		contextmenu.on('open', (evt) => {
 			const selectedFeature = map.forEachFeatureAtPixel(evt.pixel, (feature) => feature, {
 				layerFilter: (layer) => layer.get('name') === 'vectorLayer'
 			});
 			if (selectedFeature) {
-				contextmenu.enable();
+				contextmenu.clear();
+				contextmenu.push({
+					text: '删除',
+					classname: 'marker',
+					data: { marker: selectedFeature },
+					callback: deleteDraw
+				});
 				deleteFeature = selectedFeature;
 			} else {
-				contextmenu.disable();
+				contextmenu.clear();
+				contextmenu.extend(contextmenuItems);
+				contextmenu.extend(contextmenu.getDefaultItems());
 			}
 		});
 		map.addControl(contextmenu);
@@ -477,10 +470,211 @@
 	}
 
 	/**
+	 *
+	 * @param {import('ol/Feature').default} feature
+	 */
+	function handleCircleBefore(feature) {
+		/** @type {import('ol/geom/Circle').default} */
+		const geometryCircle = /** @type {import('ol/geom/Circle')} */ feature.getGeometry();
+		beforeCenter = geometryCircle.getCenter();
+		beforeRadius = geometryCircle.getRadius();
+		beforeMarkList = markerVectorSource.getFeatures().filter((item) => geometryCircle.intersectsCoordinate(item.getGeometry().getCoordinates()));
+	}
+
+	/**
+	 *
+	 * @param {import('ol/Feature').default} feature
+	 */
+	function handleCircleAfter(feature) {
+		const geometryCircle = feature.getGeometry();
+		const center = geometryCircle.getCenter();
+		const radius = geometryCircle.getRadius();
+		// drag
+		if (beforeCenter.toString() !== center.toString()) {
+			beforeMarkList.forEach((item) => {
+				if (!geometryCircle.intersectsCoordinate(item.getGeometry().getCoordinates())) {
+					removeMarker(item);
+				}
+			});
+			handleFetch({
+				type: 'Circle',
+				center: toLonLat(center),
+				radius
+			});
+		} else if (radius > beforeRadius) {
+			handleFetch({
+				type: 'Circle',
+				center: toLonLat(center),
+				radius
+			});
+		} else {
+			beforeMarkList.forEach((item) => {
+				if (!geometryCircle.intersectsCoordinate(item.getGeometry().getCoordinates())) {
+					removeMarker(item);
+				}
+			});
+		}
+	}
+
+	/**
+	 * 根据查询到的医院数据添加地图标记
+	 * @param {Array} list
+	 */
+	function addMarker(list) {
+		if (!Array.isArray(list)) {
+			return;
+		}
+
+		const newList = [];
+		list
+			// 过滤已绘制的
+			.filter((item) => !allFeature.includes(item.id))
+			.forEach((item) => {
+				allFeature.push(item.id);
+				newList.push(item);
+			});
+
+		const featureList = [];
+		newList.forEach((item) => {
+			const iconFeature = new Feature({
+				geometry: new Point(fromLonLat([item.lng, item.lat])),
+				id: item.id,
+				name: item.name,
+				code: item.code,
+				type: item.type,
+				district: item.district,
+				level: item.level,
+				postalCode: item.postalCode,
+				address: item.address,
+				introduction: item.introduction
+			});
+			featureList.push(iconFeature);
+		});
+		markerVectorSource.addFeatures(featureList);
+		beforeMarkList = [];
+	}
+
+	/**
+	 * 添加A类医院
+	 * @param list
+	 */
+	function addMarkerA19(list) {
+		if (!list || !Array.isArray(list) || Object.keys(list).length) {
+			return;
+		}
+		const newList = [];
+		list
+			.filter((item) => !a19AllFeature.includes(item.id))
+			.forEach((item) => {
+				a19AllFeature.push(item.id);
+				newList.push(item);
+			});
+
+		const featureArray = [];
+		newList.forEach((item, index) => {
+			const iconFeature = new Feature({
+				geometry: new Point(fromLonLat([item.lng, item.lat])),
+				id: item.id,
+				name: item.name,
+				code: item.code,
+				type: item.type,
+				district: item.district,
+				level: item.level,
+				postalCode: item.postalCode,
+				address: item.address,
+				introduction: item.introduction
+			});
+			const iconStyle = new Style({
+				image: new Icon({
+					anchor: [0.5, 0.96],
+					size: [44, 64],
+					offset: handleOffset(index, 'red'),
+					src: 'https://www.amap.com/assets/img/poi-marker.png'
+				})
+			});
+			iconFeature.setStyle(iconStyle);
+			featureArray.push(iconFeature);
+		});
+		a19VectorSource.addFeatures(featureArray);
+	}
+
+	/**
+	 * 删除地图标记
+	 * @param {import('../lib/ol/types').CallbackObject} feature
+	 */
+	function removeMarker(feature) {
+		const sum = vectorSource.getFeatures().length;
+		if (sum === 0) {
+			markerVectorSource.clear();
+			allFeature = [];
+		} else {
+			let isDelete = true;
+			vectorSource.forEachFeature((item) => {
+				if (item.getGeometry().intersectsCoordinate(feature.coordinate)) {
+					isDelete = false;
+				}
+			});
+			if (isDelete) {
+				allFeature = allFeature.filter((it) => it !== feature.get('id'));
+				markerVectorSource.removeFeature(feature);
+			}
+		}
+	}
+
+	/**
+	 * 删除选中的图形区域
+	 */
+	function deleteDraw() {
+		const selected = select.getFeatures();
+		if (deleteFeature === selected.getArray()[0]) {
+			hospitalList = [];
+		}
+
+		const geometry = deleteFeature.getGeometry();
+		const deletMarkers = markerVectorSource.getFeatures().filter((item) => geometry.intersectsCoordinate(item.getGeometry().getCoordinates()));
+		deletMarkers.forEach((feature) => markerVectorSource.removeFeature(feature));
+		vectorSource.removeFeature(deleteFeature);
+	}
+
+	/**
+	 * 【弹出层】，关闭
+	 */
+	function handleClose() {
+		map.getOverlayById('popup').setPosition(undefined);
+		return false;
+	}
+
+	/**
+	 * 【弹出层】，从医院名称跳转到官网详情页面
+	 * @param {string} name
+	 */
+	function handleDetail(name) {
+		const tempForm = document.createElement('form');
+		tempForm.id = 'tempForm1';
+		tempForm.method = 'post';
+		tempForm.action = 'https://fw.ybj.beijing.gov.cn/ddyy/ddyy/list';
+		tempForm.target = 'ddyy1form';
+
+		const hideInput = document.createElement('input');
+		hideInput.type = 'hidden';
+		hideInput.name = 'search_LIKE_yymc';
+		hideInput.value = name;
+
+		tempForm.appendChild(hideInput);
+		tempForm.addEventListener('submit', () => {
+			window.open('https://fw.ybj.beijing.gov.cn/ddyy/ddyy/list', 'ddyy1form');
+		});
+
+		document.body.appendChild(tempForm);
+		tempForm.submit();
+		document.body.removeChild(tempForm);
+	}
+
+	/**
 	 * 根据坐标范围查询医院数据
 	 * @param params
 	 */
-	function handleFetch(params) {
+	function handleFetch() {
 		const dataMock = [
 			{
 				id: 9467,
@@ -748,163 +942,6 @@
 				addMarker(dataMock);
 			}, 1000);
 		});
-	}
-
-	/**
-	 * 根据查询到的医院数据添加地图标记
-	 * @param {Array} list
-	 */
-	function addMarker(list) {
-		if (!Array.isArray(list)) {
-			return;
-		}
-
-		const newList = [];
-		list
-			// 过滤已绘制的
-			.filter((item) => !allFeature.includes(item.id))
-			.forEach((item) => {
-				allFeature.push(item.id);
-				newList.push(item);
-			});
-
-		const featureList = [];
-		newList.forEach((item) => {
-			const iconFeature = new Feature({
-				geometry: new Point(fromLonLat([item.lng, item.lat])),
-				id: item.id,
-				name: item.name,
-				code: item.code,
-				type: item.type,
-				district: item.district,
-				level: item.level,
-				postalCode: item.postalCode,
-				address: item.address,
-				introduction: item.introduction
-			});
-			featureList.push(iconFeature);
-		});
-		markerVectorSource.addFeatures(featureList);
-		beforeMarkList = [];
-	}
-
-	/**
-	 * 添加A类医院
-	 * @param list
-	 */
-	function addMarkerA19(list) {
-		if (!list || !Array.isArray(list) || Object.keys(list).length) {
-			return;
-		}
-		const newList = [];
-		list
-			.filter((item) => !a19AllFeature.includes(item.id))
-			.forEach((item) => {
-				a19AllFeature.push(item.id);
-				newList.push(item);
-			});
-
-		const featureArray = [];
-		newList.forEach((item, index) => {
-			const iconFeature = new Feature({
-				geometry: new Point(fromLonLat([item.lng, item.lat])),
-				id: item.id,
-				name: item.name,
-				code: item.code,
-				type: item.type,
-				district: item.district,
-				level: item.level,
-				postalCode: item.postalCode,
-				address: item.address,
-				introduction: item.introduction
-			});
-			const iconStyle = new Style({
-				image: new Icon({
-					anchor: [0.5, 0.96],
-					size: [44, 64],
-					offset: handleOffset(index, 'red'),
-					src: 'https://www.amap.com/assets/img/poi-marker.png'
-				})
-			});
-			iconFeature.setStyle(iconStyle);
-			featureArray.push(iconFeature);
-		});
-		a19VectorSource.addFeatures(featureArray);
-	}
-
-	/**
-	 * 删除地图标记
-	 */
-	function removeMarker(feature) {
-		const sum = vectorSource.getFeatures().length;
-		if (sum === 0) {
-			markerVectorSource.clear();
-			allFeature = [];
-		} else {
-			let isDelete = true;
-			vectorSource.forEachFeature((item) => {
-				if (item.getGeometry().intersectsCoordinate(feature.getGeometry().getCoordinates())) {
-					isDelete = false;
-				}
-			});
-			if (isDelete) {
-				allFeature = allFeature.filter((it) => it !== feature.get('id'));
-				markerVectorSource.removeFeature(feature);
-			}
-		}
-	}
-
-	/**
-	 * 删除选中的图形区域
-	 */
-	function deleteDraw() {
-		const selected = select.getFeatures();
-		if (deleteFeature === selected.getArray()[0]) {
-			hospitalList = [];
-		}
-
-		const geometry = deleteFeature.getGeometry();
-		vectorSource.removeFeature(deleteFeature);
-		markerVectorSource
-			.getFeatures()
-			.filter((item) => geometry.intersectsCoordinate(item.getGeometry().getCoordinates()))
-			.forEach((item) => {
-				removeMarker(item);
-			});
-	}
-
-	/**
-	 * 【弹出层】，关闭
-	 */
-	function handleClose() {
-		map.getOverlayById('popup').setPosition(undefined);
-		return false;
-	}
-
-	/**
-	 * 【弹出层】，从医院名称跳转到官网详情页面
-	 * @param {string} name
-	 */
-	function handleDetail(name) {
-		const tempForm = document.createElement('form');
-		tempForm.id = 'tempForm1';
-		tempForm.method = 'post';
-		tempForm.action = 'https://fw.ybj.beijing.gov.cn/ddyy/ddyy/list';
-		tempForm.target = 'ddyy1form';
-
-		const hideInput = document.createElement('input');
-		hideInput.type = 'hidden';
-		hideInput.name = 'search_LIKE_yymc';
-		hideInput.value = name;
-
-		tempForm.appendChild(hideInput);
-		tempForm.addEventListener('submit', () => {
-			window.open('https://fw.ybj.beijing.gov.cn/ddyy/ddyy/list', 'ddyy1form');
-		});
-
-		document.body.appendChild(tempForm);
-		tempForm.submit();
-		document.body.removeChild(tempForm);
 	}
 
 	onMount(() => {
