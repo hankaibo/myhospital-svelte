@@ -12,7 +12,7 @@
 	import { Fill, Stroke, Style, Icon, Circle as CircleStyle, Text as TextStyle } from 'ol/style';
 	import { click } from 'ol/events/condition';
 	import ContextMenu from '$lib/ol/Contextmenu';
-	import { Heading, List, Li, A } from 'flowbite-svelte';
+	import { Heading, List, Li, A, Label, Select as FSSelect } from 'flowbite-svelte';
 	import { CloseSolid } from 'flowbite-svelte-icons';
 	import 'ol/ol.css';
 	import '$lib/ol/contextmenu.css';
@@ -49,7 +49,8 @@
 	 */
 	/** @type {Hospital} */
 	let hospital;
-	let hospitalList = [];
+	/** @type {Array<Hospital>}*/
+	$: hospitalList = [];
 	/** @type {Array<import('ol/Feature').default>} */
 	let allFeature = [];
 	/** @type {Array<number>} */
@@ -288,7 +289,7 @@
 	 */
 	function addEvent() {
 		map.on('click', (evt) => {
-						const selectedFeature = map.forEachFeatureAtPixel(evt.pixel, (feature) => feature, {
+			const selectedFeature = map.forEachFeatureAtPixel(evt.pixel, (feature) => feature, {
 				layerFilter: (layer) => ['clusterLayer', 'a19VectorLayer'].includes(layer.get('name'))
 			});
 			if (!selectedFeature) {
@@ -962,6 +963,8 @@
 </svelte:head>
 
 <div id="map" class="h-[calc(100vh-73px)]"></div>
+
+<!-- 某个医院的详情弹框 -->
 <div
 	id="popup"
 	class="absolute bg-white shadow p-4 rounded-lg border border-gray-300 bottom-3 -left-12 min-w-max after:top-full after:border-transparent after:h-0 after:w-0 after:absolute after:pointer-events-none after:border-t-white after:border-[10px] after:left-12 after:-ml-2.5 before:top-full before:border-transparent before:h-0 before:w-0 before:absolute before:pointer-events-none before:border-t-slate-200 before:border-[11px] before:left-1 before:-ml-3"
@@ -997,3 +1000,50 @@
 		</List>
 	</div>
 </div>
+
+{#if hospitalList.length}
+	<div class="absolute top-20 left-4 w-96 bg-white shadow">
+		<div class="mb-2">
+			<Label for="select-underline" class="sr-only">请选择</Label>
+			<FSSelect
+				id="select-underline"
+				underline
+				items={[
+					{ value: '-', name: '-' },
+					{ value: '对外综合', name: '对外综合' },
+					{ value: '对外专科', name: '对外专科' },
+					{ value: '对外中医', name: '对外中医' },
+					{ value: '社区卫生站', name: '社区卫生站' },
+					{ value: '村卫生室', name: '村卫生室' },
+					{ value: '对内', name: '对内' }
+				]}
+			/>
+		</div>
+		<div class="mb-2">
+			<Label for="select-underline2" class="sr-only">请选择</Label>
+			<FSSelect
+				id="select-underline2"
+				underline
+				items={[
+					{ value: '-', name: '-' },
+					{ value: '三级', name: '三级' },
+					{ value: '二级', name: '二级' },
+					{ value: '一级', name: '一级' },
+					{ value: '未评级', name: '未评级' }
+				]}
+			/>
+		</div>
+		<div class="h-96 overflow-y-auto">
+			<List tag="ul" class="space-y-4 text-xs text-gray-500 dark:text-gray-400" list="none">
+				{#each hospitalList as hospital}
+					<Li class="flex">
+						<A class="flex-1 mr-2 text-gray-900" on:click={() => handleDetail(hospital?.name)}>{hospital?.name}</A>
+						<span class="w-16">{hospital?.code}</span>
+						<span class="w-10">{hospital?.level}</span>
+						<span class="w-16">{hospital?.type}</span>
+					</Li>
+				{/each}
+			</List>
+		</div>
+	</div>
+{/if}
