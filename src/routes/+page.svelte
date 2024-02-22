@@ -17,8 +17,8 @@
 	import 'ol/ol.css';
 	import '$lib/ol/contextmenu.css';
 
-	/** @type {import('./$types').PageData} */
-	export let data;
+	// /** @type {import('./$types').PageData} */
+	// export const data;
 
 	/**	@type {import('ol/Map').default} */
 	let map;
@@ -676,271 +676,9 @@
 	 * @param params
 	 */
 	function handleFetch() {
-		const dataMock = [
-			{
-				id: 9467,
-				name: '北京丰台右安门医院',
-				code: '06110017',
-				district: '丰台区',
-				type: '对外综合',
-				level: '三级',
-				address: '北京市丰台区右安门外大街199号',
-				postalCode: '110106',
-				introduction: '',
-				lng: 116.361553,
-				lat: 39.859265
-			},
-			{
-				id: 9332,
-				name: '丰台区右安门街道玉林西里社区卫生服务站',
-				code: '06162090',
-				district: '丰台区',
-				type: '社区卫生站',
-				level: '未评级',
-				address: '北京市丰台区右安门外翠林一里17号楼107-108室',
-				postalCode: '110106',
-				introduction: '',
-				lng: 116.366663,
-				lat: 39.857547
-			},
-			{
-				id: 9487,
-				name: '北京市丰台区右安门翠林敬老院医务室',
-				code: '06100099',
-				district: '丰台区',
-				type: '对内',
-				level: '未评级',
-				address: '北京市丰台区右安门外翠林二里九号楼',
-				postalCode: '110106',
-				introduction: '',
-				lng: 116.368738,
-				lat: 39.859625
-			},
-			{
-				id: 9375,
-				name: '丰台区右安门街道玉林社区卫生服务站',
-				code: '06162028',
-				district: '丰台区',
-				type: '社区卫生站',
-				level: '未评级',
-				address: '北京市丰台区右安门外玉林里38号楼',
-				postalCode: '110106',
-				introduction: '',
-				lng: 116.359383,
-				lat: 39.863242
-			},
-			{
-				id: 9368,
-				name: '丰台区右安门街道翠林社区卫生服务站',
-				code: '06162035',
-				district: '丰台区',
-				type: '社区卫生站',
-				level: '未评级',
-				address: '北京市丰台区翠林小区二里1号楼',
-				postalCode: '110106',
-				introduction: '',
-				lng: 116.371493,
-				lat: 39.860167
-			},
-			{
-				id: 9418,
-				name: '北京开阳中医医院',
-				code: '06151200',
-				district: '丰台区',
-				type: '对外中医',
-				level: '一级',
-				address: '北京市丰台区右安门外东三条1号',
-				postalCode: '110106',
-				introduction: '',
-				lng: 116.365395,
-				lat: 39.86551
-			},
-			{
-				id: 9430,
-				name: '首都医科大学校医院',
-				code: '06141004',
-				district: '丰台区',
-				type: '对外综合',
-				level: '未评级',
-				address: '北京市丰台区右安门外西头条10号',
-				postalCode: '110106',
-				introduction: '',
-				lng: 116.354228,
-				lat: 39.863791
-			},
-			{
-				id: 9414,
-				name: '北京市丰台区马家堡社区卫生服务中心',
-				code: '06152001',
-				district: '丰台区',
-				type: '对外综合',
-				level: '一级',
-				address: '北京市丰台区马家堡嘉园二里14号',
-				postalCode: '110106',
-				introduction: '',
-				lng: 116.374709,
-				lat: 39.850852
-			},
-			{
-				id: 9372,
-				name: '丰台区马家堡街道马家堡社区卫生服务站',
-				code: '06162031',
-				district: '丰台区',
-				type: '社区卫生站',
-				level: '未评级',
-				address: '北京市丰台区马家堡西里53号楼',
-				postalCode: '110106',
-				introduction: '',
-				lng: 116.374521,
-				lat: 39.850544
-			},
-			{
-				id: 9334,
-				name: '北京市丰台区马家堡街道镇国寺社区卫生服务站',
-				code: '06162076',
-				district: '丰台区',
-				type: '社区卫生站',
-				level: '未评级',
-				address: '北京市丰台区镇国寺北街4号院2号楼底商601室',
-				postalCode: '110106',
-				introduction: '',
-				lng: 116.362491,
-				lat: 39.845087
-			},
-			{
-				id: 9975,
-				name: '北京市西城区月坛街道复外24号楼社区卫生服务站',
-				code: '02162002',
-				district: '西城区',
-				type: '社区卫生站',
-				level: '未评级',
-				address: '北京市西城区复外大街24号楼老干部活动室',
-				postalCode: '110106',
-				introduction: '',
-				lng: 116.362491,
-				lat: 39.845087
-			},
-			{
-				id: 9472,
-				name: '北京市丰台区右安门社区卫生服务中心',
-				code: '06110011',
-				district: '丰台区',
-				type: '对外综合',
-				level: '一级',
-				address: '北京市丰台区右安门外开阳里二街5号',
-				postalCode: '110106',
-				introduction: '',
-				lng: 116.368813,
-				lat: 39.86689
-			},
-			{
-				id: 9412,
-				name: '首都医科大学附属北京佑安医院（传染病专科）',
-				code: '06154001',
-				district: '丰台区',
-				type: '对外专科',
-				level: '三级',
-				address: '北京市丰台区右安门外西头条8号',
-				postalCode: '110106',
-				introduction: '',
-				lng: 116.355575,
-				lat: 39.866847
-			},
-			{
-				id: 9347,
-				name: '丰台区西罗园街道洋桥西里社区卫生服务站',
-				code: '06162056',
-				district: '丰台区',
-				type: '社区卫生站',
-				level: '未评级',
-				address: '北京市丰台区洋桥西里29号楼前商用房',
-				postalCode: '110106',
-				introduction: '',
-				lng: 116.378503,
-				lat: 39.858141
-			},
-			{
-				id: 9305,
-				name: '北京市丰台区卢沟桥乡万泉寺村社区卫生服务站',
-				code: '06162146',
-				district: '丰台区',
-				type: '社区卫生站',
-				level: '未评级',
-				address: '北京市丰台区柳村路九号院10号楼裙房一层',
-				postalCode: '110106',
-				introduction: '',
-				lng: 116.345532,
-				lat: 39.856576
-			},
-			{
-				id: 9376,
-				name: '丰台区西罗园街道洋桥北里社区卫生服务站',
-				code: '06162027',
-				district: '丰台区',
-				type: '社区卫生站',
-				level: '未评级',
-				address: '北京市丰台区洋桥北里小区38号楼一层东侧',
-				postalCode: '110106',
-				introduction: '',
-				lng: 116.380134,
-				lat: 39.860901
-			},
-			{
-				id: 9410,
-				name: '北京博爱医院',
-				code: '06155001',
-				district: '丰台区',
-				type: '对外综合',
-				level: '三级',
-				address: '北京市丰台区角门北路10号',
-				postalCode: '110106',
-				introduction: '',
-				lng: 116.379032,
-				lat: 39.849267
-			},
-			{
-				id: 9324,
-				name: '北京市丰台区花乡草桥村社区卫生服务站',
-				code: '06162126',
-				district: '丰台区',
-				type: '社区卫生站',
-				level: '未评级',
-				address: '北京市丰台区草桥欣园乙10号楼',
-				postalCode: '110106',
-				introduction: '',
-				lng: 116.352021,
-				lat: 39.844291
-			},
-			{
-				id: 9879,
-				name: '北京市西城区证仁医院',
-				code: '04110016',
-				district: '西城区',
-				type: '对外综合',
-				level: '一级',
-				address: '北京市西城区右安门西街临4号',
-				postalCode: '110102',
-				introduction: '',
-				lng: 116.357705,
-				lat: 39.870383
-			},
-			{
-				id: 9407,
-				name: '北京市丰台区妇幼保健计划生育服务中心（北京市丰台区妇幼保健院）',
-				code: '06159071',
-				district: '丰台区',
-				type: '对外专科',
-				level: '二级',
-				address: '北京市丰台区开阳里三区1号/北京市丰台区风格与林苑甲37号楼',
-				postalCode: '110106',
-				introduction: '',
-				lng: 116.373794,
-				lat: 39.86824
-			}
-		];
 		new Promise(() => {
 			setTimeout(() => {
-				addMarker(dataMock);
+				addMarker([]);
 			}, 1000);
 		});
 	}
@@ -967,9 +705,9 @@
 <!-- 某个医院的详情弹框 -->
 <div
 	id="popup"
-	class="absolute bg-white shadow p-4 rounded-lg border border-gray-300 bottom-3 -left-12 min-w-max after:top-full after:border-transparent after:h-0 after:w-0 after:absolute after:pointer-events-none after:border-t-white after:border-[10px] after:left-12 after:-ml-2.5 before:top-full before:border-transparent before:h-0 before:w-0 before:absolute before:pointer-events-none before:border-t-slate-200 before:border-[11px] before:left-1 before:-ml-3"
+	class="absolute -left-12 bottom-3 min-w-max rounded-lg border border-gray-300 bg-white p-4 shadow before:pointer-events-none before:absolute before:left-1 before:top-full before:-ml-3 before:h-0 before:w-0 before:border-[11px] before:border-transparent before:border-t-slate-200 after:pointer-events-none after:absolute after:left-12 after:top-full after:-ml-2.5 after:h-0 after:w-0 after:border-[10px] after:border-transparent after:border-t-white"
 >
-	<CloseSolid class="absolute top-5 right-4 cursor-pointer" size="sm" on:click={handleClose} />
+	<CloseSolid class="absolute right-4 top-5 cursor-pointer" size="sm" on:click={handleClose} />
 	<div id="popup-content">
 		<Heading tag="h2" customSize="text-lg font-semibold" class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">医院信息</Heading>
 		<List tag="ul" class="mb-8 space-y-4 text-gray-500 dark:text-gray-400" list="none">
@@ -1002,7 +740,7 @@
 </div>
 
 {#if hospitalList.length}
-	<div class="absolute top-20 left-4 w-96 bg-white shadow">
+	<div class="absolute left-4 top-20 w-96 bg-white shadow">
 		<div class="mb-2">
 			<Label for="select-underline" class="sr-only">请选择</Label>
 			<FSSelect
@@ -1037,7 +775,7 @@
 			<List tag="ul" class="space-y-4 text-xs text-gray-500 dark:text-gray-400" list="none">
 				{#each hospitalList as hospital}
 					<Li class="flex">
-						<A class="flex-1 mr-2 text-gray-900" on:click={() => handleDetail(hospital?.name)}>{hospital?.name}</A>
+						<A class="mr-2 flex-1 text-gray-900" on:click={() => handleDetail(hospital?.name)}>{hospital?.name}</A>
 						<span class="w-16">{hospital?.code}</span>
 						<span class="w-10">{hospital?.level}</span>
 						<span class="w-16">{hospital?.type}</span>

@@ -1,14 +1,13 @@
 <script>
 	import { page } from '$app/stores';
-	import { Navbar, NavBrand, NavLi, NavUl, NavHamburger, Avatar, Dropdown, DropdownItem, DropdownHeader } from 'flowbite-svelte';
+	import { Navbar, NavBrand, NavLi, NavUl, NavHamburger, Avatar, Dropdown, DropdownItem, DropdownHeader, DropdownDivider } from 'flowbite-svelte';
 
 	$: activeUrl = $page.url.pathname;
 </script>
 
 <Navbar class="border-b border-gray-200">
 	<NavBrand href="/">
-		<img src="https://www.gov.cn/images/gtrs_logo_lt.png" class="mr-3 h-6 sm:h-9" alt="Svelte Logo" />
-		<span class="self-center whitespace-nowrap text-xl font-semibold dark:text-white">医保</span>
+		<slot name="brand" />
 	</NavBrand>
 	<div class="flex items-center md:order-2">
 		{#if $page.data.user}
@@ -25,6 +24,10 @@
 				<span class="block truncate text-sm font-medium">{$page.data.user.email}</span>
 			</DropdownHeader>
 			<DropdownItem href="/settings">设置</DropdownItem>
+			<DropdownDivider />
+			<DropdownItem>
+				<slot name="logout" />
+			</DropdownItem>
 		{:else}
 			<DropdownItem href="/login">登录</DropdownItem>
 		{/if}

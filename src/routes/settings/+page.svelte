@@ -52,7 +52,7 @@
 	<title>设置</title>
 </svelte:head>
 
-<div class="w-[800px] m-auto space-y-8">
+<div class="m-auto w-[800px] space-y-8">
 	<div class="text-center">
 		<h2 class="mt-6 text-3xl font-bold text-gray-900">个人信息</h2>
 	</div>
@@ -66,11 +66,11 @@
 		method="post"
 		action="?/save"
 	>
-		<div class="grid gap-6 grid-cols-2">
+		<div class="grid grid-cols-2 gap-6">
 			<div class="mb-6">
 				{#if $page.data.user.photo}
 					<Label for="email" class="mb-2">头像</Label>
-					<Avatar class="w-full h-full" />
+					<Avatar class="h-full w-full" />
 				{:else}
 					<Dropzone
 						id="dropzone"
@@ -80,7 +80,7 @@
 						}}
 						on:change={handleChange}
 					>
-						<svg aria-hidden="true" class="mb-3 w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
+						<svg aria-hidden="true" class="mb-3 h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
 							><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg
 						>
 						{#if value.length === 0}
@@ -95,7 +95,7 @@
 				{/if}
 			</div>
 			<div>
-				<div class="grid gap-6 mb-6 md:grid-cols-2">
+				<div class="mb-6 grid gap-6 md:grid-cols-2">
 					<div>
 						<Label for="first_name" class="mb-2">First name</Label>
 						<Input name="firstName" type="text" id="first_name" bind:value={data.user.firstName} required />
@@ -118,8 +118,5 @@
 				</div>
 			</div>
 		</div>
-	</form>
-	<form use:enhance method="post" action="?/logout">
-		<button class="">登出</button>
 	</form>
 </div>
