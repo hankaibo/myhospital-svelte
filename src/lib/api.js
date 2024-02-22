@@ -11,10 +11,11 @@ const base = 'http://localhost:3000/api/v1';
  * @param {string} options.path The path to the resource.
  * @param {object} [options.data] The request data.
  * @param {string} [options.token] The authentication token.
+ * @param {object} [options.headers] The HTTP headers.
  * @returns {Promise<Response>} The promise for the response.
  */
-async function send({ method, path, data, token }) {
-	const opts = { method, headers: {} };
+async function send({ method, path, data, token, headers }) {
+	const opts = { method, headers };
 
 	if (data) {
 		opts.headers['Content-Type'] = 'application/json';
@@ -37,11 +38,12 @@ async function send({ method, path, data, token }) {
 /**
  *
  * @param {string} path
- * @param {string} token
+ * @param {string} [token]
+ * @param {object} [headers]
  * @returns
  */
-export function get(path, token) {
-	return send({ method: 'GET', path, token });
+export function get(path, token, headers) {
+	return send({ method: 'GET', path, token, headers });
 }
 
 /**

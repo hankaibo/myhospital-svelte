@@ -12,6 +12,7 @@
 	import { Fill, Stroke, Style, Icon, Circle as CircleStyle, Text as TextStyle } from 'ol/style';
 	import { click } from 'ol/events/condition';
 	import ContextMenu from '$lib/ol/Contextmenu';
+	import * as api from '$lib/api.js';
 	import { Heading, List, Li, A, Label, Select as FSSelect } from 'flowbite-svelte';
 	import { CloseSolid } from 'flowbite-svelte-icons';
 	import 'ol/ol.css';
@@ -674,13 +675,21 @@
 	/**
 	 * 根据坐标范围查询医院数据
 	 * @param params
+	 * @property {object} params.center
+	 * @property {number} params.center
 	 */
-	function handleFetch() {
-		new Promise(() => {
-			setTimeout(() => {
-				addMarker([]);
-			}, 1000);
+	async function handleFetch({ center, radius }) {
+		const [longitude, latitude] = center;
+		const q = new URLSearchParams();
+		q.set('longitude', longitude);
+		q.set('latitude', latitude);
+		q.set('radius', radius);
+		const response = await api.get(`hospitals?${q}`, undefined, {
+			'Content-Type': 'application/json'
 		});
+		if (Array.isArray(response)) {
+			addMarker(response);
+		}
 	}
 
 	onMount(() => {
