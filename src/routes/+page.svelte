@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { Map, View } from 'ol';
 	import { Draw, Modify, Snap, Select } from 'ol/interaction.js';
-	import { XYZ, Vector as VectorSource, Cluster } from 'ol/source';
+	import { XYZ, Vector as VectorSource, Cluster, OSM } from 'ol/source';
 	import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 	import Feature from 'ol/Feature';
 	import Overlay from 'ol/Overlay';
@@ -67,11 +67,12 @@
 
 	// 瓦片图层
 	const rasterLayer = new TileLayer({
-		source: new XYZ({
-			// 高德
-			url: 'https://webrd0{1-4}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&scl=1&x={x}&y={y}&z={z}'
-			// crossOrigin: '',
-		})
+		source: new OSM()
+		// source: new XYZ({
+		// 	// 高德
+		// 	url: 'https://webrd0{1-4}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&scl=1&x={x}&y={y}&z={z}'
+		// 	// crossOrigin: '',
+		// })
 	});
 	rasterLayer.set('name', 'rasterLayer');
 
@@ -196,9 +197,10 @@
 		const closer = document.getElementById('popup-closer');
 
 		view = new View({
-			center: fromLonLat([116.397507, 39.908708]),
-			zoom: 13,
-			minZoom: 8,
+			// center: fromLonLat([116.397507, 39.908708]),
+			center: [-11000000, 4600000],
+			zoom: 15,
+			minZoom: 3,
 			maxZoom: 18,
 			constrainResolution: true,
 			extent
@@ -246,6 +248,7 @@
 		draw.on('drawend', ({ feature }) => {
 			const center = feature.getGeometry().getCenter();
 			const radius = feature.getGeometry().getRadius();
+			console.log(`The current radius length of the drawn circle is : ${radius}m`)
 			handleFetch({
 				type: 'Circle',
 				center: toLonLat(center),
@@ -698,7 +701,6 @@
 		addInteractionDraw();
 		addInteractionSnap();
 		addInteractionSelect();
-
 		addEvent();
 		handleContextMenu();
 		handleLocation();
