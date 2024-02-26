@@ -2,13 +2,14 @@
 	import { onMount } from 'svelte';
 	import { Map, View } from 'ol';
 	import { Draw, Modify, Snap, Select } from 'ol/interaction.js';
-	import { XYZ, Vector as VectorSource, Cluster, OSM } from 'ol/source';
-	import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
+	import { XYZ, Vector as VectorSource, Cluster, OSM, VectorTile as VectorTileSource } from 'ol/source';
+	import { Tile as TileLayer, Vector as VectorLayer, VectorTile as VectorTileLayer } from 'ol/layer';
 	import Feature from 'ol/Feature';
 	import Overlay from 'ol/Overlay';
 	import { fromLonLat, toLonLat, get } from 'ol/proj';
 	import { defaults as defaultControls } from 'ol/control.js';
-	import { Point, Circle } from 'ol/geom';
+	import { Point, LineString, Circle } from 'ol/geom';
+	import { getLength } from 'ol/sphere.js';
 	import { Fill, Stroke, Style, Icon, Circle as CircleStyle, Text as TextStyle } from 'ol/style';
 	import { click } from 'ol/events/condition';
 	import ContextMenu from '$lib/ol/Contextmenu';
@@ -67,12 +68,12 @@
 
 	// 瓦片图层
 	const rasterLayer = new TileLayer({
-		source: new OSM()
-		// source: new XYZ({
-		// 	// 高德
-		// 	url: 'https://webrd0{1-4}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&scl=1&x={x}&y={y}&z={z}'
-		// 	// crossOrigin: '',
-		// })
+		// source: new OSM()
+		source: new XYZ({
+			// 高德
+			url: 'https://webrd04.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}'
+			// crossOrigin: '',
+		})
 	});
 	rasterLayer.set('name', 'rasterLayer');
 
@@ -197,8 +198,7 @@
 		const closer = document.getElementById('popup-closer');
 
 		view = new View({
-			// center: fromLonLat([116.397507, 39.908708]),
-			center: [-11000000, 4600000],
+			center: fromLonLat([116.397029, 39.917839]),
 			zoom: 15,
 			minZoom: 3,
 			maxZoom: 18,
@@ -246,13 +246,15 @@
 			type: 'Circle'
 		});
 		draw.on('drawend', ({ feature }) => {
-			const center = feature.getGeometry().getCenter();
-			const radius = feature.getGeometry().getRadius();
-			console.log(`The current radius length of the drawn circle is : ${radius}m`)
+			const geometry = feature.getGeometry();
+			const center = geometry.getCenter();
+			const lastPoint = geometry.getLastCoordinate();
+			const line = new LineString([center, lastPoint]);
+			const distance = getLength(line);
 			handleFetch({
 				type: 'Circle',
 				center: toLonLat(center),
-				radius
+				radius: distance
 			});
 		});
 		map.addInteraction(draw);
