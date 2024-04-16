@@ -4,6 +4,19 @@ import { error } from '@sveltejs/kit';
 const base = 'http://localhost:3000/api/v1';
 
 /**
+ * @typedef {object} RequestHeaders
+ * @property {string} [Authorization] The authentication token.
+ * @property {string} [Content-Type] The content type of the request.
+ */
+
+/**
+ * @typedef {object} RequestOptions
+ * @property {string} [method] The HTTP method to use.
+ * @property {RequestHeaders} headers The HTTP headers.
+ * @property {string|undefined} [body] The request payload as a stringified JSON object.
+ */
+
+/**
  * Sends a request to the server.
  *
  * @param {object} options The request options.
@@ -11,10 +24,11 @@ const base = 'http://localhost:3000/api/v1';
  * @param {string} options.path The path to the resource.
  * @param {object} [options.data] The request data.
  * @param {string} [options.token] The authentication token.
- * @param {object} [options.headers] The HTTP headers.
+ * @param {RequestHeaders} [options.headers] The HTTP headers.
  * @returns {Promise<Response>} The promise for the response.
  */
-async function send({ method, path, data, token, headers }) {
+async function send({ method, path, data, token, headers = {} }) {
+	/** @type {RequestOptions} */
 	const opts = { method, headers };
 
 	if (data) {

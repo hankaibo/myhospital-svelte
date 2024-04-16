@@ -2,8 +2,8 @@
 	import { onMount } from 'svelte';
 	import { Map, View } from 'ol';
 	import { Draw, Modify, Snap, Select } from 'ol/interaction.js';
-	import { XYZ, Vector as VectorSource, Cluster, OSM, VectorTile as VectorTileSource } from 'ol/source';
-	import { Tile as TileLayer, Vector as VectorLayer, VectorTile as VectorTileLayer } from 'ol/layer';
+	import { XYZ, Vector as VectorSource, Cluster, OSM } from 'ol/source';
+	import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 	import Feature from 'ol/Feature';
 	import Overlay from 'ol/Overlay';
 	import { fromLonLat, toLonLat, get } from 'ol/proj';
@@ -14,7 +14,7 @@
 	import { click } from 'ol/events/condition';
 	import ContextMenu from '$lib/ol/Contextmenu';
 	import * as api from '$lib/api.js';
-	import { Heading, List, Li, A, Label, Select as FSSelect } from 'flowbite-svelte';
+	import { Heading, List, Li, A, Label, Select as FSSelect, Popover } from 'flowbite-svelte';
 	import { CloseSolid } from 'flowbite-svelte-icons';
 	import 'ol/ol.css';
 	import '$lib/ol/contextmenu.css';
@@ -67,7 +67,7 @@
 	let a19AllFeature = [];
 
 	// 瓦片图层
-	const rasterLayer = new TileLayer({
+	const tileLayer = new TileLayer({
 		// source: new OSM()
 		source: new XYZ({
 			// 高德
@@ -75,7 +75,7 @@
 			// crossOrigin: '',
 		})
 	});
-	rasterLayer.set('name', 'rasterLayer');
+	tileLayer.set('name', 'tileLayer');
 
 	// 矢量图层
 	/** @type {import('ol/source/Vector').default} */
@@ -208,7 +208,7 @@
 
 		map = new Map({
 			target: 'map',
-			layers: [rasterLayer, vectorLayer, clusterLayer, a19VectorLayer],
+			layers: [tileLayer, vectorLayer, clusterLayer],
 			view,
 			overlays: [
 				new Overlay({
@@ -310,7 +310,7 @@
 					};
 					const coordinates = evt.coordinate;
 					// const coordinates = selectedFeature.getGeometry().getCoordinates();
-					map.getOverlayById('popup').setPosition(coordinates);
+					map.getOverlayById('popup')?.setPosition(coordinates);
 				} else {
 					window.alert('聚合元素不可以显示详情，请重新选择。');
 				}
@@ -329,7 +329,7 @@
 					introduction
 				};
 				const coordinates = evt.coordinate;
-				map.getOverlayById('popup').setPosition(coordinates);
+				map.getOverlayById('popup')?.setPosition(coordinates);
 			}
 		});
 
@@ -543,7 +543,7 @@
 
 		const featureList = [];
 		newList.forEach((item) => {
-			const iconFeature = new Feature({
+			const marker = new Feature({
 				geometry: new Point(fromLonLat([item.lng, item.lat])),
 				id: item.id,
 				name: item.name,
@@ -555,7 +555,11 @@
 				address: item.address,
 				introduction: item.introduction
 			});
-			featureList.push(iconFeature);
+			featureList.push(marker);
+			marker.on('click', function (evt) {
+				// 在此处添加要执行的代码
+				console.log(evt);
+			});
 		});
 		markerVectorSource.addFeatures(featureList);
 		beforeMarkList = [];
@@ -699,11 +703,11 @@
 
 	onMount(() => {
 		initMap();
-		addInteractionModify();
+		// addInteractionModify();
 		addInteractionDraw();
-		addInteractionSnap();
-		addInteractionSelect();
-		addEvent();
+		// addInteractionSnap();
+		// addInteractionSelect();
+		// addEvent();
 		handleContextMenu();
 		handleLocation();
 	});
@@ -716,10 +720,7 @@
 <div id="map" class="h-[calc(100vh-73px)]"></div>
 
 <!-- 某个医院的详情弹框 -->
-<div
-	id="popup"
-	class="absolute -left-12 bottom-3 min-w-max rounded-lg border border-gray-300 bg-white p-4 shadow before:pointer-events-none before:absolute before:left-1 before:top-full before:-ml-3 before:h-0 before:w-0 before:border-[11px] before:border-transparent before:border-t-slate-200 after:pointer-events-none after:absolute after:left-12 after:top-full after:-ml-2.5 after:h-0 after:w-0 after:border-[10px] after:border-transparent after:border-t-white"
->
+<Popover class="w-64 text-sm font-light " title="Popover title" triggeredBy="#click" trigger="click">
 	<CloseSolid class="absolute right-4 top-5 cursor-pointer" size="sm" on:click={handleClose} />
 	<div id="popup-content">
 		<Heading tag="h2" customSize="text-lg font-semibold" class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">医院信息</Heading>
@@ -750,7 +751,7 @@
 			</Li>
 		</List>
 	</div>
-</div>
+</Popover>
 
 {#if hospitalList.length}
 	<div class="absolute left-4 top-20 w-96 bg-white shadow">

@@ -12,7 +12,8 @@
 		"format": "prettier --write ."
 	},
 	"dependencies": {
-		"ol": "^8.2.0"
+		"ol": "^8.2.0",
+		"proj4": "^2.10.0"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.0.0",
