@@ -1,8 +1,11 @@
 <script>
-	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { Checkbox, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell, TableSearch, Pagination } from 'flowbite-svelte';
 
+	/** @type {import('./$types').PageData} */
+	export let data;
+
+	$: name = '';
 	$: activeUrl = $page.url.searchParams.get('page');
 
 	/**
@@ -38,35 +41,6 @@
 		alert('Next btn clicked. Make a call to your server to fetch data.');
 	};
 
-	let pageSize = 5;
-	let pageNum = 1;
-	/**
-	 * @typedef User
-	 * @property {number} id
-	 * @property {string} email
-	 * @property {string} provider
-	 * @property {string} make
-	 */
-	/**
-	 * @type {User[]}
-	 */
-	let tableData = [];
-	let searchTerm = '';
-
-	async function getList() {
-		const params = new URLSearchParams();
-		params.append('page', '' + pageNum);
-		params.append('limit', '' + pageSize);
-		const res = await fetch(`/api/users?${params.toString()}`, {
-			method: 'get',
-			headers: {
-				Authorization: `Bearer ${localStorage.getItem('token')}`
-			}
-		});
-		const users = await res.json();
-		tableData = users.data;
-	}
-
 	/**
 	 * 删除用户
 	 * @param {number} id
@@ -82,13 +56,9 @@
 	// 		getList();
 	// 	}
 	// }
-
-	onMount(() => {
-		getList();
-	});
 </script>
 
-<TableSearch striped={true} shadow placeholder="Search by maker name" hoverable={true} bind:inputValue={searchTerm}>
+<TableSearch striped={true} shadow placeholder="Search by maker name" hoverable={true} bind:inputValue={name}>
 	<TableHead>
 		<TableHeadCell class="!p-4">
 			<Checkbox />
@@ -102,7 +72,7 @@
 		</TableHeadCell>
 	</TableHead>
 	<TableBody tableBodyClass="divide-y">
-		{#each tableData as item}
+		{#each data.users as item}
 			<TableBodyRow>
 				<TableBodyCell class="!p-4">
 					<Checkbox />
@@ -110,7 +80,7 @@
 				<TableBodyCell>{item.id}</TableBodyCell>
 				<TableBodyCell>{item.email}</TableBodyCell>
 				<TableBodyCell>{item.provider}</TableBodyCell>
-				<TableBodyCell>{item.make}</TableBodyCell>
+				<TableBodyCell>{item.status.name}</TableBodyCell>
 				<TableBodyCell>
 					<a href="/tables" class="font-medium text-primary-600 hover:underline dark:text-primary-500">Edit</a>
 				</TableBodyCell>
