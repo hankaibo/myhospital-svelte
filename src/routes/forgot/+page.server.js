@@ -25,7 +25,7 @@ export const actions = {
 			email: data.get('email')
 		};
 
-		const body = await api.post('auth/email/register', user);
+		const body = await api.post('auth/forgot/password', user);
 
 		if (body.errors) {
 			return fail(401, body);
