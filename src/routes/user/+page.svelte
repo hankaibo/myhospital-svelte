@@ -1,5 +1,6 @@
 <script>
 	import { page } from '$app/stores';
+	import { enhance } from '$app/forms';
 	import { Checkbox, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell, TableSearch, Pagination } from 'flowbite-svelte';
 
 	/** @type {import('./$types').PageData} */
@@ -41,21 +42,6 @@
 		alert('Next btn clicked. Make a call to your server to fetch data.');
 	};
 
-	/**
-	 * 删除用户
-	 * @param {number} id
-	 */
-	// async function handleDelete(id) {
-	// 	const res = await fetch(`/api/users/${id}`, {
-	// 		method: 'delete',
-	// 		headers: {
-	// 			Authorization: `Bearer ${localStorage.getItem('token')}`
-	// 		}
-	// 	});
-	// 	if (res.ok) {
-	// 		getList();
-	// 	}
-	// }
 </script>
 
 <TableSearch striped={true} shadow placeholder="Search by maker name" hoverable={true} bind:inputValue={name}>
@@ -83,6 +69,11 @@
 				<TableBodyCell>{item.status.name}</TableBodyCell>
 				<TableBodyCell>
 					<a href="/tables" class="font-medium text-primary-600 hover:underline dark:text-primary-500">Edit</a>
+					<form use:enhance method="POST" action="?/deleteUser">
+						<button class="btn btn-outline-danger btn-sm">
+							<i class="ion-trash-a" /> Delete User
+						</button>
+					</form>
 				</TableBodyCell>
 			</TableBodyRow>
 		{/each}

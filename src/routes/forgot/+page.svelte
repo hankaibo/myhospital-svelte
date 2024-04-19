@@ -1,4 +1,5 @@
 <script>
+	import { enhance } from '$app/forms';
 	import { Label, Input, GradientButton, A, Img, Span } from 'flowbite-svelte';
 
 	/** @type {import('./$types').PageData} */
@@ -15,7 +16,7 @@
 				<h2 class="mt-6 text-3xl font-bold text-gray-900">找回密码</h2>
 			</div>
 
-			<form method="post" class="space-y-8">
+			<form use:enhance method="post" class="space-y-8">
 				<div>
 					<Label for="email" class="mb-2">Email address</Label>
 					<Input name="email" type="email" id="email" required />

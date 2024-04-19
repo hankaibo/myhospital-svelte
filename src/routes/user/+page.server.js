@@ -43,5 +43,13 @@ export const actions = {
 		}
 
 		throw redirect(307, '/');
+	},
+	handleDelete: async ({ locals, params }) => {
+
+
+		if (!locals.user) throw error(401);
+
+		await api.del(`users/${id}`, locals?.token);
+		throw redirect(307, '/');
 	}
 };

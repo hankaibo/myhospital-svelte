@@ -1,4 +1,5 @@
 <script>
+	import { enhance } from '$app/forms';
 	import { Label, Helper, Input, Button, GradientButton, Checkbox, A, Hr, Img } from 'flowbite-svelte';
 	import { FacebookSolid, TwitterSolid, GoogleSolid, AppleSolid } from 'flowbite-svelte-icons';
 
@@ -40,7 +41,7 @@
 				<Hr classHr="my-8 w-full"><span class="font-normal text-gray-300">or continue with</span></Hr>
 			</div>
 
-			<form method="post" class="space-y-6">
+			<form use:enhance method="post" class="space-y-6">
 				<div>
 					<Label for="email" class="mb-2">Email address</Label>
 					<Input name="email" type="email" id="email" required />
