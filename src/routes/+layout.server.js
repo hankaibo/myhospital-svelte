@@ -5,7 +5,7 @@ export function load({ locals }) {
 			lastName: locals.user.lastName,
 			firstName: locals.user.firstName,
 			email: locals.user.email,
-			image: locals.user.photo,
+			photo: locals.user.photo,
 			role: locals.user.role
 		},
 		token: locals.token

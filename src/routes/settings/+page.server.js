@@ -9,6 +9,28 @@ export function load({ locals }) {
 
 /** @type {import('./$types').Actions} */
 export const actions = {
+	upload: async ({ cookies, locals, request }) => {
+		if (!locals.user) {
+			throw error(401);
+		}
+
+		const data = await request.formData();
+
+		const user = {
+			firstName: data.get('firstName'),
+			lastName: data.get('lastName'),
+			oldPassword: data.get('oldPassword'),
+			password: data.get('password'),
+			photo: data.get('photo')
+		};
+
+		const body = await api.patch('files/upload', user, locals.token);
+		if (body.errors) {
+			return fail(400, body.errors);
+		}
+
+		locals.user = body.user;
+	},
 	save: async ({ cookies, locals, request }) => {
 		if (!locals.user) {
 			throw error(401);

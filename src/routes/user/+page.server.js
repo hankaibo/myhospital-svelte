@@ -1,4 +1,4 @@
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import * as api from '$lib/api.js';
 
 /** @type {import('./$types').PageServerLoad} */
@@ -26,7 +26,7 @@ export async function load({ locals, url }) {
 
 /** @type {import('./$types').Actions} */
 export const actions = {
-	default: async ({ request }) => {
+	add: async ({ request }) => {
 		const data = await request.formData();
 
 		const user = {
@@ -36,7 +36,7 @@ export const actions = {
 			lastName: data.get('lastName')
 		};
 
-		const body = await api.post('auth/email/register', user);
+		const body = await api.post('users', user);
 
 		if (body.errors) {
 			return fail(401, body);
@@ -44,12 +44,13 @@ export const actions = {
 
 		throw redirect(307, '/');
 	},
-	handleDelete: async ({ locals, params }) => {
-
-
+	delete: async ({ locals, request }) => {
 		if (!locals.user) throw error(401);
 
+		const data = await request.formData();
+		const id = data.get('id');
+
 		await api.del(`users/${id}`, locals?.token);
-		throw redirect(307, '/');
+		throw redirect(307, '/user');
 	}
 };

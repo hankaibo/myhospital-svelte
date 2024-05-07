@@ -41,7 +41,6 @@
 	const next = () => {
 		alert('Next btn clicked. Make a call to your server to fetch data.');
 	};
-
 </script>
 
 <TableSearch striped={true} shadow placeholder="Search by maker name" hoverable={true} bind:inputValue={name}>
@@ -69,7 +68,8 @@
 				<TableBodyCell>{item.status.name}</TableBodyCell>
 				<TableBodyCell>
 					<a href="/tables" class="font-medium text-primary-600 hover:underline dark:text-primary-500">Edit</a>
-					<form use:enhance method="POST" action="?/deleteUser">
+					<form use:enhance method="POST" action="?/delete">
+						<input type="hidden" name="id" value={item.id} />
 						<button class="btn btn-outline-danger btn-sm">
 							<i class="ion-trash-a" /> Delete User
 						</button>

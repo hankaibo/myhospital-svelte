@@ -1,12 +1,16 @@
 <script>
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
+	import {tick} from 'svelte';
 	import { Label, Input, Avatar, Dropzone, GradientButton } from 'flowbite-svelte';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
 
 	let value = [];
+	/** @type FileList | undefined  */
+	$: files = undefined;
+
 	const dropHandle = (event) => {
 		value = [];
 		event.preventDefault();
@@ -25,12 +29,16 @@
 		}
 	};
 
-	const handleChange = (event) => {
-		const files = event.target.files;
+	const handleChange = async (event) => {
+		files = event.target.files;
 		if (files.length > 0) {
 			value.push(files[0].name);
 			value = value;
 		}
+
+		const form = document.querySelector('#formUpload');
+		await tick()
+		form.submit();
 	};
 
 	const showFiles = (files) => {
@@ -57,23 +65,16 @@
 		<h2 class="mt-6 text-3xl font-bold text-gray-900">个人信息</h2>
 	</div>
 
-	<form
-		use:enhance={() => {
-			return ({ update }) => {
-				update({ reset: false });
-			};
-		}}
-		method="post"
-		action="?/save"
-	>
-		<div class="grid grid-cols-2 gap-6">
-			<div class="mb-6">
-				{#if $page.data.user.photo}
-					<Label for="email" class="mb-2">头像</Label>
-					<Avatar class="h-full w-full" />
-				{:else}
+	<div class="grid grid-cols-2 gap-6">
+		<div class="mb-6">
+			{#if $page.data.user.photo}
+				<Label for="email" class="mb-2">头像</Label>
+				<Avatar class="h-full w-full" />
+			{:else}
+				<form id="formUpload" method="post" action="?/upload">
 					<Dropzone
 						id="dropzone"
+						:files={files}
 						on:drop={dropHandle}
 						on:dragover={(event) => {
 							event.preventDefault();
@@ -92,9 +93,20 @@
 							<p>{showFiles(value)}</p>
 						{/if}
 					</Dropzone>
-				{/if}
-			</div>
-			<div>
+				</form>
+			{/if}
+		</div>
+
+		<div>
+			<form
+				use:enhance={() => {
+					return ({ update }) => {
+						update({ reset: false });
+					};
+				}}
+				method="post"
+				action="?/save"
+			>
 				<div class="mb-6 grid gap-6 md:grid-cols-2">
 					<div>
 						<Label for="first_name" class="mb-2">First name</Label>
@@ -116,7 +128,7 @@
 				<div class="mb-6">
 					<GradientButton type="submit" color="purpleToBlue" class="w-full">更新</GradientButton>
 				</div>
-			</div>
+			</form>
 		</div>
-	</form>
+	</div>
 </div>
