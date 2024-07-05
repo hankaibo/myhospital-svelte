@@ -1,7 +1,6 @@
 <script>
 	import { enhance } from '$app/forms';
-	import { Label, Helper, Input, Button, GradientButton, Checkbox, A, Hr, Img } from 'flowbite-svelte';
-	import { FacebookSolid, TwitterSolid, GoogleSolid, AppleSolid } from 'flowbite-svelte-icons';
+	import { Button } from "$lib/components/ui/button/index.js";
 
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -16,7 +15,7 @@
 
 <div class="flex h-screen items-center justify-center">
 	<div class="hidden h-full overflow-hidden lg:block lg:w-3/5">
-		<Img bind:src={data.url} alt="forgot logo" class="h-full object-cover" />
+		<img bind:src={data.url} alt="forgot logo" class="h-full object-cover" />
 	</div>
 	<div class="flex w-full items-center justify-center rounded-xl bg-white p-6 shadow sm:max-w-md lg:w-2/5 lg:max-w-full lg:rounded-none lg:p-14 lg:shadow-none">
 		<div class="w-full max-w-md space-y-8">
