@@ -67,7 +67,7 @@
 				<TableBodyCell>{item.provider}</TableBodyCell>
 				<TableBodyCell>{item.status.name}</TableBodyCell>
 				<TableBodyCell>
-					<a href="/tables" class="font-medium text-primary-600 hover:underline dark:text-primary-500">Edit</a>
+					<a href="/tables" class="text-primary-600 dark:text-primary-500 font-medium hover:underline">Edit</a>
 					<form use:enhance method="POST" action="?/delete">
 						<input type="hidden" name="id" value={item.id} />
 						<button class="btn btn-outline-danger btn-sm">

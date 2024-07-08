@@ -24,5 +24,5 @@
 {/if}
 
 {#if p >= 0.4}
-	<div class="pointer-events-none fixed z-40 h-full w-full animate-fade bg-[rgba(255,255,255,0.3)]"></div>
+	<div class="animate-fade pointer-events-none fixed z-40 h-full w-full bg-[rgba(255,255,255,0.3)]"></div>
 {/if}

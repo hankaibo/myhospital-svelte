@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-  import * as api from '$lib/api.js';
+	import * as api from '$lib/api.js';
 
 	/** @type {string} */
 	let hash;

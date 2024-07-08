@@ -1,5 +1,8 @@
 import { fail, redirect } from '@sveltejs/kit';
 import * as api from '$lib/api.js';
+import { zod } from 'sveltekit-superforms/adapters';
+import { formSchema } from './schema';
+import { superValidate } from 'sveltekit-superforms';
 
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ locals }) {
@@ -11,14 +14,23 @@ export async function load({ locals }) {
 	const data = await response.json();
 	const url = `https://cn.bing.com${data.images[0].url}`;
 	return {
-		url
+		url,
+		form: await superValidate(zod(formSchema))
 	};
 }
 
 /** @type {import('./$types').Actions} */
 export const actions = {
-	default: async ({ cookies, request }) => {
+	default: async (event) => {
+		const { cookies, request } = event;
 		const data = await request.formData();
+
+		const form = await superValidate(event, zod(formSchema));
+		if (!form.valid) {
+			return fail(400, {
+				form
+			});
+		}
 
 		const body = await api.post('auth/email/login', {
 			email: data.get('email'),

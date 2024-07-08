@@ -1,7 +1,7 @@
 <script>
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
-	import {tick} from 'svelte';
+	import { tick } from 'svelte';
 	import { Label, Input, Avatar, Dropzone, GradientButton } from 'flowbite-svelte';
 
 	/** @type {import('./$types').PageData} */
@@ -37,7 +37,7 @@
 		}
 
 		const form = document.querySelector('#formUpload');
-		await tick()
+		await tick();
 		form.submit();
 	};
 
