@@ -1,7 +1,6 @@
 <script>
 	import { Button } from '$lib/components/ui/button';
-	import FacebookSolid from '$lib/components/svg/brand-facebook.svelte';
-	import TwitterSolid from '$lib/components/svg/brand-x.svelte';
+	import { Facebook, Twitter } from 'lucide-svelte';
 	import GoogleSolid from '$lib/components/svg/brand-google.svelte';
 	import AppleSolid from '$lib/components/svg/brand-apple.svelte';
 	import LoginForm from './form.svelte';
@@ -26,10 +25,10 @@
 
 			<div class="flex flex-row items-center justify-center space-x-3">
 				<Button class="bg-[#3b5998] hover:bg-[#3b5998]/90 focus:ring-[#3b5998]/50 dark:focus:ring-[#3b5998]/55">
-					<FacebookSolid />
+					<Facebook />
 				</Button>
 				<Button class="bg-[#1da1f2] hover:bg-[#1da1f2]/90 focus:ring-[#1da1f2]/50 dark:focus:ring-[#1da1f2]/55">
-					<TwitterSolid />
+					<Twitter />
 				</Button>
 				<Button class="bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-[#4285F4]/50 dark:focus:ring-[#4285F4]/55">
 					<GoogleSolid />

@@ -1,44 +1,70 @@
 <script>
 	import { page } from '$app/stores';
-	import { Navbar, NavBrand, NavLi, NavUl, NavHamburger, Avatar, Dropdown, DropdownItem, DropdownHeader, DropdownDivider } from 'flowbite-svelte';
+	import * as Menubar from '$lib/components/ui/menubar';
+	import * as Avatar from '$lib/components/ui/avatar';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+
+	import LifeBuoy from 'lucide-svelte/icons/life-buoy';
+	import LogOut from 'lucide-svelte/icons/log-out';
+	import Settings from 'lucide-svelte/icons/settings';
+	import User from 'lucide-svelte/icons/user';
 
 	$: activeUrl = $page.url.pathname;
-
-	console.log({}.toString.call($page?.data?.user?.phone));
 </script>
 
-<Navbar class="border-b border-gray-200">
-	<NavBrand href="/">
-		<slot name="brand" />
-	</NavBrand>
-	<NavUl {activeUrl}>
-		<NavLi href="/">Home</NavLi>
-		{#if $page.data.user?.role?.name === 'Admin'}
-			<NavLi href="/user">User</NavLi>
-		{/if}
-		<NavLi href="/about">About</NavLi>
-	</NavUl>
+<nav class="flex flex-wrap items-center justify-between border-b border-gray-200 bg-white p-4">
 	<div class="flex items-center">
-		{#if $page.data.user}
-			<Avatar class="cursor-pointer" id="avatar-menu" bind:src={$page.data.user.photo} />
-		{:else}
-			<Avatar class="cursor-pointer" id="avatar-menu" />
-		{/if}
-		<NavHamburger class1="w-full md:flex md:w-auto md:order-1" />
-		<Dropdown placement="bottom" triggeredBy="#avatar-menu">
-			{#if $page.data.user}
-				<DropdownHeader>
-					<span class="block text-sm">{$page.data.user.lastName + $page.data.user.firstName}</span>
-					<span class="block truncate text-sm font-medium">{$page.data.user.email}</span>
-				</DropdownHeader>
-				<DropdownItem href="/settings">设置</DropdownItem>
-				<DropdownDivider />
-				<DropdownItem>
-					<slot name="logout" />
-				</DropdownItem>
-			{:else}
-				<DropdownItem href="/login">登录</DropdownItem>
-			{/if}
-		</Dropdown>
+		<slot name="brand" />
 	</div>
-</Navbar>
+
+	<Menubar.Root>
+		<Menubar.Menu>
+			<Menubar.Trigger>Home</Menubar.Trigger>
+		</Menubar.Menu>
+
+		{#if $page.data.user?.role?.name === 'Admin'}
+			<Menubar.Menu>
+				<Menubar.Trigger>User</Menubar.Trigger>
+			</Menubar.Menu>
+		{/if}
+
+		<Menubar.Menu>
+			<Menubar.Trigger>About</Menubar.Trigger>
+		</Menubar.Menu>
+	</Menubar.Root>
+
+	<DropdownMenu.Root>
+		<DropdownMenu.Trigger asChild let:builder>
+			<Avatar.Root builders={[builder]}>
+				<Avatar.Image src={$page?.data?.user?.photo} alt="用户头像" />
+				<Avatar.Fallback>CN</Avatar.Fallback>
+			</Avatar.Root>
+		</DropdownMenu.Trigger>
+		<DropdownMenu.Content class="w-56">
+			{#if $page.data.user}
+				<DropdownMenu.Label>My Account</DropdownMenu.Label>
+				<DropdownMenu.Separator />
+				<DropdownMenu.Group>
+					<DropdownMenu.Item>
+						<User class="mr-2 h-4 w-4" />
+						<span>Profile</span>
+					</DropdownMenu.Item>
+					<DropdownMenu.Item>
+						<Settings class="mr-2 h-4 w-4" />
+						<span>Settings</span>
+					</DropdownMenu.Item>
+				</DropdownMenu.Group>
+				<DropdownMenu.Separator />
+				<DropdownMenu.Item>
+					<LifeBuoy class="mr-2 h-4 w-4" />
+					<span>Support</span>
+				</DropdownMenu.Item>
+				<DropdownMenu.Separator />
+				<DropdownMenu.Item>
+					<LogOut class="mr-2 h-4 w-4" />
+					<slot name="logout" />
+				</DropdownMenu.Item>
+			{/if}
+		</DropdownMenu.Content>
+	</DropdownMenu.Root>
+</nav>

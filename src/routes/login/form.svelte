@@ -1,25 +1,23 @@
 <script>
-	import { formSchema } from './schema';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { formSchema } from './schema';
 
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input';
 	import { Checkbox } from '$lib/components/ui/checkbox';
-	import SuperDebug from 'sveltekit-superforms';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
 
 	const form = superForm(data.form, {
-		validators: zodClient(formSchema),
-		dataType: 'json'
+		validators: zodClient(formSchema)
 	});
 
 	const { form: formData, enhance } = form;
 </script>
 
-<form use:enhance method="post">
+<form use:enhance method="post" class="space-y-6">
 	<Form.Field {form} name="email">
 		<Form.Control let:attrs>
 			<Form.Label>邮箱</Form.Label>
@@ -47,4 +45,3 @@
 		<a href="/register" class="font-medium hover:underline">注册</a>
 	</p>
 </form>
-<SuperDebug data={$formData} />
