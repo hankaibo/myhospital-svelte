@@ -3,11 +3,23 @@
 declare global {
 	namespace App {
 		// interface Error {}
-		// interface Locals {}
+		interface Locals {
+			user?: User; // 根据实际情况设置类型
+			token?: string;
+		}
 		// interface PageData {}
 		// interface PageState {}
 		// interface Platform {}
 	}
 }
 
-export {};
+interface User {
+	id: string;
+	firstName: string;
+	lastName: string;
+	email: string;
+	photo: string;
+	role: string;
+}
+
+export { };

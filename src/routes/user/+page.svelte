@@ -1,6 +1,7 @@
 <script>
 	import { page } from '$app/stores';
 	import { enhance } from '$app/forms';
+	import DataTable from "./data-table.svelte";
 	import { Checkbox, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell, TableSearch, Pagination } from 'flowbite-svelte';
 
 	/** @type {import('./$types').PageData} */
@@ -79,5 +80,7 @@
 		{/each}
 	</TableBody>
 </TableSearch>
+
+<DataTable />
 
 <Pagination {pages} on:previous={previous} on:next={next} />

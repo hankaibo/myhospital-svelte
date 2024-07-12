@@ -2,6 +2,7 @@
 	import { page } from '$app/stores';
 	import * as Menubar from '$lib/components/ui/menubar';
 	import * as Avatar from '$lib/components/ui/avatar';
+	import { Button } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 
 	import LifeBuoy from 'lucide-svelte/icons/life-buoy';
@@ -19,27 +20,31 @@
 
 	<Menubar.Root>
 		<Menubar.Menu>
-			<Menubar.Trigger>Home</Menubar.Trigger>
+			<Menubar.Item href="/" active={activeUrl === '/'}><Button variant="link">首页</Button></Menubar.Item>
 		</Menubar.Menu>
 
 		{#if $page.data.user?.role?.name === 'Admin'}
 			<Menubar.Menu>
-				<Menubar.Trigger>User</Menubar.Trigger>
+				<Menubar.Item href="/user"><Button variant="link">用户管理</Button></Menubar.Item>
 			</Menubar.Menu>
 		{/if}
 
 		<Menubar.Menu>
-			<Menubar.Trigger>About</Menubar.Trigger>
+			<Menubar.Item href="/about"><Button variant="link">关于</Button></Menubar.Item>
 		</Menubar.Menu>
 	</Menubar.Root>
 
 	<DropdownMenu.Root>
-		<DropdownMenu.Trigger>
-			<Avatar.Root>
-				<Avatar.Image src={$page?.data?.user?.photo} alt="用户头像" />
-				<Avatar.Fallback>CN</Avatar.Fallback>
-			</Avatar.Root>
-		</DropdownMenu.Trigger>
+		{#if $page.data.user}
+			<DropdownMenu.Trigger>
+				<Avatar.Root>
+					<Avatar.Image src={$page.data.user.photo} alt="用户头像" />
+					<Avatar.Fallback>CN</Avatar.Fallback>
+				</Avatar.Root>
+			</DropdownMenu.Trigger>
+		{:else}
+			<Button variant="link" href="/login">登录</Button>
+		{/if}
 		<DropdownMenu.Content class="w-56">
 			{#if $page.data.user}
 				<DropdownMenu.Label>我的账户</DropdownMenu.Label>
