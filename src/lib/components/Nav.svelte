@@ -34,15 +34,15 @@
 	</Menubar.Root>
 
 	<DropdownMenu.Root>
-		<DropdownMenu.Trigger asChild let:builder>
-			<Avatar.Root builders={[builder]}>
+		<DropdownMenu.Trigger>
+			<Avatar.Root>
 				<Avatar.Image src={$page?.data?.user?.photo} alt="用户头像" />
 				<Avatar.Fallback>CN</Avatar.Fallback>
 			</Avatar.Root>
 		</DropdownMenu.Trigger>
 		<DropdownMenu.Content class="w-56">
 			{#if $page.data.user}
-				<DropdownMenu.Label>My Account</DropdownMenu.Label>
+				<DropdownMenu.Label>我的账户</DropdownMenu.Label>
 				<DropdownMenu.Separator />
 				<DropdownMenu.Group>
 					<DropdownMenu.Item>
@@ -51,13 +51,13 @@
 					</DropdownMenu.Item>
 					<DropdownMenu.Item>
 						<Settings class="mr-2 h-4 w-4" />
-						<span>Settings</span>
+						<span>设置</span>
 					</DropdownMenu.Item>
 				</DropdownMenu.Group>
 				<DropdownMenu.Separator />
 				<DropdownMenu.Item>
 					<LifeBuoy class="mr-2 h-4 w-4" />
-					<span>Support</span>
+					<span>支持</span>
 				</DropdownMenu.Item>
 				<DropdownMenu.Separator />
 				<DropdownMenu.Item>

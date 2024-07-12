@@ -16,25 +16,27 @@
 	const { form: formData, enhance } = form;
 </script>
 
-<form use:enhance method="post" class="space-y-8">
-	<Form.Field {form} name="firstName" class="grid gap-6 md:grid-cols-2">
-		<Form.Control let:attrs>
-			<Form.Label class="mb-2">名</Form.Label>
-			<Input {...attrs} type="text" bind:value={$formData.firstName} required />
-			<Form.FieldErrors />
-		</Form.Control>
-	</Form.Field>
-	<Form.Field {form} name="lastName" class="grid gap-6 md:grid-cols-2">
-		<Form.Control let:attrs>
-			<Form.Label class="mb-2">姓</Form.Label>
-			<Input {...attrs} type="text" bind:value={$formData.lastName} required />
-			<Form.FieldErrors />
-		</Form.Control>
-	</Form.Field>
+<form use:enhance method="post" class="space-y-6">
+	<div class="grid grid-cols-2 gap-6">
+		<Form.Field {form} name="firstName">
+			<Form.Control let:attrs>
+				<Form.Label>名</Form.Label>
+				<Input {...attrs} type="text" bind:value={$formData.firstName} required />
+				<Form.FieldErrors />
+			</Form.Control>
+		</Form.Field>
+		<Form.Field {form} name="lastName">
+			<Form.Control let:attrs>
+				<Form.Label>姓</Form.Label>
+				<Input {...attrs} type="text" bind:value={$formData.lastName} required />
+				<Form.FieldErrors />
+			</Form.Control>
+		</Form.Field>
+	</div>
 
 	<Form.Field {form} name="email">
 		<Form.Control let:attrs>
-			<Form.Label class="mb-2">邮箱</Form.Label>
+			<Form.Label>邮箱</Form.Label>
 			<Input {...attrs} type="email" bind:value={$formData.email} required />
 			<Form.FieldErrors />
 		</Form.Control>
@@ -42,7 +44,7 @@
 
 	<Form.Field {form} name="password">
 		<Form.Control let:attrs>
-			<Form.Label class="mb-2">密码</Form.Label>
+			<Form.Label>密码</Form.Label>
 			<Input {...attrs} type="password" bind:value={$formData.password} required />
 			<Form.FieldErrors />
 		</Form.Control>
@@ -50,7 +52,7 @@
 
 	<Form.Field {form} name="confirmPassword">
 		<Form.Control let:attrs>
-			<Form.Label class="mb-2">确认密码</Form.Label>
+			<Form.Label>确认密码</Form.Label>
 			<Input {...attrs} type="password" bind:value={$formData.confirmPassword} required />
 			<Form.FieldErrors />
 		</Form.Control>

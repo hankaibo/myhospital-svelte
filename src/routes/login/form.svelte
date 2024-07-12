@@ -17,7 +17,7 @@
 	const { form: formData, enhance } = form;
 </script>
 
-<form use:enhance method="post" class="space-y-6">
+<form use:enhance method="post" class="w-full space-y-6">
 	<Form.Field {form} name="email">
 		<Form.Control let:attrs>
 			<Form.Label>邮箱</Form.Label>
@@ -33,7 +33,7 @@
 		</Form.Control>
 	</Form.Field>
 
-	<Form.Button class="w-full">Submit</Form.Button>
+	<Form.Button class="w-full">登录</Form.Button>
 
 	<div class="flex items-center justify-between">
 		<Checkbox>记住我</Checkbox>
