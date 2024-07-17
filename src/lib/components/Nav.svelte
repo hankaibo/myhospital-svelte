@@ -54,7 +54,7 @@
 						<User class="mr-2 h-4 w-4" />
 						<span>Profile</span>
 					</DropdownMenu.Item>
-					<DropdownMenu.Item>
+					<DropdownMenu.Item href="/settings">
 						<Settings class="mr-2 h-4 w-4" />
 						<span>设置</span>
 					</DropdownMenu.Item>

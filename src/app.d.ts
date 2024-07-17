@@ -6,6 +6,7 @@ declare global {
 		interface Locals {
 			user?: User; // 根据实际情况设置类型
 			token?: string;
+			refreshToken?: string;
 		}
 		// interface PageData {}
 		// interface PageState {}

@@ -1,27 +1,26 @@
 <script>
+	import { readable } from 'svelte/store';
 	import { createTable, Render, Subscribe, createRender } from 'svelte-headless-table';
 	import { addPagination, addSortBy, addTableFilter, addHiddenColumns, addSelectedRows } from 'svelte-headless-table/plugins';
-	import { readable } from 'svelte/store';
 	import ArrowUpDown from 'lucide-svelte/icons/arrow-up-down';
 	import ChevronDown from 'lucide-svelte/icons/chevron-down';
+
 	import * as Table from '$lib/components/ui/table';
-	import DataTableActions from './data-table-actions.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
+	import { Switch } from '$lib/components/ui/switch';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+
+	import DataTableAvator from './data-table-avatar.svelte';
+	import DataTableActions from './data-table-actions.svelte';
 	import DataTableCheckbox from './data-table-checkbox.svelte';
 
-	const data = [
-		{
-			id: 'm5gr84i9',
-			amount: 316,
-			status: 'success',
-			email: 'ken99@yahoo.com'
-		}
-		// ...
-	];
+	/** @type {User}*/
+	export let userList = [];
+	/** @type {boolean} */
+	export let isNextPage = false;
 
-	const table = createTable(readable(data), {
+	const table = createTable(readable(userList), {
 		page: addPagination(),
 		sort: addSortBy({ disableMultiSort: true }),
 		filter: addTableFilter({
@@ -59,8 +58,29 @@
 			}
 		}),
 		table.column({
-			accessor: 'status',
-			header: 'Status',
+			accessor: 'photo',
+			header: '头像',
+			cell: (dataCell, status) => {
+				console.log(dataCell, status);
+				return createRender(DataTableAvator, { src: dataCell.value });
+			},
+			plugins: {
+				sort: {
+					disable: true
+				},
+				filter: {
+					exclude: true
+				}
+			}
+		}),
+		table.column({
+			accessor: 'name',
+			header: '姓名',
+			cell: ({ row }) => {
+				const { original } = row;
+				const { firstName, lastName } = original;
+				return lastName + firstName;
+			},
 			plugins: {
 				sort: {
 					disable: true
@@ -75,14 +95,21 @@
 			header: 'Email'
 		}),
 		table.column({
-			accessor: 'amount',
-			header: 'Amount',
+			accessor: 'status',
+			header: '状态',
 			cell: ({ value }) => {
-				const formatted = new Intl.NumberFormat('en-US', {
-					style: 'currency',
-					currency: 'USD'
-				}).format(value);
-				return formatted;
+				return createRender(Switch, {
+					checked: value.name === 'Active',
+					id: value.id,
+					/**
+					 * 处理 Switch 组件的状态改变事件
+					 * @param {boolean} checked - 表示 Switch 组件的当前状态，true 表示开启，false 表示关闭
+					 */
+					onCheckedChange: (checked) => {
+						// 在这里处理 change 事件
+						console.log('Switch 状态改变:', checked, value.id);
+					}
+				});
 			},
 			plugins: {
 				sort: {
@@ -95,7 +122,7 @@
 		}),
 		table.column({
 			accessor: ({ id }) => id,
-			header: '',
+			header: '操作',
 			cell: ({ value }) => {
 				return createRender(DataTableActions, { id: value });
 			},
@@ -124,7 +151,7 @@
 		.filter(([, hide]) => !hide)
 		.map(([id]) => id);
 
-	const hidableCols = ['status', 'email', 'amount'];
+	const hidableCols = ['name', 'email', 'status'];
 </script>
 
 <div>

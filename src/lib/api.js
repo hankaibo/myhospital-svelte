@@ -47,22 +47,6 @@ async function send({ method, path, data, token, headers = {} }) {
 		return text ? JSON.parse(text) : {};
 	}
 
-	if (res.status === 401) {
-		try {
-			const newToken = await refreshAccessToken();
-
-			if (newToken) {
-				headers['Authorization'] = `Bearer ${newToken}`;
-				response = await fetch(`${base}/${path}`, opts);
-			} else {
-				throw new Error('Unable to refresh token');
-			}
-		} catch (error) {
-			console.error('Token refresh failed', error);
-			goto('/login');
-		}
-	}
-
 	throw error(res.status);
 }
 
@@ -120,42 +104,23 @@ export function patch(path, data, token) {
 	return send({ method: 'PATCH', path, data, token });
 }
 
-let refreshingToken = false;
-let subscribers = [];
-
-async function refreshAccessToken() {
-	if (refreshingToken) {
-		// If already refreshing, return a promise that resolves when the refresh is done
-		return new Promise((resolve) => {
-			subscribers.push(resolve);
-		});
-	}
-
-	refreshingToken = true;
-
+/**
+ * 
+ * @param {string} token 
+ * @returns 
+ */
+export async function handleRefreshToken(token) {
 	try {
 		const res = await fetch(`${base}/auth/refresh`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				Authorization: `Bearer ${getToken()}`
+				Authorization: `Bearer ${token}`
 			}
 		});
 
-		if (res.ok) {
-			const { accessToken } = await res.json();
-
-			// Notify all subscribers that the token has been refreshed
-			subscribers.forEach((resolve) => resolve(accessToken));
-			subscribers = [];
-			refreshingToken = false;
-
-			return accessToken;
-		} else {
-			throw new Error('Failed to refresh token');
-		}
+		return res;
 	} catch (error) {
-		refreshingToken = false;
 		throw error;
 	}
 }

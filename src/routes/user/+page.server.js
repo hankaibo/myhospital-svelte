@@ -20,7 +20,8 @@ export async function load({ locals, url }) {
 		return fail(401, body);
 	}
 	return {
-		users: body.data
+		users: body.data,
+		hasNextPage: body.hasNextPage
 	};
 }
 
