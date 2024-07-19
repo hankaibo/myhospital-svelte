@@ -23,4 +23,4 @@ interface User {
 	role: string;
 }
 
-export { };
+export {};

@@ -2,8 +2,9 @@
 	import { onMount } from 'svelte';
 	import { Map, View } from 'ol';
 	import { Draw, Modify, Snap, Select } from 'ol/interaction.js';
-	import { XYZ, Vector as VectorSource, Cluster, OSM } from 'ol/source';
+	import { XYZ, Vector as VectorSource, Cluster, OSM, WMTS } from 'ol/source';
 	import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
+	import WMTSTileGrid from 'ol/tilegrid/WMTS';
 	import Feature from 'ol/Feature';
 	import Overlay from 'ol/Overlay';
 	import { fromLonLat, toLonLat, get } from 'ol/proj';
@@ -14,10 +15,13 @@
 	import { click } from 'ol/events/condition';
 	import ContextMenu from '$lib/ol/Contextmenu';
 	import * as api from '$lib/api.js';
-	import { Heading, List, Li, A, Label, Select as FSSelect, Popover } from 'flowbite-svelte';
-	import { CloseSolid } from 'flowbite-svelte-icons';
 	import 'ol/ol.css';
 	import '$lib/ol/contextmenu.css';
+
+	import * as Popover from '$lib/components/ui/popover';
+	import { Label } from '$lib/components/ui/label/index.js';
+
+	import { X } from 'lucide-svelte';
 
 	// /** @type {import('./$types').PageData} */
 	// export const data;
@@ -70,9 +74,7 @@
 	const tileLayer = new TileLayer({
 		// source: new OSM()
 		source: new XYZ({
-			// 高德
-			url: 'https://webrd04.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}'
-			// crossOrigin: '',
+			url: 'http://t{0-7}.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=42974d10cfa313d12aefa1a633e50a0c'
 		})
 	});
 	tileLayer.set('name', 'tileLayer');
@@ -693,8 +695,10 @@
 		q.set('longitude', longitude);
 		q.set('latitude', latitude);
 		q.set('radius', radius);
-		const response = await api.get(`hospitals?${q}`, undefined, {
-			'Content-Type': 'application/json'
+		const response = await api.get(`hospitals?${q}`, {
+			headers: {
+				'Content-Type': 'application/json'
+			}
 		});
 		if (Array.isArray(response)) {
 			addMarker(response);
@@ -720,44 +724,44 @@
 <div id="map" class="h-[calc(100vh-73px)]"></div>
 
 <!-- 某个医院的详情弹框 -->
-<Popover class="w-64 text-sm font-light " title="Popover title" triggeredBy="#click" trigger="click">
-	<CloseSolid class="absolute right-4 top-5 cursor-pointer" size="sm" on:click={handleClose} />
+<Popover.Root class="hidden w-64 text-sm font-light " title="Popover title">
+	<!-- <X class="absolute right-4 top-5 cursor-pointer" size="sm" on:click={handleClose} /> -->
 	<div id="popup-content">
-		<Heading tag="h2" customSize="text-lg font-semibold" class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">医院信息</Heading>
-		<List tag="ul" class="mb-8 space-y-4 text-gray-500 dark:text-gray-400" list="none">
-			<Li class="gap-3">
+		<h2 customSize="text-lg font-semibold" class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">医院信息</h2>
+		<ul class="mb-8 space-y-4 text-gray-500 dark:text-gray-400" list="none">
+			<li class="gap-3">
 				<span class="mr-2 text-gray-900">医院名称</span>
-				<A class="mr-2 text-gray-900" on:click={() => handleDetail(hospital?.name)}>{hospital?.name}</A>
-			</Li>
-			<Li class="gap-3">
+				<a class="mr-2 text-gray-900" on:click={() => handleDetail(hospital?.name)}>{hospital?.name}</a>
+			</li>
+			<li class="gap-3">
 				<span class="mr-2 text-gray-900">医院编码</span>
 				{hospital?.code}
-			</Li>
-			<Li class="gap-3">
+			</li>
+			<li class="gap-3">
 				<span class="mr-2 text-gray-900">医院等级</span>
 				{hospital?.level}
-			</Li>
-			<Li class="gap-3">
+			</li>
+			<li class="gap-3">
 				<span class="mr-2 text-gray-900">医院类别</span>
 				{hospital?.type}
-			</Li>
-			<Li class="gap-3">
+			</li>
+			<li class="gap-3">
 				<span class="mr-2 text-gray-900">单位地址</span>
 				{hospital?.address}
-			</Li>
-			<Li class="gap-3">
+			</li>
+			<li class="gap-3">
 				<span class="mr-2 text-gray-900">医院简介</span>
 				{hospital?.introduction}
-			</Li>
-		</List>
+			</li>
+		</ul>
 	</div>
-</Popover>
+</Popover.Root>
 
 {#if hospitalList.length}
 	<div class="absolute left-4 top-20 w-96 bg-white shadow">
 		<div class="mb-2">
 			<Label for="select-underline" class="sr-only">请选择</Label>
-			<FSSelect
+			<Select
 				id="select-underline"
 				underline
 				items={[
@@ -773,7 +777,7 @@
 		</div>
 		<div class="mb-2">
 			<Label for="select-underline2" class="sr-only">请选择</Label>
-			<FSSelect
+			<Select
 				id="select-underline2"
 				underline
 				items={[
@@ -786,16 +790,16 @@
 			/>
 		</div>
 		<div class="h-96 overflow-y-auto">
-			<List tag="ul" class="space-y-4 text-xs text-gray-500 dark:text-gray-400" list="none">
+			<ul class="space-y-4 text-xs text-gray-500 dark:text-gray-400" list="none">
 				{#each hospitalList as hospital}
-					<Li class="flex">
-						<A class="mr-2 flex-1 text-gray-900" on:click={() => handleDetail(hospital?.name)}>{hospital?.name}</A>
+					<li class="flex">
+						<a class="mr-2 flex-1 text-gray-900" on:click={() => handleDetail(hospital?.name)}>{hospital?.name}</a>
 						<span class="w-16">{hospital?.code}</span>
 						<span class="w-10">{hospital?.level}</span>
 						<span class="w-16">{hospital?.type}</span>
-					</Li>
+					</li>
 				{/each}
-			</List>
+			</ul>
 		</div>
 	</div>
 {/if}

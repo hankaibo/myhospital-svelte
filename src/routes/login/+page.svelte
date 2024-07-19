@@ -1,8 +1,9 @@
 <script>
 	import { Button } from '$lib/components/ui/button';
-	import { Facebook, Twitter } from 'lucide-svelte';
+	import Facebook from '$lib/components/svg/brand-facebook.svelte';
 	import GoogleSolid from '$lib/components/svg/brand-google.svelte';
 	import AppleSolid from '$lib/components/svg/brand-apple.svelte';
+	import Twitter from '$lib/components/svg/brand-x.svelte';
 	import LoginForm from './form.svelte';
 
 	/** @type {import('./$types').PageData} */

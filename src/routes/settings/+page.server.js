@@ -1,10 +1,16 @@
 import { fail, error, redirect } from '@sveltejs/kit';
+import { superValidate } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
+import { formSchema } from './schema';
 import * as api from '$lib/api.js';
 
-export function load({ locals }) {
+export async function load({ locals }) {
 	if (!locals.user) {
 		throw redirect(302, '/login');
 	}
+	return {
+		form: await superValidate(zod(formSchema))
+	};
 }
 
 /** @type {import('./$types').Actions} */
@@ -24,7 +30,7 @@ export const actions = {
 			photo: data.get('photo')
 		};
 
-		const body = await api.patch('files/upload', user, locals.token);
+		const body = await api.patch('files/upload', user, { cookies });
 		if (body.errors) {
 			return fail(400, body.errors);
 		}
@@ -46,7 +52,7 @@ export const actions = {
 			photo: data.get('photo')
 		};
 
-		const body = await api.patch('auth/me', user, locals.token);
+		const body = await api.patch('auth/me', user, { cookies });
 		if (body.errors) {
 			return fail(400, body.errors);
 		}

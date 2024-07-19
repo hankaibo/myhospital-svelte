@@ -1,8 +1,7 @@
 <script>
-	import { enhance } from '$app/forms';
-	import { page } from '$app/stores';
 	import { tick } from 'svelte';
-	import { Label, Input, Avatar, Dropzone, GradientButton } from 'flowbite-svelte';
+	import { page } from '$app/stores';
+	import SettingsForm from './form.svelte';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -98,37 +97,7 @@
 		</div>
 
 		<div>
-			<form
-				use:enhance={() => {
-					return ({ update }) => {
-						update({ reset: false });
-					};
-				}}
-				method="post"
-				action="?/save"
-			>
-				<div class="mb-6 grid gap-6 md:grid-cols-2">
-					<div>
-						<Label for="first_name" class="mb-2">First name</Label>
-						<Input name="firstName" type="text" id="first_name" bind:value={data.user.firstName} required />
-					</div>
-					<div>
-						<Label for="last_name" class="mb-2">Last name</Label>
-						<Input name="lastName" type="text" id="last_name" bind:value={data.user.lastName} required />
-					</div>
-				</div>
-				<div class="mb-6">
-					<Label for="oldPassword" class="mb-2">密码</Label>
-					<Input name="oldPassword" type="password" id="oldPassword" required />
-				</div>
-				<div class="mb-6">
-					<Label for="password" class="mb-2">新密码</Label>
-					<Input name="password" type="password" id="password" required />
-				</div>
-				<div class="mb-6">
-					<GradientButton type="submit" color="purpleToBlue" class="w-full">更新</GradientButton>
-				</div>
-			</form>
+			<SettingsForm {data} />
 		</div>
 	</div>
 </div>

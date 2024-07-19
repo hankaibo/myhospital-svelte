@@ -61,7 +61,6 @@
 			accessor: 'photo',
 			header: '头像',
 			cell: (dataCell, status) => {
-				console.log(dataCell, status);
 				return createRender(DataTableAvator, { src: dataCell.value });
 			},
 			plugins: {

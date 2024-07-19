@@ -60,15 +60,6 @@ importers:
       eslint-plugin-svelte:
         specifier: ^2.41.0
         version: 2.41.0(eslint@8.56.0)(svelte@4.2.18)
-      flowbite:
-        specifier: ^2.2.1
-        version: 2.2.1
-      flowbite-svelte:
-        specifier: ^0.44.21
-        version: 0.44.21(svelte@4.2.18)
-      flowbite-svelte-icons:
-        specifier: ^0.4.5
-        version: 0.4.5(svelte@4.2.18)(tailwind-merge@2.4.0)(tailwindcss@3.4.4)
       postcss:
         specifier: ^8.4.39
         version: 8.4.39
@@ -513,9 +504,6 @@ packages:
   '@polka/url@1.0.0-next.24':
     resolution: {integrity: sha512-2LuNTFBIO0m7kKIQvvPHN6UE63VjpmL9rnEEaOOaiSPbZK+zUOYIzBAWcED+3XYzhYsd/0mD57VdxAEqqV52CQ==}
 
-  '@popperjs/core@2.11.8':
-    resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
-
   '@poppinss/macroable@1.0.2':
     resolution: {integrity: sha512-xhhEcEvhQC8mP5oOr5hbE4CmUgmw/IPV1jhpGg2xSkzoFrt9i8YVqBQt9744EFesi5F7pBheWozg63RUBM/5JA==}
     engines: {node: '>=18.16.0'}
@@ -690,9 +678,6 @@ packages:
     resolution: {integrity: sha512-Qq3XxbA26jzqS9ICifkqzT399lMQZ2fWtqeV3luI2as+UIK7qDifJFU2Q4W3q3IB5VXoWxgwAZSZEO0em9I/qQ==}
     engines: {node: '>=18.16.0'}
 
-  '@yr/monotone-cubic-spline@1.0.3':
-    resolution: {integrity: sha512-FQXkOta0XBSUPHndIKON2Y9JeQz5ZeMqLYZVVK93FliNBFm7LNMIZmY6FrMEB9XPcDbE2bekMbZD6kzDkxwYjA==}
-
   abbrev@1.1.1:
     resolution: {integrity: sha512-nne9/IiQ/hzIhY6pdDnbBtz7DjPTKrY00P/zvPSm5pOFkl6xuGrGnXn/VtTNNfNtAfZ9/1RtehkszU9qcTii0Q==}
 
@@ -740,9 +725,6 @@ packages:
   anymatch@3.1.3:
     resolution: {integrity: sha512-KMReFUr0B4t+D+OBkjR3KYqvocp2XaSzO55UcB6mgQMd3KbcE+mWTyvVV7D/zsdEbNnV6acZUutkiHQXvTr1Rw==}
     engines: {node: '>= 8'}
-
-  apexcharts@3.45.1:
-    resolution: {integrity: sha512-pPjj/SA6dfPvR/IKRZF0STdfBGpBh3WRt7K0DFuW9P8erypYkX17EHu3/molPRfo2zSiQwTVpshHC5ncysqfkA==}
 
   aproba@2.0.0:
     resolution: {integrity: sha512-lYe4Gx7QT+MKGbDsA+Z+he/Wtef0BiwDOlK/XkBrdfsh9J/jPPXbX0tE9x9cl27Tmu5gg3QUbUrQYa/y+KOHPQ==}
@@ -1085,22 +1067,6 @@ packages:
   flatted@3.2.9:
     resolution: {integrity: sha512-36yxDn5H7OFZQla0/jFJmbIKTdZAQHngCedGxiMmpNfEZM0sdEeT+WczLQrjK6D7o2aiyLYDnkw0R3JK0Qv1RQ==}
 
-  flowbite-svelte-icons@0.4.5:
-    resolution: {integrity: sha512-IBudEfw9B4UE2gCRMhbRnyE8p7qq7DDMauy0mPVIShzjaN3yVk2AmAHia1JRe9jUC98Wn7xNk/IdJlXeQj19Iw==}
-    peerDependencies:
-      svelte: ^3.54.0 || ^4.0.0
-      tailwind-merge: ^2.0.0
-      tailwindcss: ^3.3.2
-
-  flowbite-svelte@0.44.21:
-    resolution: {integrity: sha512-M3xmu/HUgGHMR+iJNzxd9J3j8o1SzsrbvWlOKQOdIhcsRVNioqfcNvvjKgSciMf8p/GcUQq6AS5UyfIpqo5aGw==}
-    engines: {node: '>=18.0.0', npm: '>=7.0.0'}
-    peerDependencies:
-      svelte: ^4.0.0
-
-  flowbite@2.2.1:
-    resolution: {integrity: sha512-iiZyBTtriEDRHrqXZgpKHaxl4B2J8HZUP8Yn1RXozUDKszWHDVj4GxQqMMB9AJHRWOgXV/4E/LJZ/zqQgBUhWA==}
-
   focus-trap@7.5.4:
     resolution: {integrity: sha512-N7kHdlgsO/v+iD/dMoJKtsSqs5Dz/dXZVebRgJw23LDk+jMi/974zyiOYDziY2JPp8xivq9BmUGwIJMiuSBi7w==}
 
@@ -1358,10 +1324,6 @@ packages:
   min-indent@1.0.1:
     resolution: {integrity: sha512-I9jwMn07Sy/IwOj3zVkVik2JTvgpaykDZEigL6Rx6N9LbMywwUSMtxET+7lVoDLLd3O3IXwJwvuuns8UB/HeAg==}
     engines: {node: '>=4'}
-
-  mini-svg-data-uri@1.4.4:
-    resolution: {integrity: sha512-r9deDe9p5FJUPZAk3A59wGH7Ii9YrjjWw0jmw/liSbHl2CHiyXj6FcDXDu2K3TjVAXqiJdaw3xxwlZZr9E6nHg==}
-    hasBin: true
 
   minimatch@3.1.2:
     resolution: {integrity: sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==}
@@ -1954,37 +1916,6 @@ packages:
       '@sveltejs/kit': 1.x || 2.x
       svelte: 3.x || 4.x || >=5.0.0-next.51
 
-  svg.draggable.js@2.2.2:
-    resolution: {integrity: sha512-JzNHBc2fLQMzYCZ90KZHN2ohXL0BQJGQimK1kGk6AvSeibuKcIdDX9Kr0dT9+UJ5O8nYA0RB839Lhvk4CY4MZw==}
-    engines: {node: '>= 0.8.0'}
-
-  svg.easing.js@2.0.0:
-    resolution: {integrity: sha512-//ctPdJMGy22YoYGV+3HEfHbm6/69LJUTAqI2/5qBvaNHZ9uUFVC82B0Pl299HzgH13rKrBgi4+XyXXyVWWthA==}
-    engines: {node: '>= 0.8.0'}
-
-  svg.filter.js@2.0.2:
-    resolution: {integrity: sha512-xkGBwU+dKBzqg5PtilaTb0EYPqPfJ9Q6saVldX+5vCRy31P6TlRCP3U9NxH3HEufkKkpNgdTLBJnmhDHeTqAkw==}
-    engines: {node: '>= 0.8.0'}
-
-  svg.js@2.7.1:
-    resolution: {integrity: sha512-ycbxpizEQktk3FYvn/8BH+6/EuWXg7ZpQREJvgacqn46gIddG24tNNe4Son6omdXCnSOaApnpZw6MPCBA1dODA==}
-
-  svg.pathmorphing.js@0.1.3:
-    resolution: {integrity: sha512-49HWI9X4XQR/JG1qXkSDV8xViuTLIWm/B/7YuQELV5KMOPtXjiwH4XPJvr/ghEDibmLQ9Oc22dpWpG0vUDDNww==}
-    engines: {node: '>= 0.8.0'}
-
-  svg.resize.js@1.4.3:
-    resolution: {integrity: sha512-9k5sXJuPKp+mVzXNvxz7U0uC9oVMQrrf7cFsETznzUDDm0x8+77dtZkWdMfRlmbkEEYvUn9btKuZ3n41oNA+uw==}
-    engines: {node: '>= 0.8.0'}
-
-  svg.select.js@2.1.2:
-    resolution: {integrity: sha512-tH6ABEyJsAOVAhwcCjF8mw4crjXSI1aa7j2VQR8ZuJ37H2MBUbyeqYr5nEO7sSN3cy9AR9DUwNg0t/962HlDbQ==}
-    engines: {node: '>= 0.8.0'}
-
-  svg.select.js@3.0.1:
-    resolution: {integrity: sha512-h5IS/hKkuVCbKSieR9uQCj9w+zLHoPh+ce19bBYyqF53g6mnPB8sAtIbe1s9dh2S2fCmYX2xel1Ln3PJBbK4kw==}
-    engines: {node: '>= 0.8.0'}
-
   tabbable@6.2.0:
     resolution: {integrity: sha512-Cat63mxsVJlzYvN51JmVXIgNoUokrIaT2zLclCXjRd8boZ0004U4KCs/sToJ75C6sdlByWxpYnb5Boif1VSFew==}
 
@@ -2492,8 +2423,6 @@ snapshots:
 
   '@polka/url@1.0.0-next.24': {}
 
-  '@popperjs/core@2.11.8': {}
-
   '@poppinss/macroable@1.0.2':
     optional: true
 
@@ -2677,8 +2606,6 @@ snapshots:
       validator: 13.12.0
     optional: true
 
-  '@yr/monotone-cubic-spline@1.0.3': {}
-
   abbrev@1.1.1: {}
 
   acorn-import-attributes@1.9.5(acorn@8.11.3):
@@ -2720,16 +2647,6 @@ snapshots:
     dependencies:
       normalize-path: 3.0.0
       picomatch: 2.3.1
-
-  apexcharts@3.45.1:
-    dependencies:
-      '@yr/monotone-cubic-spline': 1.0.3
-      svg.draggable.js: 2.2.2
-      svg.easing.js: 2.0.0
-      svg.filter.js: 2.0.2
-      svg.pathmorphing.js: 0.1.3
-      svg.resize.js: 1.4.3
-      svg.select.js: 3.0.1
 
   aproba@2.0.0: {}
 
@@ -3136,25 +3053,6 @@ snapshots:
 
   flatted@3.2.9: {}
 
-  flowbite-svelte-icons@0.4.5(svelte@4.2.18)(tailwind-merge@2.4.0)(tailwindcss@3.4.4):
-    dependencies:
-      svelte: 4.2.18
-      tailwind-merge: 2.4.0
-      tailwindcss: 3.4.4
-
-  flowbite-svelte@0.44.21(svelte@4.2.18):
-    dependencies:
-      '@floating-ui/dom': 1.5.4
-      apexcharts: 3.45.1
-      flowbite: 2.2.1
-      svelte: 4.2.18
-      tailwind-merge: 2.4.0
-
-  flowbite@2.2.1:
-    dependencies:
-      '@popperjs/core': 2.11.8
-      mini-svg-data-uri: 1.4.4
-
   focus-trap@7.5.4:
     dependencies:
       tabbable: 6.2.0
@@ -3404,8 +3302,6 @@ snapshots:
       picomatch: 2.3.1
 
   min-indent@1.0.1: {}
-
-  mini-svg-data-uri@1.4.4: {}
 
   minimatch@3.1.2:
     dependencies:
@@ -3933,37 +3829,6 @@ snapshots:
       yup: 1.4.0
       zod: 3.23.8
       zod-to-json-schema: 3.23.1(zod@3.23.8)
-
-  svg.draggable.js@2.2.2:
-    dependencies:
-      svg.js: 2.7.1
-
-  svg.easing.js@2.0.0:
-    dependencies:
-      svg.js: 2.7.1
-
-  svg.filter.js@2.0.2:
-    dependencies:
-      svg.js: 2.7.1
-
-  svg.js@2.7.1: {}
-
-  svg.pathmorphing.js@0.1.3:
-    dependencies:
-      svg.js: 2.7.1
-
-  svg.resize.js@1.4.3:
-    dependencies:
-      svg.js: 2.7.1
-      svg.select.js: 2.1.2
-
-  svg.select.js@2.1.2:
-    dependencies:
-      svg.js: 2.7.1
-
-  svg.select.js@3.0.1:
-    dependencies:
-      svg.js: 2.7.1
 
   tabbable@6.2.0: {}
 

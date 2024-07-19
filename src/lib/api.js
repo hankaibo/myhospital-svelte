@@ -1,6 +1,5 @@
 // place files you want to import through the `$lib` alias in this folder.
 import { error } from '@sveltejs/kit';
-import { goto } from '$app/navigation';
 
 const base = 'http://localhost:3000/api/v1';
 
@@ -20,31 +19,63 @@ const base = 'http://localhost:3000/api/v1';
 /**
  * Sends a request to the server.
  *
+ * @async
  * @param {object} options The request options.
- * @param {string} [options.method] The HTTP method to use.
- * @param {string} options.path The path to the resource.
- * @param {object} [options.data] The request data.
- * @param {string} [options.token] The authentication token.
+ * @param {string} options.method The HTTP method to use.
+ * @param {string} options.url The path to the resource.
+ * @param {object|null|undefined} [options.data] The request data.
  * @param {RequestHeaders} [options.headers] The HTTP headers.
- * @returns {Promise<Response>} The promise for the response.
+ * @param {Record<string, any>} [options.cookies] The HTTP headers.
+ * @returns {Promise<object>} - The response from the server, parsed as a JSON object.
+ * @throws {HttpError} This error instructs SvelteKit to initiate HTTP error handling.
+ * @throws {Error} If the provided status is invalid (not between 400 and 599).
  */
-async function send({ method, path, data, token, headers = {} }) {
+async function send({ method, url, data, headers = {}, cookies }) {
 	/** @type {RequestOptions} */
 	const opts = { method, headers };
+
+	/** @type {string} */
+	let token = '';
+	/** @type {string} */
+	let refreshToken = '';
+	let user = {};
 
 	if (data) {
 		opts.headers['Content-Type'] = 'application/json';
 		opts.body = JSON.stringify(data);
 	}
 
-	if (token) {
+	if (cookies) {
+		const jwt = cookies.get('jwt');
+		({ token, refreshToken, user } = JSON.parse(atob(jwt)));
 		opts.headers['Authorization'] = `Bearer ${token}`;
 	}
 
-	const res = await fetch(`${base}/${path}`, opts);
+	const res = await fetch(`${base}/${url}`, opts);
 	if (res.ok || res.status === 422) {
 		const text = await res.text();
 		return text ? JSON.parse(text) : {};
+	}
+
+	if (res.status === 401) {
+		try {
+			const { token: newToken, refreshToken: newRefreshToken } = await refreshAccessToken(refreshToken);
+			const value = btoa(JSON.stringify({ token: newToken, refreshToken: newRefreshToken, user }));
+			cookies?.set('jwt', value, { path: '/' });
+
+			if (newToken) {
+				headers['Authorization'] = `Bearer ${newToken}`;
+
+				const retryRes = await fetch(`${base}/${url}`, opts);
+				const retryText = await retryRes.text();
+
+				return retryText ? JSON.parse(retryText) : {};
+			} else {
+				throw new Error('Unable to refresh token');
+			}
+		} catch (err) {
+			console.error('Token refresh failed', err);
+		}
 	}
 
 	throw error(res.status);
@@ -52,75 +83,112 @@ async function send({ method, path, data, token, headers = {} }) {
 
 /**
  *
- * @param {string} path
- * @param {string} [token]
- * @param {object} [headers]
+ * @param {string} url
+ * @param {object} [options]
+ * @param {object} [options.headers]
+ * @param {object} [options.cookies]
  * @returns
  */
-export function get(path, token, headers) {
-	return send({ method: 'GET', path, token, headers });
+export function get(url, options = {}) {
+	return send({ method: 'GET', url, ...options });
 }
 
 /**
  *
- * @param {string} path
- * @param {string} token
+ * @param {string} url
+ * @param {object} [options]
+ * @param {object} [options.headers]
+ * @param {object} [options.cookies]
  * @returns
  */
-export function del(path, token) {
-	return send({ method: 'DELETE', path, token });
+export function del(url, options = {}) {
+	return send({ method: 'DELETE', url, ...options });
 }
 
 /**
  *
- * @param {string} path
+ * @param {string} url
+ * @param {object|null|undefined} data
+ * @param {object} [options]
+ * @param {object} [options.headers]
+ * @param {object} [options.cookies]
+ * @returns {Promise<object>} - The response from the server, parsed as a JSON object.
+ * @throws {Error} If an HTTP error occurs.
+ */
+export function post(url, data, options = {}) {
+	return send({ method: 'POST', url, data, ...options });
+}
+
+/**
+ *
+ * @param {string} url
  * @param {object} data
- * @param {string} [token]
+ * @param {object} [options]
+ * @param {object} [options.headers]
+ * @param {object} [options.cookies]
  * @returns
  */
-export function post(path, data, token) {
-	return send({ method: 'POST', path, data, token });
+export function put(url, data, options = {}) {
+	return send({ method: 'PUT', url, data, ...options });
 }
 
 /**
  *
- * @param {string} path
+ * @param {string} url
  * @param {object} data
- * @param {string} token
+ * @param {object} [options]
+ * @param {object} [options.headers]
+ * @param {object} [options.cookies]
  * @returns
  */
-export function put(path, data, token) {
-	return send({ method: 'PUT', path, data, token });
+export function patch(url, data, options = {}) {
+	return send({ method: 'PATCH', url, data, ...options });
 }
+
+/** @type {boolean} */
+let refreshingToken = false;
+
+/** @type {any[]} */
+let subscribers = [];
 
 /**
  *
- * @param {string} path
- * @param {object} data
- * @param {string} token
+ * @param {string} refreshToken
  * @returns
  */
-export function patch(path, data, token) {
-	return send({ method: 'PATCH', path, data, token });
-}
+async function refreshAccessToken(refreshToken) {
+	if (refreshingToken) {
+		// If already refreshing, return a promise that resolves when the refresh is done
+		return new Promise((resolve) => {
+			subscribers.push(resolve);
+		});
+	}
 
-/**
- * 
- * @param {string} token 
- * @returns 
- */
-export async function handleRefreshToken(token) {
+	refreshingToken = true;
+
 	try {
 		const res = await fetch(`${base}/auth/refresh`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`
+				Authorization: `Bearer ${refreshToken}`
 			}
 		});
 
-		return res;
+		if (res.ok) {
+			const { token, refreshToken } = await res.json();
+
+			// Notify all subscribers that the token has been refreshed
+			subscribers.forEach((resolve) => resolve(token));
+			subscribers = [];
+			refreshingToken = false;
+
+			return { token, refreshToken };
+		} else {
+			throw new Error('Failed to refresh token');
+		}
 	} catch (error) {
+		refreshingToken = false;
 		throw error;
 	}
 }

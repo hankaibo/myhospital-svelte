@@ -8,7 +8,7 @@ export const actions = {
 			throw error(401);
 		}
 
-		const body = await api.post('auth/logout', null, locals.token);
+		const body = await api.post('auth/logout', null, { cookies });
 		if (body.errors) {
 			return fail(400, body.errors);
 		}
