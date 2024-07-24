@@ -1,15 +1,14 @@
 <script>
 	import { onMount } from 'svelte';
 	import { Map, View } from 'ol';
-	import { Draw, Modify, Snap, Select } from 'ol/interaction.js';
-	import { XYZ, Vector as VectorSource, Cluster, OSM, WMTS } from 'ol/source';
 	import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
-	import WMTSTileGrid from 'ol/tilegrid/WMTS';
+	import { XYZ, Vector as VectorSource, Cluster, OSM } from 'ol/source';
+	import { Draw, Modify, Snap, Select } from 'ol/interaction.js';
 	import Feature from 'ol/Feature';
 	import Overlay from 'ol/Overlay';
 	import { fromLonLat, toLonLat, get } from 'ol/proj';
 	import { defaults as defaultControls } from 'ol/control.js';
-	import { Point, LineString, Circle } from 'ol/geom';
+	import { Point, LineString, Circle as CircleGeom } from 'ol/geom';
 	import { getLength } from 'ol/sphere.js';
 	import { Fill, Stroke, Style, Icon, Circle as CircleStyle, Text as TextStyle } from 'ol/style';
 	import { click } from 'ol/events/condition';
@@ -71,13 +70,19 @@
 	let a19AllFeature = [];
 
 	// 瓦片图层
-	const tileLayer = new TileLayer({
+	const tileLayer1 = new TileLayer({
 		// source: new OSM()
 		source: new XYZ({
-			url: 'http://t{0-7}.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=42974d10cfa313d12aefa1a633e50a0c'
+			url: 'http://t{0-7}.tianditu.gov.cn/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=42974d10cfa313d12aefa1a633e50a0c'
 		})
 	});
-	tileLayer.set('name', 'tileLayer');
+	const tileLayer2 = new TileLayer({
+		source: new XYZ({
+			url: 'http://t{0-7}.tianditu.gov.cn/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=42974d10cfa313d12aefa1a633e50a0c'
+		})
+	});
+	tileLayer1.set('name', 'tileLayer1');
+	tileLayer2.set('name', 'tileLayer2');
 
 	// 矢量图层
 	/** @type {import('ol/source/Vector').default} */
@@ -210,7 +215,7 @@
 
 		map = new Map({
 			target: 'map',
-			layers: [tileLayer, vectorLayer, clusterLayer],
+			layers: [tileLayer1, tileLayer2, vectorLayer, clusterLayer],
 			view,
 			overlays: [
 				new Overlay({
@@ -340,7 +345,7 @@
 				return;
 			}
 			const hit = map.hasFeatureAtPixel(e.pixel, {
-				layerFilter: (layer) => layer.get('name') === 'vectorLayer' || layer.get('name') === 'clusterLayer' || layer.get('name') === 'a19VectorLayer'
+				layerFilter: (layer) => ['vectorLayer', 'clusterLayer', 'a19VectorLayer'].includes(layer.get('name'))
 			});
 			draw.setActive(!hit);
 			map.getTargetElement().style.cursor = hit ? 'pointer' : '';
@@ -406,7 +411,7 @@
 
 				// 标记
 				const circleFeature = new Feature({
-					geometry: new Circle(center, 50)
+					geometry: new CircleGeom(center, 50)
 				});
 				circleFeature.setStyle(
 					new Style({
@@ -707,11 +712,11 @@
 
 	onMount(() => {
 		initMap();
-		// addInteractionModify();
+		addInteractionModify();
 		addInteractionDraw();
-		// addInteractionSnap();
-		// addInteractionSelect();
-		// addEvent();
+		addInteractionSnap();
+		addInteractionSelect();
+		addEvent();
 		handleContextMenu();
 		handleLocation();
 	});
@@ -726,12 +731,12 @@
 <!-- 某个医院的详情弹框 -->
 <Popover.Root class="hidden w-64 text-sm font-light " title="Popover title">
 	<!-- <X class="absolute right-4 top-5 cursor-pointer" size="sm" on:click={handleClose} /> -->
-	<div id="popup-content">
-		<h2 customSize="text-lg font-semibold" class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">医院信息</h2>
-		<ul class="mb-8 space-y-4 text-gray-500 dark:text-gray-400" list="none">
+	<div id="popup-content" class="hidden">
+		<h2 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">医院信息</h2>
+		<ul class="mb-8 space-y-4 text-gray-500 dark:text-gray-400">
 			<li class="gap-3">
 				<span class="mr-2 text-gray-900">医院名称</span>
-				<a class="mr-2 text-gray-900" on:click={() => handleDetail(hospital?.name)}>{hospital?.name}</a>
+				<a href="#" class="mr-2 text-gray-900" on:click={() => handleDetail(hospital?.name)}>{hospital?.name}</a>
 			</li>
 			<li class="gap-3">
 				<span class="mr-2 text-gray-900">医院编码</span>
