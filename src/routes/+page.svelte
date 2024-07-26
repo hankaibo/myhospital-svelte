@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { Map, View } from 'ol';
 	import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
-	import { XYZ, Vector as VectorSource, Cluster, OSM } from 'ol/source';
+	import { XYZ, Vector as VectorSource, Cluster } from 'ol/source';
 	import { Draw, Modify, Snap, Select } from 'ol/interaction.js';
 	import Feature from 'ol/Feature';
 	import Overlay from 'ol/Overlay';
@@ -17,10 +17,7 @@
 	import 'ol/ol.css';
 	import '$lib/ol/contextmenu.css';
 
-	import * as Popover from '$lib/components/ui/popover';
 	import { Label } from '$lib/components/ui/label/index.js';
-
-	import { X } from 'lucide-svelte';
 
 	// /** @type {import('./$types').PageData} */
 	// export const data;
@@ -37,7 +34,14 @@
 	let snap;
 	/** @type {import('ol/interaction/Select').default} */
 	let select;
+	/** @type {import('ol/Overlay').default} */
+	let overlay;
 
+	/**
+	 * @typedef {Object} LngLat
+	 * @property {Array<number>} coordinates
+	 * @property {string} type
+	 */
 	/**
 	 * @typedef {Object} Hospital
 	 * @property {number} id
@@ -45,21 +49,21 @@
 	 * @property {string} code
 	 * @property {string} district
 	 * @property {string} type
-	 * @property {string} level
+	 * @property {string} lvl
 	 * @property {string} address
 	 * @property {string} zipCode
 	 * @property {string} introduction
-	 * @property {number} [lng]
-	 * @property {number} [lat]
+	 * @property {LngLat} [lngLat]
 	 */
 	/** @type {Hospital} */
 	let hospital;
 	/** @type {Array<Hospital>}*/
 	$: hospitalList = [];
-	/** @type {Array<import('ol/Feature').default>} */
+	/** @type {Array<number>} */
 	let allFeature = [];
 	/** @type {Array<number>} */
 	let beforeCenter = [];
+	/** @type {Array<import('ol/Feature').default>} */
 	let beforeMarkList = [];
 	/** @type {number} */
 	let beforeRadius = 0;
@@ -69,16 +73,22 @@
 	/** @type {Array<import('ol/Feature').default>} */
 	let a19AllFeature = [];
 
+	/** @type {HTMLElement | null}*/
+	let container;
+	/** @type {HTMLElement | null}*/
+	let closer;
+
 	// 瓦片图层
 	const tileLayer1 = new TileLayer({
 		// source: new OSM()
 		source: new XYZ({
-			url: 'http://t{0-7}.tianditu.gov.cn/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=42974d10cfa313d12aefa1a633e50a0c'
+			// url: '/tile&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}'
+			url: '/tile/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}'
 		})
 	});
 	const tileLayer2 = new TileLayer({
 		source: new XYZ({
-			url: 'http://t{0-7}.tianditu.gov.cn/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=42974d10cfa313d12aefa1a633e50a0c'
+			url: '/tile/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}'
 		})
 	});
 	tileLayer1.set('name', 'tileLayer1');
@@ -197,12 +207,14 @@
 	}
 
 	function initMap() {
-		/**
-		 * Elements that make up the popup.
-		 */
-		const container = document.getElementById('popup');
-		const content = document.getElementById('popup-content');
-		const closer = document.getElementById('popup-closer');
+		overlay = new Overlay({
+			element: container || undefined,
+			autoPan: {
+				animation: {
+					duration: 250
+				}
+			}
+		});
 
 		view = new View({
 			center: fromLonLat([116.397029, 39.917839]),
@@ -217,17 +229,7 @@
 			target: 'map',
 			layers: [tileLayer1, tileLayer2, vectorLayer, clusterLayer],
 			view,
-			overlays: [
-				new Overlay({
-					id: 'popup',
-					element: container,
-					autoPan: {
-						animation: {
-							duration: 250
-						}
-					}
-				})
-			],
+			overlays: [overlay],
 			controls: defaultControls({
 				zoom: false,
 				rotate: false,
@@ -317,26 +319,26 @@
 					};
 					const coordinates = evt.coordinate;
 					// const coordinates = selectedFeature.getGeometry().getCoordinates();
-					map.getOverlayById('popup')?.setPosition(coordinates);
+					overlay?.setPosition(coordinates);
 				} else {
 					window.alert('聚合元素不可以显示详情，请重新选择。');
 				}
 			} else {
 				evt.stopPropagation();
-				const { id, name, code, type, district, level, zipCode, address, introduction } = selectedFeature.getProperties();
+				const { id, name, code, type, district, lvl, zipCode, address, introduction } = selectedFeature.getProperties();
 				hospital = {
 					id,
 					name,
 					code,
 					type,
 					district,
-					level,
+					lvl,
 					zipCode,
 					address,
 					introduction
 				};
 				const coordinates = evt.coordinate;
-				map.getOverlayById('popup')?.setPosition(coordinates);
+				overlay?.setPosition(coordinates);
 			}
 		});
 
@@ -403,6 +405,7 @@
 	 * 定位地图中心到用户当前位置
 	 */
 	function handleLocation() {
+		// 获取用户位置
 		if (navigator.geolocation) {
 			navigator.geolocation.getCurrentPosition((position) => {
 				const { longitude, latitude } = position.coords;
@@ -410,75 +413,76 @@
 				map.getView().animate({ center });
 
 				// 标记
-				const circleFeature = new Feature({
-					geometry: new CircleGeom(center, 50)
-				});
-				circleFeature.setStyle(
-					new Style({
-						renderer: function renderer(coordinates, state) {
-							const coordinates0 = coordinates[0];
-							const x = coordinates0[0];
-							const y = coordinates0[1];
-							const coordinates1 = coordinates[1];
-							const x1 = coordinates1[0];
-							const y1 = coordinates1[1];
-							const ctx = state.context;
-							const dx = x1 - x;
-							const dy = y1 - y;
-							const radius = Math.sqrt(dx * dx + dy * dy);
+				// const circleFeature = new Feature({
+				// 	geometry: new CircleGeom(center, 50)
+				// });
+				// circleFeature.setStyle(
+				// 	new Style({
+				// 		renderer: function renderer(coordinates, state) {
+				// 			const coordinates0 = coordinates[0];
+				// 			const x = coordinates0[0];
+				// 			const y = coordinates0[1];
+				// 			const coordinates1 = coordinates[1];
+				// 			const x1 = coordinates1[0];
+				// 			const y1 = coordinates1[1];
+				// 			const ctx = state.context;
+				// 			const dx = x1 - x;
+				// 			const dy = y1 - y;
+				// 			const radius = Math.sqrt(dx * dx + dy * dy);
 
-							const innerRadius = 0;
-							const outerRadius = radius * 1.4;
+				// 			const innerRadius = 0;
+				// 			const outerRadius = radius * 1.4;
 
-							const gradient = ctx.createRadialGradient(x, y, innerRadius, x, y, outerRadius);
-							gradient.addColorStop(0, 'rgba(255,0,0,0)');
-							gradient.addColorStop(0.6, 'rgba(255,0,0,0.2)');
-							gradient.addColorStop(1, 'rgba(255,0,0,0.8)');
-							ctx.beginPath();
-							ctx.arc(x, y, radius, 0, 2 * Math.PI, true);
-							ctx.fillStyle = gradient;
-							ctx.fill();
+				// 			const gradient = ctx.createRadialGradient(x, y, innerRadius, x, y, outerRadius);
+				// 			gradient.addColorStop(0, 'rgba(255,0,0,0)');
+				// 			gradient.addColorStop(0.6, 'rgba(255,0,0,0.2)');
+				// 			gradient.addColorStop(1, 'rgba(255,0,0,0.8)');
+				// 			ctx.beginPath();
+				// 			ctx.arc(x, y, radius, 0, 2 * Math.PI, true);
+				// 			ctx.fillStyle = gradient;
+				// 			ctx.fill();
 
-							ctx.arc(x, y, radius, 0, 2 * Math.PI, true);
-							ctx.strokeStyle = 'rgba(255,0,0,1)';
-							ctx.stroke();
-						}
-					})
-				);
+				// 			ctx.arc(x, y, radius, 0, 2 * Math.PI, true);
+				// 			ctx.strokeStyle = 'rgba(255,0,0,1)';
+				// 			ctx.stroke();
+				// 		}
+				// 	})
+				// );
 
-				const circle = new Feature({
-					geometry: new Point(center)
-				});
-				circle.setStyle(
-					new Style({
-						image: new CircleStyle({
-							radius: 0,
-							stroke: new Stroke({
-								color: 'red'
-							})
-						})
-					})
-				);
-				a19VectorSource.addFeature(circleFeature);
-				a19VectorSource.addFeature(circle);
-				map.addLayer(userVectorLayer);
+				// const circle = new Feature({
+				// 	geometry: new Point(center)
+				// });
+				// circle.setStyle(
+				// 	new Style({
+				// 		image: new CircleStyle({
+				// 			radius: 0,
+				// 			stroke: new Stroke({
+				// 				color: 'red'
+				// 			})
+				// 		})
+				// 	})
+				// );
+				// a19VectorSource.addFeature(circleFeature);
+				// a19VectorSource.addFeature(circle);
+				// map.addLayer(userVectorLayer);
 
 				// 动画
-				let radius = 0;
-				map.on('postcompose', () => {
-					radius += 1;
-					radius %= 20;
-					circle.setStyle(
-						new Style({
-							image: new CircleStyle({
-								radius,
-								stroke: new Stroke({
-									color: 'red'
-								})
-							})
-						})
-					);
-				});
+				// let radius = 0;
+				// map.on('postcompose', () => {
+				// 	radius += 1;
+				// 	radius %= 20;
+				// 	console.log(radius);
+				// 	circle.setStyle(
+				// 		new Style({
+				// 			image: new CircleStyle({
+				// 				radius,
+				// 				stroke: new Stroke({
+				// 					color: 'red'
+				// 				})
+				// 			})
+				// 		})
+				// 	);
+				// });
 			});
 		}
 	}
@@ -532,13 +536,14 @@
 
 	/**
 	 * 根据查询到的医院数据添加地图标记
-	 * @param {Array} list
+	 * @param {Array<Hospital>} list
 	 */
 	function addMarker(list) {
 		if (!Array.isArray(list)) {
 			return;
 		}
 
+		/** @type {Array<Hospital>} */
 		const newList = [];
 		list
 			// 过滤已绘制的
@@ -548,25 +553,27 @@
 				newList.push(item);
 			});
 
+		/** @type {Array<import('ol/Feature').default>} */
 		const featureList = [];
 		newList.forEach((item) => {
+			const { lngLat } = item;
+			let coordinates = [0, 0];
+			if (lngLat) {
+				({ coordinates } = lngLat);
+			}
 			const marker = new Feature({
-				geometry: new Point(fromLonLat([item.lng, item.lat])),
+				geometry: new Point(fromLonLat(coordinates)),
 				id: item.id,
 				name: item.name,
 				code: item.code,
 				type: item.type,
 				district: item.district,
-				level: item.level,
-				postalCode: item.postalCode,
+				level: item.lvl,
+				zipCode: item.zipCode,
 				address: item.address,
 				introduction: item.introduction
 			});
 			featureList.push(marker);
-			marker.on('click', function (evt) {
-				// 在此处添加要执行的代码
-				console.log(evt);
-			});
 		});
 		markerVectorSource.addFeatures(featureList);
 		beforeMarkList = [];
@@ -598,7 +605,7 @@
 				type: item.type,
 				district: item.district,
 				level: item.level,
-				postalCode: item.postalCode,
+				zipCode: item.zipCode,
 				address: item.address,
 				introduction: item.introduction
 			});
@@ -690,16 +697,17 @@
 
 	/**
 	 * 根据坐标范围查询医院数据
-	 * @param params
-	 * @property {object} params.center
-	 * @property {number} params.center
+	 * @param {Object} params - 参数对象
+	 * @param {string} params.type - 类型
+	 * @param {import("ol/coordinate").Coordinate} params.center - 中心坐标
+	 * @param {number} params.radius - 半径
 	 */
 	async function handleFetch({ center, radius }) {
 		const [longitude, latitude] = center;
 		const q = new URLSearchParams();
-		q.set('longitude', longitude);
-		q.set('latitude', latitude);
-		q.set('radius', radius);
+		q.set('longitude', longitude.toString());
+		q.set('latitude', latitude.toString());
+		q.set('radius', radius.toString());
 		const response = await api.get(`hospitals?${q}`, {
 			headers: {
 				'Content-Type': 'application/json'
@@ -719,6 +727,9 @@
 		addEvent();
 		handleContextMenu();
 		handleLocation();
+
+		container = document.getElementById('popup');
+		closer = document.getElementById('popup-closer');
 	});
 </script>
 
@@ -729,8 +740,8 @@
 <div id="map" class="h-[calc(100vh-73px)]"></div>
 
 <!-- 某个医院的详情弹框 -->
-<Popover.Root class="hidden w-64 text-sm font-light " title="Popover title">
-	<!-- <X class="absolute right-4 top-5 cursor-pointer" size="sm" on:click={handleClose} /> -->
+<div id="popup" class="ol-popup">
+	<a href="#" id="popup-closer" class="ol-popup-closer"></a>
 	<div id="popup-content" class="hidden">
 		<h2 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">医院信息</h2>
 		<ul class="mb-8 space-y-4 text-gray-500 dark:text-gray-400">
@@ -744,7 +755,7 @@
 			</li>
 			<li class="gap-3">
 				<span class="mr-2 text-gray-900">医院等级</span>
-				{hospital?.level}
+				{hospital?.lvl}
 			</li>
 			<li class="gap-3">
 				<span class="mr-2 text-gray-900">医院类别</span>
@@ -760,9 +771,9 @@
 			</li>
 		</ul>
 	</div>
-</Popover.Root>
+</div>
 
-{#if hospitalList.length}
+{#if hospitalList.length > 100}
 	<div class="absolute left-4 top-20 w-96 bg-white shadow">
 		<div class="mb-2">
 			<Label for="select-underline" class="sr-only">请选择</Label>
@@ -795,12 +806,12 @@
 			/>
 		</div>
 		<div class="h-96 overflow-y-auto">
-			<ul class="space-y-4 text-xs text-gray-500 dark:text-gray-400" list="none">
+			<ul class="space-y-4 text-xs text-gray-500 dark:text-gray-400">
 				{#each hospitalList as hospital}
 					<li class="flex">
 						<a class="mr-2 flex-1 text-gray-900" on:click={() => handleDetail(hospital?.name)}>{hospital?.name}</a>
 						<span class="w-16">{hospital?.code}</span>
-						<span class="w-10">{hospital?.level}</span>
+						<span class="w-10">{hospital?.lvl}</span>
 						<span class="w-16">{hospital?.type}</span>
 					</li>
 				{/each}
@@ -808,3 +819,48 @@
 		</div>
 	</div>
 {/if}
+
+<style>
+	.ol-popup {
+		position: absolute;
+		background-color: white;
+		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+		padding: 15px;
+		border-radius: 10px;
+		border: 1px solid #cccccc;
+		bottom: 12px;
+		left: -50px;
+		min-width: 280px;
+	}
+	.ol-popup:after,
+	.ol-popup:before {
+		top: 100%;
+		border: solid transparent;
+		content: ' ';
+		height: 0;
+		width: 0;
+		position: absolute;
+		pointer-events: none;
+	}
+	.ol-popup:after {
+		border-top-color: white;
+		border-width: 10px;
+		left: 48px;
+		margin-left: -10px;
+	}
+	.ol-popup:before {
+		border-top-color: #cccccc;
+		border-width: 11px;
+		left: 48px;
+		margin-left: -11px;
+	}
+	.ol-popup-closer {
+		text-decoration: none;
+		position: absolute;
+		top: 2px;
+		right: 8px;
+	}
+	.ol-popup-closer:after {
+		content: '✖';
+	}
+</style>
