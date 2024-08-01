@@ -1,4 +1,5 @@
 <script>
+	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import { Map, View } from 'ol';
 	import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
@@ -16,11 +17,14 @@
 	import * as api from '$lib/api.js';
 	import 'ol/ol.css';
 	import '$lib/ol/contextmenu.css';
-
-	import { Label } from '$lib/components/ui/label/index.js';
+	import HospitalDetail from './index/popup-detail.svelte';
+	import HospitalList from './index/popup-list.svelte';
+	import LoginAvatar from './index/avatar.svelte';
 
 	// /** @type {import('./$types').PageData} */
 	// export const data;
+
+	$: avatar = $page.data?.user?.photo;
 
 	/**	@type {import('ol/Map').default} */
 	let map;
@@ -35,29 +39,11 @@
 	/** @type {import('ol/interaction/Select').default} */
 	let select;
 	/** @type {import('ol/Overlay').default} */
-	let overlay;
+	let overlayDetail;
 
-	/**
-	 * @typedef {Object} LngLat
-	 * @property {Array<number>} coordinates
-	 * @property {string} type
-	 */
-	/**
-	 * @typedef {Object} Hospital
-	 * @property {number} id
-	 * @property {string} name
-	 * @property {string} code
-	 * @property {string} district
-	 * @property {string} type
-	 * @property {string} lvl
-	 * @property {string} address
-	 * @property {string} zipCode
-	 * @property {string} introduction
-	 * @property {LngLat} [lngLat]
-	 */
-	/** @type {Hospital} */
+	/** @type {import('./index/types').Hospital} */
 	let hospital;
-	/** @type {Array<Hospital>}*/
+	/** @type {Array<import('./index/types').Hospital>}*/
 	$: hospitalList = [];
 	/** @type {Array<number>} */
 	let allFeature = [];
@@ -74,15 +60,11 @@
 	let a19AllFeature = [];
 
 	/** @type {HTMLElement | null}*/
-	let container;
-	/** @type {HTMLElement | null}*/
-	let closer;
+	let popupDetail;
 
 	// 瓦片图层
 	const tileLayer1 = new TileLayer({
-		// source: new OSM()
 		source: new XYZ({
-			// url: '/tile&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}'
 			url: '/tile/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}'
 		})
 	});
@@ -120,14 +102,15 @@
 		distance: 40,
 		source: markerVectorSource
 	});
+	/** @type {Object<number, import('ol/style/Style').default>} */
 	const styleCache = {};
 	const clusterLayer = new VectorLayer({
 		source: clusterSource,
 		style(feature) {
 			const size = feature.get('features').length;
-			let style = styleCache[size];
-			if (!style) {
-				style = new Style({
+			let cacheStyle = styleCache[size];
+			if (!cacheStyle) {
+				cacheStyle = new Style({
 					image: new Icon({
 						anchor: [0.5, 30],
 						anchorXUnits: 'fraction',
@@ -143,9 +126,9 @@
 						})
 					})
 				});
-				styleCache[size] = style;
+				styleCache[size] = cacheStyle;
 			}
-			return style;
+			return cacheStyle;
 		}
 	});
 	clusterLayer.set('name', 'clusterLayer');
@@ -207,8 +190,8 @@
 	}
 
 	function initMap() {
-		overlay = new Overlay({
-			element: container || undefined,
+		overlayDetail = new Overlay({
+			element: popupDetail || undefined,
 			autoPan: {
 				animation: {
 					duration: 250
@@ -229,7 +212,7 @@
 			target: 'map',
 			layers: [tileLayer1, tileLayer2, vectorLayer, clusterLayer],
 			view,
-			overlays: [overlay],
+			overlays: [overlayDetail],
 			controls: defaultControls({
 				zoom: false,
 				rotate: false,
@@ -319,7 +302,8 @@
 					};
 					const coordinates = evt.coordinate;
 					// const coordinates = selectedFeature.getGeometry().getCoordinates();
-					overlay?.setPosition(coordinates);
+					overlayDetail?.setPosition(coordinates);
+					evt.stopPropagation();
 				} else {
 					window.alert('聚合元素不可以显示详情，请重新选择。');
 				}
@@ -338,7 +322,8 @@
 					introduction
 				};
 				const coordinates = evt.coordinate;
-				overlay?.setPosition(coordinates);
+				overlayDetail?.setPosition(coordinates);
+				evt.stopPropagation();
 			}
 		});
 
@@ -536,14 +521,14 @@
 
 	/**
 	 * 根据查询到的医院数据添加地图标记
-	 * @param {Array<Hospital>} list
+	 * @param {Array<import('./index/types').Hospital>} list
 	 */
 	function addMarker(list) {
 		if (!Array.isArray(list)) {
 			return;
 		}
 
-		/** @type {Array<Hospital>} */
+		/** @type {Array<import('./index/types').Hospital>} */
 		const newList = [];
 		list
 			// 过滤已绘制的
@@ -568,7 +553,7 @@
 				code: item.code,
 				type: item.type,
 				district: item.district,
-				level: item.lvl,
+				lvl: item.lvl,
 				zipCode: item.zipCode,
 				address: item.address,
 				introduction: item.introduction
@@ -581,12 +566,14 @@
 
 	/**
 	 * 添加A类医院
-	 * @param list
+	 * @param {Array<import('./index/types').Hospital>} list
 	 */
 	function addMarkerA19(list) {
 		if (!list || !Array.isArray(list) || Object.keys(list).length) {
 			return;
 		}
+
+		/** @type {Array<import('./index/types').Hospital>} */
 		const newList = [];
 		list
 			.filter((item) => !a19AllFeature.includes(item.id))
@@ -604,7 +591,7 @@
 				code: item.code,
 				type: item.type,
 				district: item.district,
-				level: item.level,
+				lvl: item.lvl,
 				zipCode: item.zipCode,
 				address: item.address,
 				introduction: item.introduction
@@ -665,34 +652,8 @@
 	 * 【弹出层】，关闭
 	 */
 	function handleClose() {
-		map.getOverlayById('popup').setPosition(undefined);
+		overlayDetail.setPosition(undefined);
 		return false;
-	}
-
-	/**
-	 * 【弹出层】，从医院名称跳转到官网详情页面
-	 * @param {string} name
-	 */
-	function handleDetail(name) {
-		const tempForm = document.createElement('form');
-		tempForm.id = 'tempForm1';
-		tempForm.method = 'post';
-		tempForm.action = 'https://fw.ybj.beijing.gov.cn/ddyy/ddyy/list';
-		tempForm.target = 'ddyy1form';
-
-		const hideInput = document.createElement('input');
-		hideInput.type = 'hidden';
-		hideInput.name = 'search_LIKE_yymc';
-		hideInput.value = name;
-
-		tempForm.appendChild(hideInput);
-		tempForm.addEventListener('submit', () => {
-			window.open('https://fw.ybj.beijing.gov.cn/ddyy/ddyy/list', 'ddyy1form');
-		});
-
-		document.body.appendChild(tempForm);
-		tempForm.submit();
-		document.body.removeChild(tempForm);
 	}
 
 	/**
@@ -727,9 +688,6 @@
 		addEvent();
 		handleContextMenu();
 		handleLocation();
-
-		container = document.getElementById('popup');
-		closer = document.getElementById('popup-closer');
 	});
 </script>
 
@@ -737,130 +695,11 @@
 	<title>首页</title>
 </svelte:head>
 
-<div id="map" class="h-[calc(100vh-73px)]"></div>
+<div id="map" class="h-dvh"></div>
 
 <!-- 某个医院的详情弹框 -->
-<div id="popup" class="ol-popup">
-	<a href="#" id="popup-closer" class="ol-popup-closer"></a>
-	<div id="popup-content" class="hidden">
-		<h2 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">医院信息</h2>
-		<ul class="mb-8 space-y-4 text-gray-500 dark:text-gray-400">
-			<li class="gap-3">
-				<span class="mr-2 text-gray-900">医院名称</span>
-				<a href="#" class="mr-2 text-gray-900" on:click={() => handleDetail(hospital?.name)}>{hospital?.name}</a>
-			</li>
-			<li class="gap-3">
-				<span class="mr-2 text-gray-900">医院编码</span>
-				{hospital?.code}
-			</li>
-			<li class="gap-3">
-				<span class="mr-2 text-gray-900">医院等级</span>
-				{hospital?.lvl}
-			</li>
-			<li class="gap-3">
-				<span class="mr-2 text-gray-900">医院类别</span>
-				{hospital?.type}
-			</li>
-			<li class="gap-3">
-				<span class="mr-2 text-gray-900">单位地址</span>
-				{hospital?.address}
-			</li>
-			<li class="gap-3">
-				<span class="mr-2 text-gray-900">医院简介</span>
-				{hospital?.introduction}
-			</li>
-		</ul>
-	</div>
-</div>
+<HospitalDetail {hospital} bind:domRef={popupDetail} on:closeDetail={handleClose} />
 
-{#if hospitalList.length > 100}
-	<div class="absolute left-4 top-20 w-96 bg-white shadow">
-		<div class="mb-2">
-			<Label for="select-underline" class="sr-only">请选择</Label>
-			<Select
-				id="select-underline"
-				underline
-				items={[
-					{ value: '-', name: '-' },
-					{ value: '对外综合', name: '对外综合' },
-					{ value: '对外专科', name: '对外专科' },
-					{ value: '对外中医', name: '对外中医' },
-					{ value: '社区卫生站', name: '社区卫生站' },
-					{ value: '村卫生室', name: '村卫生室' },
-					{ value: '对内', name: '对内' }
-				]}
-			/>
-		</div>
-		<div class="mb-2">
-			<Label for="select-underline2" class="sr-only">请选择</Label>
-			<Select
-				id="select-underline2"
-				underline
-				items={[
-					{ value: '-', name: '-' },
-					{ value: '三级', name: '三级' },
-					{ value: '二级', name: '二级' },
-					{ value: '一级', name: '一级' },
-					{ value: '未评级', name: '未评级' }
-				]}
-			/>
-		</div>
-		<div class="h-96 overflow-y-auto">
-			<ul class="space-y-4 text-xs text-gray-500 dark:text-gray-400">
-				{#each hospitalList as hospital}
-					<li class="flex">
-						<a class="mr-2 flex-1 text-gray-900" on:click={() => handleDetail(hospital?.name)}>{hospital?.name}</a>
-						<span class="w-16">{hospital?.code}</span>
-						<span class="w-10">{hospital?.lvl}</span>
-						<span class="w-16">{hospital?.type}</span>
-					</li>
-				{/each}
-			</ul>
-		</div>
-	</div>
-{/if}
+<HospitalList {hospitalList} />
 
-<style>
-	.ol-popup {
-		position: absolute;
-		background-color: white;
-		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-		padding: 15px;
-		border-radius: 10px;
-		border: 1px solid #cccccc;
-		bottom: 12px;
-		left: -50px;
-		min-width: 280px;
-	}
-	.ol-popup:after,
-	.ol-popup:before {
-		top: 100%;
-		border: solid transparent;
-		content: ' ';
-		height: 0;
-		width: 0;
-		position: absolute;
-		pointer-events: none;
-	}
-	.ol-popup:after {
-		border-top-color: white;
-		border-width: 10px;
-		left: 48px;
-		margin-left: -10px;
-	}
-	.ol-popup:before {
-		border-top-color: #cccccc;
-		border-width: 11px;
-		left: 48px;
-		margin-left: -11px;
-	}
-	.ol-popup-closer {
-		text-decoration: none;
-		position: absolute;
-		top: 2px;
-		right: 8px;
-	}
-	.ol-popup-closer:after {
-		content: '✖';
-	}
-</style>
+<LoginAvatar class="absolute top-4 right-4 z-10" src={avatar} />

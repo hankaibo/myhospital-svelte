@@ -14,7 +14,7 @@ export default defineConfig({
 				configure: (proxy, options) => {
 					// 处理代理配置
 					options.headers = {
-						'Referer': 'https://t0.tianditu.gov.cn'
+						Referer: 'https://t0.tianditu.gov.cn'
 					};
 				},
 				bypass: (req, res, proxyOptions) => {
@@ -23,6 +23,6 @@ export default defineConfig({
 					req.url = req.url.replace(/t{0-7}/, `t${t}`);
 				}
 			}
-		},
-	},
+		}
+	}
 });
