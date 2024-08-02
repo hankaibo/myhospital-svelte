@@ -1,5 +1,4 @@
 <script>
-	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import { Map, View } from 'ol';
 	import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
@@ -23,8 +22,6 @@
 
 	// /** @type {import('./$types').PageData} */
 	// export const data;
-
-	$: avatar = $page.data?.user?.photo;
 
 	/**	@type {import('ol/Map').default} */
 	let map;
@@ -702,4 +699,4 @@
 
 <HospitalList {hospitalList} />
 
-<LoginAvatar class="absolute top-4 right-4 z-10" src={avatar} />
+<LoginAvatar class="absolute right-4 top-4 z-10" />
