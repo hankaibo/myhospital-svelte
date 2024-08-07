@@ -21,10 +21,10 @@
 		</Popover.Trigger>
 		<Popover.Content>
 			{#if user}
-                <div class="flex flex-col items-center">
-                    <LogOut class="mr-2 h-4 w-4" />
-                </div>
-            {:else}
+				<div class="flex flex-col items-center">
+					<LogOut class="mr-2 h-4 w-4" />
+				</div>
+			{:else}
 				<Button variant="link" href="/login" class="w-full">登录</Button>
 			{/if}
 		</Popover.Content>

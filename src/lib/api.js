@@ -1,7 +1,7 @@
 // place files you want to import through the `$lib` alias in this folder.
 import { error } from '@sveltejs/kit';
 
-const base = 'http://localhost:3000/api/v1';
+const base = import.meta.env.VITE_BASE_URL;
 
 /**
  * @typedef {object} RequestHeaders

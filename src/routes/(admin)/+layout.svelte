@@ -3,7 +3,6 @@
 	import { navigating } from '$app/stores';
 	import Nav from '$lib/components/Nav.svelte';
 	import PreloadingIndicator from '$lib/components/PreloadingIndicator.svelte';
-	import '../app.css';
 
 	async function handleLogout() {
 		const response = await fetch('/logout?/logout', {
