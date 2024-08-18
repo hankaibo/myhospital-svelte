@@ -1,519 +1,170 @@
 <script>
-	import { onMount } from 'svelte';
-	import { Map, View } from 'ol';
-	import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
-	import { XYZ, Vector as VectorSource, Cluster } from 'ol/source';
-	import { Draw, Modify, Snap, Select } from 'ol/interaction.js';
-	import Feature from 'ol/Feature';
-	import Overlay from 'ol/Overlay';
-	import { fromLonLat, toLonLat, get } from 'ol/proj';
-	import { defaults as defaultControls } from 'ol/control.js';
-	import { Point, LineString, Circle as CircleGeom } from 'ol/geom';
-	import { getLength } from 'ol/sphere.js';
-	import { Fill, Stroke, Style, Icon, Circle as CircleStyle, Text as TextStyle } from 'ol/style';
-	import { click } from 'ol/events/condition';
-	import ContextMenu from '$lib/ol/Contextmenu';
+	import { onMount, onDestroy } from 'svelte';
+	import '@amap/amap-jsapi-types';
 	import * as api from '$lib/api.js';
-	import 'ol/ol.css';
-	import '$lib/ol/contextmenu.css';
 	import HospitalDetail from './index/popup-detail.svelte';
 	import HospitalList from './index/popup-list.svelte';
 	import LoginAvatar from './index/avatar.svelte';
-
-	// /** @type {import('./$types').PageData} */
-	// export const data;
-
-	/**	@type {import('ol/Map').default} */
-	let map;
-	/** @type {import('ol/View').default} */
-	let view;
-	/**	@type {import('ol/interaction/Modify').default}	*/
-	let modify;
-	/**	@type {import('ol/interaction/Draw').default}	*/
-	let draw;
-	/** @type {import('ol/interaction/Snap').default} */
-	let snap;
-	/** @type {import('ol/interaction/Select').default} */
-	let select;
-	/** @type {import('ol/Overlay').default} */
-	let overlayDetail;
 
 	/** @type {import('./index/types').Hospital} */
 	let hospital;
 	/** @type {Array<import('./index/types').Hospital>}*/
 	$: hospitalList = [];
 	/** @type {Array<number>} */
-	let allFeature = [];
-	/** @type {Array<number>} */
-	let beforeCenter = [];
-	/** @type {Array<import('ol/Feature').default>} */
-	let beforeMarkList = [];
-	/** @type {number} */
-	let beforeRadius = 0;
-	/** @type {import('ol/Feature').default} */
-	let deleteFeature;
-
-	/** @type {Array<import('ol/Feature').default>} */
-	let a19AllFeature = [];
-
-	/** @type {HTMLElement | null}*/
+	let allHospitalIds = [];
+	/** @type {HTMLElement | undefined}*/
 	let popupDetail;
 
-	// 瓦片图层
-	const tileLayer1 = new TileLayer({
-		source: new XYZ({
-			url: `https://t{0-7}.tianditu.gov.cn/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=${import.meta.env.VITE_TK}`
-		})
-	});
-	const tileLayer2 = new TileLayer({
-		source: new XYZ({
-			url: `https://t{0-7}.tianditu.gov.cn/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=${import.meta.env.VITE_TK}`
-		})
-	});
-	tileLayer1.set('name', 'tileLayer1');
-	tileLayer2.set('name', 'tileLayer2');
+	/**	@type {AMap.Map | undefined} */
+	let map;
+	/** @type {AMap.InfoWindow}*/
+	let infoWindow;
+	/** @type {AMap.ContextMenu} */
+	let contextMenu;
+	/** @type {Array<AMap.Circle>} */
+	let circles = [];
+	/** @type {Boolean}*/
+	let isDrawing = false;
+	/** @type {AMap.Circle | undefined} */
+	let circle;
+	/** @type {AMap.Circle} */
+	let selectedCircle; // 用于保存当前右键选中的 Circle
 
-	// 矢量图层
-	/** @type {import('ol/source/Vector').default} */
-	const vectorSource = new VectorSource({
-		wrapX: true
-	});
-	const vectorLayer = new VectorLayer({
-		source: vectorSource,
-		style: new Style({
-			fill: new Fill({
-				color: 'rgba(155, 211, 229, 0.5)'
-			}),
-			stroke: new Stroke({
-				color: 'rgba(49, 143, 227, 1)',
-				width: 1
-			})
-		})
-	});
-	vectorLayer.set('name', 'vectorLayer');
-
-	// 聚合图层
-	/** @type {import('ol/source/Vector').default} */
-	const markerVectorSource = new VectorSource();
-	const clusterSource = new Cluster({
-		distance: 40,
-		source: markerVectorSource
-	});
-	/** @type {Object<number, import('ol/style/Style').default>} */
-	const styleCache = {};
-	const clusterLayer = new VectorLayer({
-		source: clusterSource,
-		style(feature) {
-			const size = feature.get('features').length;
-			let cacheStyle = styleCache[size];
-			if (!cacheStyle) {
-				cacheStyle = new Style({
-					image: new Icon({
-						anchor: [0.5, 30],
-						anchorXUnits: 'fraction',
-						anchorYUnits: 'pixels',
-						src: '/marker.png'
-					}),
-					text: new TextStyle({
-						font: 'bold 18px serif',
-						offsetY: -16,
-						text: size.toString(),
-						fill: new Fill({
-							color: '#000'
-						})
-					})
-				});
-				styleCache[size] = cacheStyle;
-			}
-			return cacheStyle;
-		}
-	});
-	clusterLayer.set('name', 'clusterLayer');
-
-	// 矢量图层（用户）
-	const userVectorSource = new VectorSource();
-	const userVectorLayer = new VectorLayer({
-		source: userVectorSource
-	});
-
-	// 矢量图层（A类医院）
-	const a19VectorSource = new VectorSource();
-	const a19VectorLayer = new VectorLayer({
-		source: a19VectorSource
-	});
-	a19VectorLayer.set('name', 'a19VectorLayer');
-
-	/**
-	 *
-	 * @param {number} index
-	 * @param {string} tag
-	 */
-	const handleOffset = (index, tag) => {
-		let row = 0;
-		let idx = index;
-		switch (tag) {
-			case 'blue':
-				if (index > 9) {
-					row = 2;
-					idx = index - 10;
-				} else {
-					row = 1;
-				}
-				break;
-			case 'red':
-				if (index > 9) {
-					row = 4;
-					idx = index - 10;
-				} else {
-					row = 3;
-				}
-				break;
-			case 'yellow':
-				row = 5;
-				break;
-			default:
-				idx = 3;
-				row = 0;
-		}
-		return [19 + 88 * idx, 8 + 88 * row];
-	};
-
-	// Limit multi-world panning to one world east and west of the real world.
-	// Geometry coordinates have to be within that range.
-	const extent = get('EPSG:3857')?.getExtent().slice();
-	if (Array.isArray(extent)) {
-		extent[0] += extent[0];
-		extent[2] += extent[2];
-	}
-
-	function initMap() {
-		overlayDetail = new Overlay({
-			element: popupDetail || undefined,
-			autoPan: {
-				animation: {
-					duration: 250
-				}
-			}
-		});
-
-		view = new View({
-			center: fromLonLat([116.397029, 39.917839]),
-			zoom: 15,
-			minZoom: 3,
-			maxZoom: 18,
-			constrainResolution: true,
-			extent
-		});
-
-		map = new Map({
-			target: 'map',
-			layers: [tileLayer1, tileLayer2, vectorLayer, clusterLayer],
-			view,
-			overlays: [overlayDetail],
-			controls: defaultControls({
-				zoom: false,
-				rotate: false,
-				attribution: false
-			})
-		});
-	}
-	function addInteractionModify() {
-		modify = new Modify({ source: vectorSource });
-		modify.on('modifystart', ({ features }) => {
-			const feature = features.item(0);
-			handleCircleBefore(feature);
-		});
-		modify.on('modifyend', ({ features }) => {
-			const feature = features.item(0);
-			handleCircleAfter(feature);
-		});
-		map.addInteraction(modify);
-	}
-	function addInteractionDraw() {
-		draw = new Draw({
-			source: vectorSource,
-			type: 'Circle'
-		});
-		draw.on('drawend', ({ feature }) => {
-			const geometry = feature.getGeometry();
-			const center = geometry.getCenter();
-			const lastPoint = geometry.getLastCoordinate();
-			const line = new LineString([center, lastPoint]);
-			const distance = getLength(line);
-			handleFetch({
-				type: 'Circle',
-				center: toLonLat(center),
-				radius: distance
-			});
-		});
-		map.addInteraction(draw);
-	}
-	function addInteractionSnap() {
-		snap = new Snap({ source: vectorSource });
-		map.addInteraction(snap);
-	}
-	function addInteractionSelect() {
-		if (select !== null) {
-			map.removeInteraction(select);
-		}
-
-		select = new Select({
-			condition: click,
-			layers: [vectorLayer]
-		});
-
-		if (select !== null) {
-			map.addInteraction(select);
-			select.on('select', (e) => {
-				if (e.selected.length) {
-					hospitalList = markerVectorSource
-						.getFeatures()
-						.filter((item) => e.selected[0].getGeometry()?.intersectsCoordinate(item.getGeometry().getCoordinates()))
-						.map((it) => ({ ...it.getProperties() }));
-				} else {
-					hospitalList = [];
-				}
-			});
+	async function initMap() {
+		try {
+			const AMap = await loadAMap();
+			initializeMap(AMap);
+			setupEventHandlers(AMap);
+		} catch (error) {
+			console.error(error);
 		}
 	}
 
-	/**
-	 * 为地图绑定事件
-	 * 1，点击 marker 显示医院详情
-	 * 2，鼠标移入 marker 变为手型
-	 */
-	function addEvent() {
-		map.on('click', (evt) => {
-			const selectedFeature = map.forEachFeatureAtPixel(evt.pixel, (feature) => feature, {
-				layerFilter: (layer) => ['clusterLayer', 'a19VectorLayer'].includes(layer.get('name'))
-			});
-			if (!selectedFeature) {
-				return;
-			}
-			// 聚合
-			if (Array.isArray(selectedFeature.get('features'))) {
-				evt.stopPropagation();
-				if (selectedFeature.get('features').length === 1) {
-					hospital = {
-						...selectedFeature.get('features')[0].getProperties()
-					};
-					const coordinates = evt.coordinate;
-					// const coordinates = selectedFeature.getGeometry().getCoordinates();
-					overlayDetail?.setPosition(coordinates);
-					evt.stopPropagation();
-				} else {
-					window.alert('聚合元素不可以显示详情，请重新选择。');
-				}
-			} else {
-				evt.stopPropagation();
-				const { id, name, code, type, district, lvl, zipCode, address, introduction } = selectedFeature.getProperties();
-				hospital = {
-					id,
-					name,
-					code,
-					type,
-					district,
-					lvl,
-					zipCode,
-					address,
-					introduction
-				};
-				const coordinates = evt.coordinate;
-				overlayDetail?.setPosition(coordinates);
-				evt.stopPropagation();
-			}
-		});
-
-		map.on('pointermove', (e) => {
-			if (e.dragging) {
-				return;
-			}
-			const hit = map.hasFeatureAtPixel(e.pixel, {
-				layerFilter: (layer) => ['vectorLayer', 'clusterLayer', 'a19VectorLayer'].includes(layer.get('name'))
-			});
-			draw.setActive(!hit);
-			map.getTargetElement().style.cursor = hit ? 'pointer' : '';
+	async function loadAMap() {
+		return await window.AMapLoader.load({
+			key: import.meta.env.VITE_KEY,
+			version: '2.0',
+			plugins: ['AMap.Scale', 'AMap.Geolocation', 'AMap.Circle', 'AMap.CircleEditor']
 		});
 	}
 
 	/**
-	 * 右键菜单
+	 * @param {AMap} AMap - 参数对象
 	 */
-	function handleContextMenu() {
-		const contextmenuItems = [
-			{
-				text: '定位中心到此',
-				classname: 'text-bold',
-				icon: '/center.png',
-				/**
-				 *
-				 * @param {import('ol/coordinate')} obj
-				 */
-				callback(obj) {
-					view.animate({
-						duration: 700,
-						center: obj.coordinate
-					});
-				}
-			}
-		];
-		const contextmenu = new ContextMenu({
-			width: 180,
-			items: contextmenuItems
+	async function initializeMap(AMap) {
+		map = new AMap.Map('map', {
+			viewMode: '2D',
+			zoom: 13,
+			center: [116.397428, 39.90923],
+			mapStyle: 'amap://styles/dark' //设置地图的显示样式
 		});
-		contextmenu.on('open', (evt) => {
-			const selectedFeature = map.forEachFeatureAtPixel(evt.pixel, (feature) => feature, {
-				layerFilter: (layer) => layer.get('name') === 'vectorLayer'
-			});
-			if (selectedFeature) {
-				contextmenu.clear();
-				contextmenu.push({
-					text: '删除',
-					classname: 'marker',
-					data: { marker: selectedFeature },
-					callback: deleteDraw
-				});
-				deleteFeature = selectedFeature;
-			} else {
-				contextmenu.clear();
-				contextmenu.extend(contextmenuItems);
-				contextmenu.extend(contextmenu.getDefaultItems());
-			}
+
+		infoWindow = new AMap.InfoWindow({
+			content: popupDetail
 		});
-		map.addControl(contextmenu);
 	}
 
 	/**
-	 * 定位地图中心到用户当前位置
+	 * @param {AMap} AMap - 参数对象
 	 */
-	function handleLocation() {
-		// 获取用户位置
-		if (navigator.geolocation) {
-			navigator.geolocation.getCurrentPosition((position) => {
-				const { longitude, latitude } = position.coords;
-				const center = fromLonLat([longitude, latitude]);
-				map.getView().animate({ center });
+	function setupEventHandlers(AMap) {
+		contextMenu = createContextMenu(AMap);
 
-				// 标记
-				// const circleFeature = new Feature({
-				// 	geometry: new CircleGeom(center, 50)
-				// });
-				// circleFeature.setStyle(
-				// 	new Style({
-				// 		renderer: function renderer(coordinates, state) {
-				// 			const coordinates0 = coordinates[0];
-				// 			const x = coordinates0[0];
-				// 			const y = coordinates0[1];
-				// 			const coordinates1 = coordinates[1];
-				// 			const x1 = coordinates1[0];
-				// 			const y1 = coordinates1[1];
-				// 			const ctx = state.context;
-				// 			const dx = x1 - x;
-				// 			const dy = y1 - y;
-				// 			const radius = Math.sqrt(dx * dx + dy * dy);
-
-				// 			const innerRadius = 0;
-				// 			const outerRadius = radius * 1.4;
-
-				// 			const gradient = ctx.createRadialGradient(x, y, innerRadius, x, y, outerRadius);
-				// 			gradient.addColorStop(0, 'rgba(255,0,0,0)');
-				// 			gradient.addColorStop(0.6, 'rgba(255,0,0,0.2)');
-				// 			gradient.addColorStop(1, 'rgba(255,0,0,0.8)');
-				// 			ctx.beginPath();
-				// 			ctx.arc(x, y, radius, 0, 2 * Math.PI, true);
-				// 			ctx.fillStyle = gradient;
-				// 			ctx.fill();
-
-				// 			ctx.arc(x, y, radius, 0, 2 * Math.PI, true);
-				// 			ctx.strokeStyle = 'rgba(255,0,0,1)';
-				// 			ctx.stroke();
-				// 		}
-				// 	})
-				// );
-
-				// const circle = new Feature({
-				// 	geometry: new Point(center)
-				// });
-				// circle.setStyle(
-				// 	new Style({
-				// 		image: new CircleStyle({
-				// 			radius: 0,
-				// 			stroke: new Stroke({
-				// 				color: 'red'
-				// 			})
-				// 		})
-				// 	})
-				// );
-				// a19VectorSource.addFeature(circleFeature);
-				// a19VectorSource.addFeature(circle);
-				// map.addLayer(userVectorLayer);
-
-				// 动画
-				// let radius = 0;
-				// map.on('postcompose', () => {
-				// 	radius += 1;
-				// 	radius %= 20;
-				// 	console.log(radius);
-				// 	circle.setStyle(
-				// 		new Style({
-				// 			image: new CircleStyle({
-				// 				radius,
-				// 				stroke: new Stroke({
-				// 					color: 'red'
-				// 				})
-				// 			})
-				// 		})
-				// 	);
-				// });
-			});
-		}
+		map?.on('click', handleMapClick.bind(null, AMap));
+		map?.on('mousemove', handleMapMouseMove.bind(null, AMap));
+		map?.on('rightclick', () => contextMenu.close());
 	}
 
 	/**
-	 *
-	 * @param {import('ol/Feature').default} feature
+	 * @param {AMap} AMap - 参数对象
 	 */
-	function handleCircleBefore(feature) {
-		/** @type {import('ol/geom/Circle').default} */
-		const geometryCircle = /** @type {import('ol/geom/Circle')} */ feature.getGeometry();
-		beforeCenter = geometryCircle.getCenter();
-		beforeRadius = geometryCircle.getRadius();
-		beforeMarkList = markerVectorSource.getFeatures().filter((item) => geometryCircle.intersectsCoordinate(item.getGeometry().getCoordinates()));
+	function createContextMenu(AMap) {
+		const contextMenu = new AMap.ContextMenu();
+		contextMenu.addItem(
+			'删除',
+			() => {
+				removeCircle(selectedCircle);
+			},
+			0
+		);
+		return contextMenu;
 	}
 
 	/**
-	 *
-	 * @param {import('ol/Feature').default} feature
+	 * @param {AMap} AMap - 参数对象
+	 * @param {AMap.Event<'click'> & { lnglat: AMap.LngLat }} event - 参数对象
 	 */
-	function handleCircleAfter(feature) {
-		const geometryCircle = feature.getGeometry();
-		const center = geometryCircle.getCenter();
-		const radius = geometryCircle.getRadius();
-		// drag
-		if (beforeCenter.toString() !== center.toString()) {
-			beforeMarkList.forEach((item) => {
-				if (!geometryCircle.intersectsCoordinate(item.getGeometry().getCoordinates())) {
-					removeMarker(item);
-				}
-			});
-			handleFetch({
-				type: 'Circle',
-				center: toLonLat(center),
-				radius
-			});
-		} else if (radius > beforeRadius) {
-			handleFetch({
-				type: 'Circle',
-				center: toLonLat(center),
-				radius
-			});
+	function handleMapClick(AMap, event) {
+		if (!isDrawing) {
+			startDrawingCircle(AMap, event.lnglat);
 		} else {
-			beforeMarkList.forEach((item) => {
-				if (!geometryCircle.intersectsCoordinate(item.getGeometry().getCoordinates())) {
-					removeMarker(item);
-				}
-			});
+			finishDrawingCircle();
 		}
+	}
+
+	/**
+	 * @param {AMap} AMap - 参数对象
+	 * @param {AMap.LngLat} point - 参数对象
+	 */
+	function startDrawingCircle(AMap, point) {
+		isDrawing = true;
+		circle = new AMap.Circle({
+			center: point,
+			radius: 0, // 初始半径为0
+			bubble: true,
+			strokeColor: '#FF33FF',
+			strokeWeight: 6,
+			strokeOpacity: 0.2,
+			fillOpacity: 0.4,
+			strokeStyle: 'dashed',
+			strokeDasharray: [10, 10],
+			fillColor: '#1791fc',
+			draggable: true,
+			zIndex: 50
+		});
+		circle.on('click', (event) => handleCircleClick(event.target));
+		circle.on('rightclick', (event) => {
+			selectedCircle = event.target;
+			if (map) {
+				contextMenu.open(map, event.lnglat);
+			}
+		});
+		if (map) {
+			circle.setMap(map);
+		}
+	}
+
+	function finishDrawingCircle() {
+		isDrawing = false;
+		if (circle) {
+			const { lng, lat } = circle.getCenter();
+			const radius = circle.getRadius();
+			handleFetch({ lng, lat, radius });
+			circle = undefined; // 重置圆形对象
+		}
+	}
+
+	/**
+	 * @param {AMap} AMap - 参数对象
+	 * @param {AMap.Event<'click'> & { lnglat: AMap.LngLat }} event - 参数对象
+	 */
+	function handleMapMouseMove(AMap, event) {
+		if (isDrawing && circle) {
+			const movePoint = event.lnglat;
+			const radius = AMap.GeometryUtil.distance(circle.getCenter(), movePoint);
+			circle.setRadius(radius);
+		}
+	}
+
+	/**
+	 * @param {AMap.Circle} circle - 参数对象
+	 */
+	function handleCircleClick(circle) {
+		map?.getAllOverlays('marker').forEach((marker) => {
+			if (circle.contains(marker.getPosition())) {
+				hospitalList.push(marker.getExtData());
+			}
+		});
 	}
 
 	/**
@@ -529,142 +180,72 @@
 		const newList = [];
 		list
 			// 过滤已绘制的
-			.filter((item) => !allFeature.includes(item.id))
+			.filter((item) => !allHospitalIds.includes(item.id))
 			.forEach((item) => {
-				allFeature.push(item.id);
+				allHospitalIds.push(item.id);
 				newList.push(item);
 			});
 
-		/** @type {Array<import('ol/Feature').default>} */
-		const featureList = [];
+		/** @type {Array<import('./index/types').Hospital>} */
+		const markerList = [];
 		newList.forEach((item) => {
-			const { lngLat } = item;
-			let coordinates = [0, 0];
-			if (lngLat) {
-				({ coordinates } = lngLat);
-			}
-			const marker = new Feature({
-				geometry: new Point(fromLonLat(coordinates)),
-				id: item.id,
-				name: item.name,
-				code: item.code,
-				type: item.type,
-				district: item.district,
-				lvl: item.lvl,
-				zipCode: item.zipCode,
-				address: item.address,
-				introduction: item.introduction
-			});
-			featureList.push(marker);
+			const marker = createMarker(item);
+			markerList.push(marker);
 		});
-		markerVectorSource.addFeatures(featureList);
-		beforeMarkList = [];
+		//将创建的点标记添加到已有的地图实例：
+		if (markerList.length) {
+			map.add(markerList);
+		}
 	}
 
 	/**
-	 * 添加A类医院
-	 * @param {Array<import('./index/types').Hospital>} list
+	 *
+	 * @param {import('./index/types').Hospital} item
 	 */
-	function addMarkerA19(list) {
-		if (!list || !Array.isArray(list) || Object.keys(list).length) {
-			return;
-		}
+	function createMarker(item) {
+		const { lngLat, name } = item;
+		const { coordinates } = lngLat || {};
 
-		/** @type {Array<import('./index/types').Hospital>} */
-		const newList = [];
-		list
-			.filter((item) => !a19AllFeature.includes(item.id))
-			.forEach((item) => {
-				a19AllFeature.push(item.id);
-				newList.push(item);
-			});
-
-		const featureArray = [];
-		newList.forEach((item, index) => {
-			const iconFeature = new Feature({
-				geometry: new Point(fromLonLat([item.lng, item.lat])),
-				id: item.id,
-				name: item.name,
-				code: item.code,
-				type: item.type,
-				district: item.district,
-				lvl: item.lvl,
-				zipCode: item.zipCode,
-				address: item.address,
-				introduction: item.introduction
-			});
-			const iconStyle = new Style({
-				image: new Icon({
-					anchor: [0.5, 0.96],
-					size: [44, 64],
-					offset: handleOffset(index, 'red'),
-					src: 'https://www.amap.com/assets/img/poi-marker.png'
-				})
-			});
-			iconFeature.setStyle(iconStyle);
-			featureArray.push(iconFeature);
+		const marker = new AMap.Marker({
+			position: new AMap.LngLat(...coordinates), //经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
+			title: name,
+			extData: item
 		});
-		a19VectorSource.addFeatures(featureArray);
+		marker.on('click', () => {
+			hospital = item;
+			infoWindow.open(map, marker.getPosition());
+		});
+		return marker;
 	}
 
 	/**
 	 * 删除地图标记
-	 * @param {import('../lib/ol/types').CallbackObject} feature
+	 * @param {AMap.Circle} circle - 圆形对象
 	 */
-	function removeMarker(feature) {
-		const sum = vectorSource.getFeatures().length;
-		if (sum === 0) {
-			markerVectorSource.clear();
-			allFeature = [];
-		} else {
-			let isDelete = true;
-			vectorSource.forEachFeature((item) => {
-				if (item.getGeometry().intersectsCoordinate(feature.coordinate)) {
-					isDelete = false;
-				}
-			});
-			if (isDelete) {
-				allFeature = allFeature.filter((it) => it !== feature.get('id'));
-				markerVectorSource.removeFeature(feature);
+	function removeCircle(circle) {
+		// 创建一个数组来保存 Circle 内的 Marker
+		const markersInCircle = [];
+
+		// 遍历地图上的所有 Marker
+		map.getAllOverlays('marker').forEach((marker) => {
+			// 检查 Marker 是否在 Circle 内
+			if (circle.contains(marker.getPosition())) {
+				markersInCircle.push(marker);
 			}
-		}
-	}
-
-	/**
-	 * 删除选中的图形区域
-	 */
-	function deleteDraw() {
-		const selected = select.getFeatures();
-		if (deleteFeature === selected.getArray()[0]) {
-			hospitalList = [];
-		}
-
-		const geometry = deleteFeature.getGeometry();
-		const deletMarkers = markerVectorSource.getFeatures().filter((item) => geometry.intersectsCoordinate(item.getGeometry().getCoordinates()));
-		deletMarkers.forEach((feature) => markerVectorSource.removeFeature(feature));
-		vectorSource.removeFeature(deleteFeature);
-	}
-
-	/**
-	 * 【弹出层】，关闭
-	 */
-	function handleClose() {
-		overlayDetail.setPosition(undefined);
-		return false;
+		});
 	}
 
 	/**
 	 * 根据坐标范围查询医院数据
 	 * @param {Object} params - 参数对象
-	 * @param {string} params.type - 类型
-	 * @param {import("ol/coordinate").Coordinate} params.center - 中心坐标
+	 * @param {number} params.lng - 经度
+	 * @param {number} params.lat - 纬度
 	 * @param {number} params.radius - 半径
 	 */
-	async function handleFetch({ center, radius }) {
-		const [longitude, latitude] = center;
+	async function handleFetch({ lng, lat, radius }) {
 		const q = new URLSearchParams();
-		q.set('longitude', longitude.toString());
-		q.set('latitude', latitude.toString());
+		q.set('longitude', lng.toString());
+		q.set('latitude', lat.toString());
 		q.set('radius', radius.toString());
 		const response = await api.get(`hospitals?${q}`, {
 			headers: {
@@ -678,13 +259,14 @@
 
 	onMount(() => {
 		initMap();
-		addInteractionModify();
-		addInteractionDraw();
-		addInteractionSnap();
-		addInteractionSelect();
-		addEvent();
-		handleContextMenu();
-		handleLocation();
+	});
+	onDestroy(() => {
+		//解绑地图的点击事件
+		map?.off('click', () => handleMapClick());
+		//销毁地图，并清空地图容器
+		map?.destroy();
+		//地图对象赋值为null
+		map = undefined;
 	});
 </script>
 
@@ -695,7 +277,7 @@
 <div id="map" class="h-dvh"></div>
 
 <!-- 某个医院的详情弹框 -->
-<HospitalDetail {hospital} bind:domRef={popupDetail} on:closeDetail={handleClose} />
+<HospitalDetail {hospital} bind:domRef={popupDetail} on:closeDetail={() => (popupDetail = null)} />
 
 <HospitalList {hospitalList} />
 

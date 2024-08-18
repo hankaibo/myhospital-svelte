@@ -12,7 +12,11 @@ declare global {
 		// interface PageState {}
 		// interface Platform {}
 	}
+	interface Window {
+		AMapLoader: any;
+	}
 }
+
 
 interface User {
 	id: string;
@@ -23,4 +27,4 @@ interface User {
 	role: string;
 }
 
-export {};
+export { };
