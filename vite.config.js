@@ -3,7 +3,7 @@ import { defineConfig, loadEnv } from 'vite';
 
 export default defineConfig(({ mode }) => {
 	const env = loadEnv(mode, process.cwd());
-	const { VITE_BASE, VITE_TK } = env;
+	const { VITE_BASE, VITE_JSCODE } = env;
 
 	return {
 		base: VITE_BASE || '/',
@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => {
 							let searchParams = new URLSearchParams(originalUrl.search);
 
 							// Add the jscode parameter
-							searchParams.append('jscode', VITE_TK);
+							searchParams.append('jscode', VITE_JSCODE);
 
 							// Set the modified search params back to the URL
 							proxyReq.path = `${originalUrl.pathname}?${searchParams.toString()}`;

@@ -55,8 +55,8 @@
 		map = new AMap.Map('map', {
 			viewMode: '2D',
 			zoom: 13,
-			center: [116.397428, 39.90923],
-			mapStyle: 'amap://styles/dark' //设置地图的显示样式
+			center: [116.397428, 39.90923]
+			// mapStyle: 'amap://styles/dark' //设置地图的显示样式
 		});
 
 		infoWindow = new AMap.InfoWindow({
@@ -129,6 +129,14 @@
 				contextMenu.open(map, event.lnglat);
 			}
 		});
+		circle.on('dragend', (event) => {
+			// 删除旧的不在当前圆形范围内的 marker
+			removeCircle(event.target);
+			// 发送请求，获取新的医院数据
+			const { lng, lat } = event.target.getCenter();
+			const radius = event.target.getRadius();
+			handleFetch({ lng, lat, radius });
+		});
 		if (map) {
 			circle.setMap(map);
 		}
@@ -169,7 +177,7 @@
 
 	/**
 	 * 根据查询到的医院数据添加地图标记
-	 * @param {Array<import('./index/types').Hospital>} list
+	 * @param {Array<import('./index/types').Hospital>} list 医院信息数组
 	 */
 	function addMarker(list) {
 		if (!Array.isArray(list)) {
@@ -186,7 +194,7 @@
 				newList.push(item);
 			});
 
-		/** @type {Array<import('./index/types').Hospital>} */
+		/** @type {Array<AMap.Marker>} */
 		const markerList = [];
 		newList.forEach((item) => {
 			const marker = createMarker(item);
@@ -194,7 +202,7 @@
 		});
 		//将创建的点标记添加到已有的地图实例：
 		if (markerList.length) {
-			map.add(markerList);
+			map?.add(markerList);
 		}
 	}
 
@@ -224,15 +232,22 @@
 	 */
 	function removeCircle(circle) {
 		// 创建一个数组来保存 Circle 内的 Marker
+		/** @type {Array<AMap.Marker>} */
 		const markersInCircle = [];
 
 		// 遍历地图上的所有 Marker
-		map.getAllOverlays('marker').forEach((marker) => {
+		map?.getAllOverlays('marker').forEach((marker) => {
 			// 检查 Marker 是否在 Circle 内
 			if (circle.contains(marker.getPosition())) {
 				markersInCircle.push(marker);
 			}
 		});
+		markersInCircle.forEach((marker) => {
+			allHospitalIds.splice(allHospitalIds.indexOf(marker.getExtData().id), 1);
+			marker.setMap(null);
+		});
+		// 或者
+		// map?.remove(markersInCircle);
 	}
 
 	/**
