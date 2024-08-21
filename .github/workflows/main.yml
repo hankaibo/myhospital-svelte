@@ -17,8 +17,9 @@ jobs:
       - name: Install npm dependencies
         run: npm install
 
-      - name: Create .env file
-        run: echo "VITE_KEY=${{ secrets.VITE_KEY }}" > .env
+      - name: Generate .env file
+        run: |
+          echo "VITE_KEY=${{ secrets.VITE_KEY }}" | iconv -t utf-8 > .env      
 
       - name: Run build task
         run: npm run build --if-present
@@ -28,7 +29,7 @@ jobs:
         with:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           ARGS: '-rlgoDzvc -i  --delete'
-          SOURCE: 'package.json build/'
+          SOURCE: 'package.json build/ .env'
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           TARGET: ${{ secrets.REMOTE_TARGET }}
