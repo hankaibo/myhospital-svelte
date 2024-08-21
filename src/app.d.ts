@@ -17,7 +17,6 @@ declare global {
 	}
 }
 
-
 interface User {
 	id: string;
 	firstName: string;
@@ -27,4 +26,4 @@ interface User {
 	role: string;
 }
 
-export { };
+export {};
