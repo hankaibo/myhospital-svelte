@@ -3,10 +3,9 @@ import { defineConfig, loadEnv } from 'vite';
 
 export default defineConfig(({ mode }) => {
 	const env = loadEnv(mode, process.cwd());
-	const { VITE_BASE, VITE_JSCODE } = env;
+	const { VITE_JSCODE } = env;
 
 	return {
-		base: VITE_BASE || '/',
 		plugins: [sveltekit()],
 		server: {
 			proxy: {
