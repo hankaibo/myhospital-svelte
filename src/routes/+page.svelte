@@ -277,7 +277,7 @@
 	});
 	onDestroy(() => {
 		//解绑地图的点击事件
-		map?.off('click', () => handleMapClick());
+		map?.off('click', () => handleMapClick);
 		//销毁地图，并清空地图容器
 		map?.destroy();
 		//地图对象赋值为null
@@ -292,7 +292,7 @@
 <div id="map" class="h-dvh"></div>
 
 <!-- 某个医院的详情弹框 -->
-<HospitalDetail {hospital} bind:domRef={popupDetail} on:closeDetail={() => (popupDetail = null)} />
+<HospitalDetail {hospital} bind:domRef={popupDetail} on:closeDetail={() => (popupDetail = undefined)} />
 
 <HospitalList {hospitalList} />
 

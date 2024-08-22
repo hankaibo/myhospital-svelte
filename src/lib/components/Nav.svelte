@@ -1,5 +1,6 @@
 <script>
 	import { page } from '$app/stores';
+	import { base } from '$app/paths';
 	import * as Menubar from '$lib/components/ui/menubar';
 	import * as Avatar from '$lib/components/ui/avatar';
 	import { Button } from '$lib/components/ui/button';
@@ -20,17 +21,17 @@
 
 	<Menubar.Root>
 		<Menubar.Menu>
-			<Menubar.Item href="/" active={activeUrl === '/'}><Button variant="link">首页</Button></Menubar.Item>
+			<Menubar.Item href="{base}/" active={activeUrl === '/'}><Button variant="link">首页</Button></Menubar.Item>
 		</Menubar.Menu>
 
 		{#if $page.data.user?.role?.name === 'Admin'}
 			<Menubar.Menu>
-				<Menubar.Item href="/user"><Button variant="link">用户管理</Button></Menubar.Item>
+				<Menubar.Item href="{base}/user"><Button variant="link">用户管理</Button></Menubar.Item>
 			</Menubar.Menu>
 		{/if}
 
 		<Menubar.Menu>
-			<Menubar.Item href="/about"><Button variant="link">关于</Button></Menubar.Item>
+			<Menubar.Item href="{base}/about"><Button variant="link">关于</Button></Menubar.Item>
 		</Menubar.Menu>
 	</Menubar.Root>
 
@@ -43,7 +44,7 @@
 				</Avatar.Root>
 			</DropdownMenu.Trigger>
 		{:else}
-			<Button variant="link" href="/login">登录</Button>
+			<Button variant="link" href="{base}/login">登录</Button>
 		{/if}
 		<DropdownMenu.Content class="w-56">
 			{#if $page.data.user}
@@ -54,7 +55,7 @@
 						<User class="mr-2 h-4 w-4" />
 						<span>Profile</span>
 					</DropdownMenu.Item>
-					<DropdownMenu.Item href="/settings">
+					<DropdownMenu.Item href="{base}/settings">
 						<Settings class="mr-2 h-4 w-4" />
 						<span>设置</span>
 					</DropdownMenu.Item>

@@ -1,4 +1,5 @@
 <script>
+	import { base } from '$app/paths';
 	import Ellipsis from 'lucide-svelte/icons/ellipsis';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Button } from '$lib/components/ui/button';
@@ -9,7 +10,7 @@
 
 	function handleEdit() {
 		// 跳转到用户详情页面
-		goto(`/user/${id}`);
+		goto(`${base}/user/${id}`);
 	}
 
 	function handleDelete() {

@@ -1,6 +1,7 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { navigating } from '$app/stores';
+	import { base } from '$app/paths';
 	import Nav from '$lib/components/Nav.svelte';
 	import PreloadingIndicator from '$lib/components/PreloadingIndicator.svelte';
 
@@ -13,7 +14,7 @@
 			}
 		});
 		if (response.ok) {
-			goto('/login');
+			goto(`${base}/login`);
 		} else {
 			// 退出失败，你可以在这里处理错误
 		}
