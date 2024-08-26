@@ -9,7 +9,8 @@ export default defineConfig(({ mode }) => {
 		plugins: [sveltekit()],
 		server: {
 			proxy: {
-				'/api/': 'http://localhost:3000',
+				// 代理 '/api/v1/hospitals' 请求到目标地址
+				'/api/v1': 'http://localhost:3000',
 				'/_AMapService/': {
 					target: 'https://restapi.amap.com/',
 					changeOrigin: true,

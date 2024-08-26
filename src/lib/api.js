@@ -1,7 +1,9 @@
 // place files you want to import through the `$lib` alias in this folder.
 import { error } from '@sveltejs/kit';
 
-const base = import.meta.env.VITE_BASE_URL;
+const isServer = typeof window === 'undefined';
+const baseURL = isServer ? import.meta.env.VITE_SERVER_BASE_URL : import.meta.env.VITE_BASE_URL;
+
 
 /**
  * @typedef {object} RequestHeaders
@@ -51,7 +53,7 @@ async function send({ method, url, data, headers = {}, cookies }) {
 		opts.headers['Authorization'] = `Bearer ${token}`;
 	}
 
-	const res = await fetch(`${base}/${url}`, opts);
+	const res = await fetch(`${baseURL}/${url}`, opts);
 	if (res.ok || res.status === 422) {
 		const text = await res.text();
 		return text ? JSON.parse(text) : {};
@@ -66,7 +68,7 @@ async function send({ method, url, data, headers = {}, cookies }) {
 			if (newToken) {
 				headers['Authorization'] = `Bearer ${newToken}`;
 
-				const retryRes = await fetch(`${base}/${url}`, opts);
+				const retryRes = await fetch(`${baseURL}/${url}`, opts);
 				const retryText = await retryRes.text();
 
 				return retryText ? JSON.parse(retryText) : {};
@@ -167,7 +169,7 @@ async function refreshAccessToken(refreshToken) {
 	refreshingToken = true;
 
 	try {
-		const res = await fetch(`${base}/auth/refresh`, {
+		const res = await fetch(`${baseURL}/auth/refresh`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
