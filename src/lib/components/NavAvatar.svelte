@@ -45,10 +45,12 @@
 			<DropdownMenu.Label>我的账户</DropdownMenu.Label>
 			<DropdownMenu.Separator />
 			<DropdownMenu.Group>
-				<DropdownMenu.Item class="cursor-pointer" href="{base}/user">
-					<User class="mr-2 h-4 w-4" />
-					<span>控制台</span>
-				</DropdownMenu.Item>
+				{#if user.role.name === 'Admin'}
+					<DropdownMenu.Item class="cursor-pointer" href="{base}/user">
+						<User class="mr-2 h-4 w-4" />
+						<span>控制台</span>
+					</DropdownMenu.Item>
+				{/if}
 				<DropdownMenu.Item class="cursor-pointer" href="{base}/settings">
 					<Settings class="mr-2 h-4 w-4" />
 					<span>个人中心</span>

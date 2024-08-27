@@ -18,14 +18,12 @@
 			<Menubar.Item href="{base}/" active={activeUrl === '/'}><Button variant="link">首页</Button></Menubar.Item>
 		</Menubar.Menu>
 
-		{#if $page.data.user?.role?.name === 'Admin'}
-			<Menubar.Menu>
-				<Menubar.Item href="{base}/user"><Button variant="link">用户管理</Button></Menubar.Item>
-			</Menubar.Menu>
-		{/if}
+		<Menubar.Menu>
+			<Menubar.Item href="{base}/user"><Button variant="link">用户管理</Button></Menubar.Item>
+		</Menubar.Menu>
 
 		<Menubar.Menu>
-			<Menubar.Item href="{base}/about"><Button variant="link">关于</Button></Menubar.Item>
+			<Menubar.Item href="{base}/hospital"><Button variant="link">医院管理</Button></Menubar.Item>
 		</Menubar.Menu>
 	</Menubar.Root>
 

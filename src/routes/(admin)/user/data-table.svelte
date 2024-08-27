@@ -153,13 +153,13 @@
 	const hidableCols = ['name', 'email', 'status'];
 </script>
 
-<div>
+<div class="p-4">
 	<div class="flex items-center py-4">
 		<Input class="max-w-sm" placeholder="Filter emails..." type="text" bind:value={$filterValue} />
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger asChild let:builder>
 				<Button variant="outline" class="ml-auto" builders={[builder]}>
-					Columns <ChevronDown class="ml-2 h-4 w-4" />
+					列 <ChevronDown class="ml-2 h-4 w-4" />
 				</Button>
 			</DropdownMenu.Trigger>
 			<DropdownMenu.Content>
@@ -231,7 +231,7 @@
 	<div class="flex items-center justify-end space-x-4 py-4">
 		<div class="flex-1 text-sm text-muted-foreground">
 			{Object.keys($selectedDataIds).length} of{' '}
-			{$rows.length} row(s) selected.
+			{$rows.length} 行被选中。
 		</div>
 		<Button variant="outline" size="sm" on:click={() => ($pageIndex = $pageIndex - 1)} disabled={!$hasPreviousPage}>上一页</Button>
 		<Button variant="outline" size="sm" disabled={!$hasNextPage} on:click={() => ($pageIndex = $pageIndex + 1)}>下一页</Button>
