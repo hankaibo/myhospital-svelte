@@ -15,7 +15,7 @@
 	import DataTableActions from './data-table-actions.svelte';
 	import DataTableCheckbox from './data-table-checkbox.svelte';
 
-	/** @type {User}*/
+	/** @type {Array<import('./types').User>}*/
 	export let userList = [];
 	/** @type {boolean} */
 	export let isNextPage = false;
@@ -233,7 +233,7 @@
 			{Object.keys($selectedDataIds).length} of{' '}
 			{$rows.length} row(s) selected.
 		</div>
-		<Button variant="outline" size="sm" on:click={() => ($pageIndex = $pageIndex - 1)} disabled={!$hasPreviousPage}>Previous</Button>
-		<Button variant="outline" size="sm" disabled={!$hasNextPage} on:click={() => ($pageIndex = $pageIndex + 1)}>Next</Button>
+		<Button variant="outline" size="sm" on:click={() => ($pageIndex = $pageIndex - 1)} disabled={!$hasPreviousPage}>上一页</Button>
+		<Button variant="outline" size="sm" disabled={!$hasNextPage} on:click={() => ($pageIndex = $pageIndex + 1)}>下一页</Button>
 	</div>
 </div>

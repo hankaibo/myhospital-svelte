@@ -2,14 +2,8 @@
 	import { page } from '$app/stores';
 	import { base } from '$app/paths';
 	import * as Menubar from '$lib/components/ui/menubar';
-	import * as Avatar from '$lib/components/ui/avatar';
 	import { Button } from '$lib/components/ui/button';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-
-	import LifeBuoy from 'lucide-svelte/icons/life-buoy';
-	import LogOut from 'lucide-svelte/icons/log-out';
-	import Settings from 'lucide-svelte/icons/settings';
-	import User from 'lucide-svelte/icons/user';
+	import NavAvatar from './NavAvatar.svelte';
 
 	$: activeUrl = $page.url.pathname;
 </script>
@@ -35,42 +29,5 @@
 		</Menubar.Menu>
 	</Menubar.Root>
 
-	<DropdownMenu.Root>
-		{#if $page.data.user}
-			<DropdownMenu.Trigger>
-				<Avatar.Root>
-					<Avatar.Image src={$page.data.user.photo} alt="用户头像" />
-					<Avatar.Fallback>CN</Avatar.Fallback>
-				</Avatar.Root>
-			</DropdownMenu.Trigger>
-		{:else}
-			<Button variant="link" href="{base}/login">登录</Button>
-		{/if}
-		<DropdownMenu.Content class="w-56">
-			{#if $page.data.user}
-				<DropdownMenu.Label>我的账户</DropdownMenu.Label>
-				<DropdownMenu.Separator />
-				<DropdownMenu.Group>
-					<DropdownMenu.Item>
-						<User class="mr-2 h-4 w-4" />
-						<span>Profile</span>
-					</DropdownMenu.Item>
-					<DropdownMenu.Item href="{base}/settings">
-						<Settings class="mr-2 h-4 w-4" />
-						<span>设置</span>
-					</DropdownMenu.Item>
-				</DropdownMenu.Group>
-				<DropdownMenu.Separator />
-				<DropdownMenu.Item>
-					<LifeBuoy class="mr-2 h-4 w-4" />
-					<span>支持</span>
-				</DropdownMenu.Item>
-				<DropdownMenu.Separator />
-				<DropdownMenu.Item>
-					<LogOut class="mr-2 h-4 w-4" />
-					<slot name="logout" />
-				</DropdownMenu.Item>
-			{/if}
-		</DropdownMenu.Content>
-	</DropdownMenu.Root>
+	<NavAvatar></NavAvatar>
 </nav>
