@@ -9,4 +9,6 @@
 	<title>用户管理</title>
 </svelte:head>
 
-<DataTable userList={data.users} isNextPage={data.hasNextPage} />
+<div class="container mx-auto py-10">
+	<DataTable userList={data.users} isNextPage={data.hasNextPage} />
+</div>
