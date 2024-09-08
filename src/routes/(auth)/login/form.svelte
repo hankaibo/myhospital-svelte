@@ -42,7 +42,7 @@
 	</div>
 
 	<p class="text-md text-center">
-		<span class="text-gray-500">没有账号？</span>
+		<span>没有账号？</span>
 		<a href="{base}/register" class="font-medium hover:underline">注册</a>
 	</p>
 </form>

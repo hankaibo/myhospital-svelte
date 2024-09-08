@@ -33,7 +33,7 @@
 	</div>
 
 	<p class="text-md text-center">
-		<span class="text-gray-500">已有账号？</span>
+		<span>已有账号？</span>
 		<a href="{base}/login" class="font-medium hover:underline">登录</a>
 	</p>
 </form>

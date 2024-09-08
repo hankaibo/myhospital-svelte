@@ -1,5 +1,6 @@
 <script>
 	import { onMount, onDestroy } from 'svelte';
+	import { mode } from 'mode-watcher';
 	import '@amap/amap-jsapi-types';
 	import * as api from '$lib/api.js';
 	import HospitalDetail from './index/popup-detail.svelte';
@@ -56,8 +57,12 @@
 			viewMode: '2D',
 			zoom: 13,
 			center: [116.397428, 39.90923]
-			// mapStyle: 'amap://styles/dark' //设置地图的显示样式
 		});
+
+		if ($mode === 'dark') {
+			// 设置地图的显示样式
+			map.setMapStyle('amap://styles/dark');
+		}
 
 		infoWindow = new AMap.InfoWindow({
 			content: popupDetail

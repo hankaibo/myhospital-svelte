@@ -9,6 +9,4 @@
 	<title>医院管理</title>
 </svelte:head>
 
-<div class="container mx-auto py-10">
-	<DataTable hospitalList={data.hospitals} isNextPage={data.hasNextPage} />
-</div>
+<DataTable hospitalList={data.hospitals} total={data.total} />

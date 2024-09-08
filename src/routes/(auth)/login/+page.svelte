@@ -18,24 +18,24 @@
 	<div class="hidden h-full overflow-hidden lg:block lg:w-3/5">
 		<img src={data.url} alt="Bing 每日背景图片" class="h-full object-cover" />
 	</div>
-	<div class="flex w-full items-center justify-center rounded-xl bg-white p-6 shadow sm:max-w-md lg:w-2/5 lg:max-w-full lg:rounded-none lg:p-14 lg:shadow-none">
+	<div class="flex w-full items-center justify-center rounded-xl bg-background p-6 shadow sm:max-w-md lg:w-2/5 lg:max-w-full lg:rounded-none lg:p-14 lg:shadow-none">
 		<div class="w-full max-w-md space-y-8">
 			<div class="text-center">
-				<h2 class="mt-6 text-3xl font-bold text-gray-900">欢迎回来！</h2>
+				<h2 class="mt-6 text-3xl font-bold">欢迎回来！</h2>
 			</div>
 
 			<div class="flex flex-row items-center justify-center space-x-3">
 				<Button class="bg-[#3b5998] hover:bg-[#3b5998]/90 focus:ring-[#3b5998]/50 dark:focus:ring-[#3b5998]/55">
-					<Facebook />
+					<Facebook class="h-6 w-6" />
 				</Button>
 				<Button class="bg-[#1da1f2] hover:bg-[#1da1f2]/90 focus:ring-[#1da1f2]/50 dark:focus:ring-[#1da1f2]/55">
-					<Twitter />
+					<Twitter class="h-6 w-6" />
 				</Button>
 				<Button class="bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-[#4285F4]/50 dark:focus:ring-[#4285F4]/55">
-					<GoogleSolid />
+					<GoogleSolid class="h-6 w-6" />
 				</Button>
 				<Button class="bg-[#050708] hover:bg-[#050708]/90 focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 dark:focus:ring-[#050708]/50">
-					<AppleSolid />
+					<AppleSolid class="h-6 w-6" />
 				</Button>
 			</div>
 

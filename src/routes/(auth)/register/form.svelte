@@ -65,7 +65,7 @@
 		<a href="{base}/forgot" class="text-sm font-medium hover:underline">忘记密码</a>
 	</div>
 
-	<p class="text-md text-center text-gray-500">
+	<p class="text-md text-center">
 		<span>已有账号？</span>
 		<a href="{base}/login" class="font-medium hover:underline">登录</a>
 	</p>

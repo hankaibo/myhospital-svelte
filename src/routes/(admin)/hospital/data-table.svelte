@@ -1,7 +1,9 @@
 <script>
+	import { onMount, onDestroy } from 'svelte';
+	import { goto } from '$app/navigation';
 	import { createTable, Render, Subscribe, createRender } from 'svelte-headless-table';
 	import { addPagination, addSortBy, addTableFilter, addHiddenColumns, addSelectedRows } from 'svelte-headless-table/plugins';
-	import { readable } from 'svelte/store';
+	import { writable } from 'svelte/store';
 	import ArrowUpDown from 'lucide-svelte/icons/arrow-up-down';
 	import ChevronDown from 'lucide-svelte/icons/chevron-down';
 	import * as Table from '$lib/components/ui/table';
@@ -9,15 +11,29 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import * as Pagination from '$lib/components/ui/pagination';
 	import DataTableCheckbox from './data-table-checkbox.svelte';
 	import { cn } from '$lib/utils.js';
+	import { mediaQuery } from 'svelte-legos';
+
+	const isDesktop = mediaQuery('(min-width: 768px)');
+
+	$: siblingCount = $isDesktop ? 1 : 0;
 
 	/** @type {Array<import('./types').Hospital>}  */
 	export let hospitalList = [];
+	/** @type {number} */
+	export let total = 0;
 
-	const table = createTable(readable(hospitalList), {
+	let hospitalListStore = writable(hospitalList);
+	$: hospitalListStore.set(hospitalList);
+
+	const table = createTable(hospitalListStore, {
 		sort: addSortBy({ disableMultiSort: true }),
-		page: addPagination(),
+		page: addPagination({
+			serverSide: true,
+			serverItemCount: writable(total)
+		}),
 		filter: addTableFilter({
 			fn: ({ filterValue, value }) => value.toLowerCase().includes(filterValue.toLowerCase())
 		}),
@@ -141,7 +157,7 @@
 		}),
 		table.column({
 			accessor: ({ id }) => id,
-			header: '',
+			header: '操作',
 			cell: ({ value }) => {
 				return createRender(DataTableActions, { id: value });
 			},
@@ -157,7 +173,7 @@
 	]);
 
 	const { headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates, flatColumns, rows } = table.createViewModel(columns);
-	const { hasNextPage, hasPreviousPage, pageIndex } = pluginStates.page;
+	const { pageIndex } = pluginStates.page;
 	const { sortKeys } = pluginStates.sort;
 	const { filterValue } = pluginStates.filter;
 	const { hiddenColumnIds } = pluginStates.hide;
@@ -171,6 +187,18 @@
 		.map(([id]) => id);
 
 	const hideableCols = ['name', 'code', 'district', 'address', 'zipCode', 'introduction', 'lng', 'lat'];
+
+	/** @type {Function|undefined} unsubscribe */
+	let unsubscribe;
+	onMount(() => {
+		unsubscribe = pageIndex.subscribe((val) => {
+			goto(`?page=${val + 1}`);
+		});
+	});
+	// 清理订阅
+	onDestroy(() => {
+		unsubscribe?.();
+	});
 </script>
 
 <div class="w-full">
@@ -247,9 +275,31 @@
 	</div>
 	<div class="flex items-center justify-end space-x-2 py-4">
 		<div class="flex-1 text-sm text-muted-foreground">
-			{Object.keys($selectedDataIds).length} of {$rows.length} row(s) selected.
+			{$rows.length} 条中的 {Object.keys($selectedDataIds).length} 条被选中。
 		</div>
-		<Button variant="outline" size="sm" on:click={() => ($pageIndex = $pageIndex - 1)} disabled={!$hasPreviousPage}>Previous</Button>
-		<Button variant="outline" size="sm" on:click={() => ($pageIndex = $pageIndex + 1)} disabled={!$hasNextPage}>Next</Button>
+
+		<div>
+			<Pagination.Root count={total} {siblingCount} let:pages>
+				<Pagination.Content>
+					<Pagination.Item>
+						<Pagination.PrevButton on:click={() => ($pageIndex = $pageIndex - 1)} />
+					</Pagination.Item>
+					{#each pages as page (page.key)}
+						{#if page.type === 'ellipsis'}
+							<Pagination.Item>
+								<Pagination.Ellipsis />
+							</Pagination.Item>
+						{:else}
+							<Pagination.Item isVisible={$pageIndex + 1 == page.value}>
+								<Pagination.Link {page} isActive={$pageIndex + 1 == page.value} on:click={() => ($pageIndex = page.value - 1)}></Pagination.Link>
+							</Pagination.Item>
+						{/if}
+					{/each}
+					<Pagination.Item>
+						<Pagination.NextButton on:click={() => ($pageIndex = $pageIndex + 1)} />
+					</Pagination.Item>
+				</Pagination.Content>
+			</Pagination.Root>
+		</div>
 	</div>
 </div>

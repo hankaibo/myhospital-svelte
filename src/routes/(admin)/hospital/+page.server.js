@@ -14,14 +14,34 @@ export async function load({ locals, url, cookies }) {
 	params.set('page', '' + page);
 	params.set('limit', '' + limit);
 
-	const body = await api.get(`hospitals/all?${params}`, { cookies });
-
-	if (body?.errors) {
-		return fail(401, body);
-	}
+	const { data, total } = await api.get(`hospitals/all?${params}`, { cookies });
 
 	return {
-		hospitals: body.data,
-		hasNextPage: body.hasNextPage
+		hospitals: data,
+		total: total
 	};
 }
+
+/** @type {import('./$types').Actions} */
+export const actions = {
+	// 更新医院信息
+	update: async ({ request, cookies }) => {
+		const form = await superValidate(request, zod(formSchema));
+		if (!form.valid) {
+			return fail(400, {
+				form
+			});
+		}
+
+		const body = await api.post('hospitals/', form.data);
+
+		if (body.errors) {
+			return fail(401, body);
+		}
+
+		const value = btoa(JSON.stringify(body));
+		cookies.set('jwt', value, { path: '/' });
+
+		throw redirect(307, '/');
+	}
+};

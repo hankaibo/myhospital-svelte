@@ -9,6 +9,11 @@
 	import LogOut from 'lucide-svelte/icons/log-out';
 	import Settings from 'lucide-svelte/icons/settings';
 	import User from 'lucide-svelte/icons/user';
+	import Sun from 'lucide-svelte/icons/sun';
+	import MoonStar from 'lucide-svelte/icons/moon-star';
+	import Monitor from 'lucide-svelte/icons/monitor';
+
+	import { resetMode, setMode } from 'mode-watcher';
 
 	const user = $page.data?.user;
 	const src = user?.photo || `${base}/defavatar.png`;
@@ -60,6 +65,19 @@
 			<DropdownMenu.Item class="cursor-pointer">
 				<LifeBuoy class="mr-2 h-4 w-4" />
 				<span>支持</span>
+			</DropdownMenu.Item>
+			<DropdownMenu.Separator />
+			<DropdownMenu.Item on:click={() => setMode('light')}>
+				<Sun class="mr-2 h-4 w-4" />
+				<span>浅色</span>
+			</DropdownMenu.Item>
+			<DropdownMenu.Item on:click={() => setMode('dark')}>
+				<MoonStar class="mr-2 h-4 w-4" />
+				<span>深色</span>
+			</DropdownMenu.Item>
+			<DropdownMenu.Item on:click={() => resetMode()}>
+				<Monitor class="mr-2 h-4 w-4" />
+				<span>自动</span>
 			</DropdownMenu.Item>
 			<DropdownMenu.Separator />
 			<DropdownMenu.Item class="cursor-pointer">

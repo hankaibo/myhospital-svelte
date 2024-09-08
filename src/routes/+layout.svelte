@@ -1,4 +1,5 @@
 <script>
+	import { ModeWatcher } from 'mode-watcher';
 	import { navigating } from '$app/stores';
 	import PreloadingIndicator from '$lib/components/PreloadingIndicator.svelte';
 	import '../app.css';
@@ -8,6 +9,7 @@
 	<PreloadingIndicator />
 {/if}
 
-<main>
+<div class="max-h-dvh overflow-auto">
+	<ModeWatcher />
 	<slot />
-</main>
+</div>

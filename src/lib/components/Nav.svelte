@@ -8,7 +8,7 @@
 	$: activeUrl = $page.url.pathname;
 </script>
 
-<nav class="flex flex-wrap items-center justify-between border-b border-gray-200 bg-white p-4">
+<nav class="flex flex-wrap items-center justify-between border-b bg-background p-4">
 	<div class="flex items-center">
 		<slot name="brand" />
 	</div>

@@ -18,8 +18,6 @@
 
 	/** @type {Array<import('./types').User>}*/
 	export let userList = [];
-	/** @type {boolean} */
-	export let isNextPage = false;
 
 	const table = createTable(readable(userList), {
 		page: addPagination(),
