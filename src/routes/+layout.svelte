@@ -9,7 +9,5 @@
 	<PreloadingIndicator />
 {/if}
 
-<div class="max-h-dvh overflow-auto">
-	<ModeWatcher />
-	<slot />
-</div>
+<ModeWatcher />
+<slot />
