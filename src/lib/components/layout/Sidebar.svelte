@@ -76,7 +76,7 @@
 </script>
 
 <div class="app-sidebar__overlay" data-toggle="sidebar"></div>
-<aside class="fixed bottom-0 left-0 top-0 z-10 w-60 border-border/40 bg-background/95 pt-20 shadow transition-all" class:'w-4'={$sidebarOpen ? 'translate-x-0' : '-translate-x-full'}>
+<aside class="fixed bottom-0 left-0 top-0 z-10 border-border/40 bg-background/95 pt-20 shadow transition-all {$sidebarOpen ? 'w-60' : 'w-12'}">
 	<!-- svelte-ignore a11y-invalid-attribute -->
 	<ul class="app-menu">
 		{#each dataMenu as item (item.label)}
