@@ -18,7 +18,6 @@
 <Sidebar />
 <main class="mt-[60px] min-h-[calc(100vh-60px)] {$sidebarOpen ? 'ml-60' : 'ml-12'}">
 	<Transition key={data.pathname} duration={400}>
-		<!-- <slot /> -->
-		123
+		<slot />
 	</Transition>
 </main>
