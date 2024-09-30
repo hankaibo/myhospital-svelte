@@ -1,8 +1,19 @@
 <script>
 	import { page } from '$app/stores';
-	import { onMount } from 'svelte';
-	import { ChevronRight } from 'lucide-svelte';
+	import { base } from '$app/paths';
+	import { ChevronRight, Users, House, Hospital } from 'lucide-svelte';
 	import { sidebarOpen } from '../../../stores/sidebarStore';
+
+	/**
+	 * @typedef {Record<string, any>} IconMap
+	 */
+
+	/** @type {IconMap} */
+	const iconMap = {
+		home: House,
+		user: Users,
+		hospital: Hospital
+	};
 
 	// Fungsi untuk memeriksa apakah suatu elemen menu aktif
 	$: isActive = (/** @type {any} */ item) => {
@@ -12,9 +23,19 @@
 
 	const dataMenu = [
 		{
-			label: 'Dashboard',
-			icon: 'bi bi-speedometer',
-			link: '/dashboard'
+			label: '首页',
+			icon: 'home',
+			link: `${base}`
+		},
+		{
+			label: '用户管理',
+			icon: 'user',
+			link: `${base}/user`
+		},
+		{
+			label: '医院管理',
+			icon: 'hospital',
+			link: `${base}/hospital`
 		},
 		{
 			label: 'UI Elements',
@@ -43,47 +64,18 @@
 					link: '/widgets'
 				}
 			]
-		},
-		{
-			label: 'Docs',
-			icon: 'bi bi-code-square',
-			link: '/docs'
 		}
 	];
-
-	onMount(async () => {
-		// Activate sidebar treeview toggle
-		const treeviewToggleElements = document.querySelectorAll("[data-toggle='treeview']");
-		treeviewToggleElements.forEach(function (element) {
-			element.addEventListener('click', function (event) {
-				event.preventDefault();
-				const parentElement = element.parentElement;
-
-				// @ts-ignore
-				if (!parentElement.classList.contains('is-expanded')) {
-					// @ts-ignore
-					var allTreeViewElements = treeviewMenu.querySelectorAll("[data-toggle='treeview']");
-					allTreeViewElements.forEach(function (treeviewElement) {
-						// @ts-ignore
-						treeviewElement.parentElement.classList.remove('is-expanded');
-					});
-				}
-
-				// @ts-ignore
-				parentElement.classList.toggle('is-expanded');
-			});
-		});
-	});
 </script>
 
 <div class="fixed inset-0 z-[9] md:hidden" data-toggle="sidebar"></div>
-<aside class="fixed -left-60 bottom-0 top-0 z-10 overflow-auto bg-[#222d32] pt-20 shadow transition-all md:left-0 {$sidebarOpen ? 'w-60' : 'w-12 overflow-hidden'}">
+<aside class="fixed -left-60 bottom-0 top-16 z-10 overflow-auto shadow transition-all md:left-0 {$sidebarOpen ? 'w-60' : 'w-12 overflow-hidden'}">
 	<!-- svelte-ignore a11y-invalid-attribute -->
 	<ul class="mb-0 pb-10">
 		{#each dataMenu as item (item.label)}
 			{#if item.submenu}
 				<div class={isActive(item) ? 'treeview is-expanded' : 'treeview'}>
-					<a class="relative flex items-center border-l-2 px-3 py-4 text-white transition-all" href="#" data-toggle="treeview">
+					<a class="relative flex items-center border-l-2 px-3 py-4 transition-all" href="#" data-toggle="treeview">
 						<i class="app-menu__icon {item.icon}"></i>
 						<span class="flex-1">{item.label}</span>
 						<ChevronRight />
@@ -92,7 +84,7 @@
 						{#each item.submenu as subitem (subitem.label)}
 							<li>
 								<a
-									class="relative flex items-center border-l-2 px-3 py-4 text-white transition-all {isActive(subitem) ? 'border-l-[#00695c] bg-[#0d1214] text-white' : ''}"
+									class="relative flex items-center border-l-2 px-3 py-4 transition-all {isActive(subitem) ? 'border-r-2 border-black bg-[#0d1214] text-white' : ''}"
 									href={subitem.link}
 									target={subitem.target}
 									rel={subitem.rel}
@@ -105,9 +97,9 @@
 					</ul>
 				</div>
 			{:else}
-				<a class="relative flex items-center border-l-2 px-3 py-4 text-white transition-all {isActive(item) ? 'border-l-[#00695c] bg-[#0d1214] text-white' : ''}" href={item.link}>
-					<i class="app-menu__icon {item.icon}"></i>
-					<span class="flex-1">{item.label}</span>
+				<a class="relative flex items-center gap-2 border-l-2 px-3 py-4 transition-all {isActive(item) ? 'border-l-2 border-black' : ''}" href={item.link}>
+					<svelte:component this={iconMap[item.icon]} class="h-4 w-4" />
+					<span class={$sidebarOpen ? 'flex-1' : 'hidden'}>{item.label}</span>
 				</a>
 			{/if}
 		{/each}
