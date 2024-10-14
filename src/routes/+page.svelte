@@ -267,7 +267,7 @@
 		q.set('longitude', lng.toString());
 		q.set('latitude', lat.toString());
 		q.set('radius', radius.toString());
-		const response = await api.get(`hospitals?${q}`, {
+		const response = await api.get(`hospitals/circle?${q}`, {
 			headers: {
 				'Content-Type': 'application/json'
 			}
