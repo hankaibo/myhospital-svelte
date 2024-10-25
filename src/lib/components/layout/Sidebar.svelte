@@ -76,21 +76,21 @@
 			{#if item.submenu}
 				<div class={isActive(item) ? 'treeview is-expanded' : 'treeview'}>
 					<a class="relative flex items-center border-l-2 px-3 py-4 transition-all" href="#" data-toggle="treeview">
-						<i class="app-menu__icon {item.icon}"></i>
-						<span class="flex-1">{item.label}</span>
+						<svelte:component this={iconMap[item.icon]} class="h-4 w-4" />
+						<span class={$sidebarOpen ? 'flex-1' : 'hidden'}>{item.label}</span>
 						<ChevronRight />
 					</a>
 					<ul class="max-h-0 overflow-hidden bg-[#2a383e] transition-all">
 						{#each item.submenu as subitem (subitem.label)}
 							<li>
 								<a
-									class="relative flex items-center border-l-2 px-3 py-4 transition-all {isActive(subitem) ? 'border-r-2 border-black bg-[#0d1214] text-white' : ''}"
+									class="relative flex items-center border-l-2 px-3 py-4 transition-all {isActive(subitem) ? 'border-l-2 border-black' : ''}"
 									href={subitem.link}
 									target={subitem.target}
 									rel={subitem.rel}
 								>
-									<i class="icon {subitem.icon}"></i>
-									{subitem.label}
+									<svelte:component this={iconMap[subitem.icon]} class="h-4 w-4" />
+									<span class={$sidebarOpen ? 'flex-1' : 'hidden'}>{subitem.label}</span>
 								</a>
 							</li>
 						{/each}
