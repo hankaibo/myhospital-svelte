@@ -1,15 +1,14 @@
 <script>
-	/**
-	 * @typedef {import('./types').Hospital[]}
-	 */
-	export let hospitalList;
+	
+	/** @type {{hospitalList: any}} */
+	let { hospitalList } = $props();
 
 	/** @type {string} */
-	let selectType = '';
+	let selectType = $state('');
 	/** @type {string} */
-	let selectLvl = '';
+	let selectLvl = $state('');
 
-	$: filteredHospitalList = hospitalList.filter(
+	let filteredHospitalList = $derived(hospitalList.filter(
 		/** @param {import('./types').Hospital} hospital */ (hospital) => {
 			if (selectType === '' && selectLvl === '') {
 				return true;
@@ -24,7 +23,7 @@
 				return hospital.type === selectType;
 			}
 		}
-	);
+	));
 
 	/**
 	 * 从医院名称跳转到官网详情页面
@@ -84,7 +83,7 @@
 			<ul class="space-y-4 text-xs text-gray-500 dark:text-gray-400">
 				{#each filteredHospitalList as hospital}
 					<li class="flex border-b border-gray-200 pb-2 dark:border-gray-700">
-						<button class="mr-2 flex-1 text-gray-900" on:click={() => handleDetail(hospital?.name)}>{hospital?.name}</button>
+						<button class="mr-2 flex-1 text-gray-900" onclick={() => handleDetail(hospital?.name)}>{hospital?.name}</button>
 						<span class="w-16">{hospital?.code}</span>
 						<span class="w-16">{hospital?.lvl}</span>
 						<span class="w-16">{hospital?.type}</span>

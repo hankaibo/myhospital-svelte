@@ -1,8 +1,9 @@
 <script>
 	import ForgotForm from './form.svelte';
 
-	/** @type {import('./$types').PageData} */
-	export let data;
+	
+	/** @type {{data: import('./$types').PageData}} */
+	let { data } = $props();
 </script>
 
 <div class="flex h-screen items-center justify-center">

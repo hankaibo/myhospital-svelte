@@ -8,8 +8,9 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Checkbox } from '$lib/components/ui/checkbox';
 
-	/** @type {import('./$types').PageData} */
-	export let data;
+	
+	/** @type {{data: import('./$types').PageData}} */
+	let { data } = $props();
 
 	const form = superForm(data.form, {
 		validators: zodClient(formSchema)
@@ -20,18 +21,22 @@
 
 <form use:enhance method="post" class="w-full space-y-6">
 	<Form.Field {form} name="email">
-		<Form.Control let:attrs>
-			<Form.Label>邮箱</Form.Label>
-			<Input {...attrs} type="email" bind:value={$formData.email} />
-			<Form.FieldErrors />
-		</Form.Control>
+		<Form.Control >
+			{#snippet children({ attrs })}
+						<Form.Label>邮箱</Form.Label>
+				<Input {...attrs} type="email" bind:value={$formData.email} />
+				<Form.FieldErrors />
+								{/snippet}
+				</Form.Control>
 	</Form.Field>
 	<Form.Field {form} name="password">
-		<Form.Control let:attrs>
-			<Form.Label>密码</Form.Label>
-			<Input {...attrs} type="password" bind:value={$formData.password} />
-			<Form.FieldErrors />
-		</Form.Control>
+		<Form.Control >
+			{#snippet children({ attrs })}
+						<Form.Label>密码</Form.Label>
+				<Input {...attrs} type="password" bind:value={$formData.password} />
+				<Form.FieldErrors />
+								{/snippet}
+				</Form.Control>
 	</Form.Field>
 
 	<Form.Button class="w-full">登录</Form.Button>

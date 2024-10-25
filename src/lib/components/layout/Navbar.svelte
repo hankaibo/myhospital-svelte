@@ -5,15 +5,16 @@
 	import NavAvatar from '../NavAvatar.svelte';
 	import { sidebarOpen } from '../../../stores/sidebarStore';
 	import { cn } from '$lib/utils.js';
-	let className = undefined;
-	export { className as class };
+	/** @type {{class?: any}} */
+	let { class: className = undefined } = $props();
+	
 </script>
 
 <header
 	class={cn('sticky left-0 right-0 top-0 z-50 flex w-full border-b border-border/40 bg-background/95 pr-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:pr-8 print:hidden', className)}
 >
 	<a class="shrink-0 grow basis-auto content-center px-4 text-center text-2xl md:block md:w-60 md:grow-0" href="/">Vue</a>
-	<a class="-order-1 content-center px-4 transition-all md:order-none" href="#" data-toggle="sidebar" aria-label="Hide Sidebar" on:click={() => sidebarOpen.update((n) => !n)}>
+	<a class="-order-1 content-center px-4 transition-all md:order-none" href="#" data-toggle="sidebar" aria-label="Hide Sidebar" onclick={() => sidebarOpen.update((n) => !n)}>
 		<AlignJustify />
 	</a>
 	<ul class="mb-0 flex justify-end space-x-4 pl-0 md:shrink-0 md:grow md:basis-auto">

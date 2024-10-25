@@ -1,4 +1,6 @@
 <script>
+	import { run } from 'svelte/legacy';
+
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { createTable, Render, Subscribe, createRender } from 'svelte-headless-table';
@@ -18,15 +20,17 @@
 
 	const isDesktop = mediaQuery('(min-width: 768px)');
 
-	$: siblingCount = $isDesktop ? 1 : 0;
+	let siblingCount = $derived($isDesktop ? 1 : 0);
 
-	/** @type {Array<import('./types').Hospital>}  */
-	export let hospitalList = [];
-	/** @type {number} */
-	export let total = 0;
+	
+	
+	/** @type {{hospitalList?: Array<import('./types').Hospital>, total?: number}} */
+	let { hospitalList = [], total = 0 } = $props();
 
 	let hospitalListStore = writable(hospitalList);
-	$: hospitalListStore.set(hospitalList);
+	run(() => {
+		hospitalListStore.set(hospitalList);
+	});
 
 	const table = createTable(hospitalListStore, {
 		sort: addSortBy({ disableMultiSort: true }),
@@ -180,11 +184,13 @@
 	const { selectedDataIds } = pluginStates.select;
 
 	const ids = flatColumns.map((col) => col.id);
-	let hideForId = Object.fromEntries(ids.map((id) => [id, true]));
+	let hideForId = $state(Object.fromEntries(ids.map((id) => [id, true])));
 
-	$: $hiddenColumnIds = Object.entries(hideForId)
-		.filter(([_, hide]) => !hide)
-		.map(([id]) => id);
+	run(() => {
+		$hiddenColumnIds = Object.entries(hideForId)
+			.filter(([_, hide]) => !hide)
+			.map(([id]) => id);
+	});
 
 	const hideableCols = ['name', 'code', 'district', 'address', 'zipCode', 'introduction', 'lng', 'lat'];
 
@@ -205,11 +211,13 @@
 	<div class="flex items-center py-4">
 		<Input class="max-w-sm" placeholder="Search" type="text" bind:value={$filterValue} />
 		<DropdownMenu.Root>
-			<DropdownMenu.Trigger asChild let:builder>
-				<Button variant="outline" class="ml-auto" builders={[builder]}>
-					Columns <ChevronDown class="ml-2 h-4 w-4" />
-				</Button>
-			</DropdownMenu.Trigger>
+			<DropdownMenu.Trigger asChild >
+				{#snippet children({ builder })}
+								<Button variant="outline" class="ml-auto" builders={[builder]}>
+						Columns <ChevronDown class="ml-2 h-4 w-4" />
+					</Button>
+											{/snippet}
+						</DropdownMenu.Trigger>
 			<DropdownMenu.Content>
 				{#each flatColumns as col}
 					{#if hideableCols.includes(col.id)}
@@ -229,22 +237,24 @@
 					<Subscribe rowAttrs={headerRow.attrs()}>
 						<Table.Row>
 							{#each headerRow.cells as cell (cell.id)}
-								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
-									<Table.Head {...attrs} class={cn('[&:has([role=checkbox])]:pl-3')}>
-										{#if cell.id === 'lngLat'}
-											<div class="text-right">
+								<Subscribe attrs={cell.attrs()}  props={cell.props()} >
+									{#snippet children({ attrs, props })}
+																		<Table.Head {...attrs} class={cn('[&:has([role=checkbox])]:pl-3')}>
+											{#if cell.id === 'lngLat'}
+												<div class="text-right">
+													<Render of={cell.render()} />
+												</div>
+											{:else if cell.id === 'name'}
+												<Button variant="ghost" on:click={props.sort.toggle}>
+													<Render of={cell.render()} />
+													<ArrowUpDown class={cn($sortKeys[0]?.id === cell.id && 'text-foreground', 'ml-2 h-4 w-4')} />
+												</Button>
+											{:else}
 												<Render of={cell.render()} />
-											</div>
-										{:else if cell.id === 'name'}
-											<Button variant="ghost" on:click={props.sort.toggle}>
-												<Render of={cell.render()} />
-												<ArrowUpDown class={cn($sortKeys[0]?.id === cell.id && 'text-foreground', 'ml-2 h-4 w-4')} />
-											</Button>
-										{:else}
-											<Render of={cell.render()} />
-										{/if}
-									</Table.Head>
-								</Subscribe>
+											{/if}
+										</Table.Head>
+																										{/snippet}
+																</Subscribe>
 							{/each}
 						</Table.Row>
 					</Subscribe>
@@ -252,23 +262,27 @@
 			</Table.Header>
 			<Table.Body {...$tableBodyAttrs}>
 				{#each $pageRows as row (row.id)}
-					<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
-						<Table.Row {...rowAttrs} data-state={$selectedDataIds[row.id] && 'selected'}>
-							{#each row.cells as cell (cell.id)}
-								<Subscribe attrs={cell.attrs()} let:attrs>
-									<Table.Cell class="[&:has([role=checkbox])]:pl-3" {...attrs}>
-										{#if cell.id === 'lng' || cell.id === 'lat'}
-											<div class="text-right">
-												<Render of={cell.render()} />
-											</div>
-										{:else}
-											<Render of={cell.render()} />
-										{/if}
-									</Table.Cell>
-								</Subscribe>
-							{/each}
-						</Table.Row>
-					</Subscribe>
+					<Subscribe rowAttrs={row.attrs()} >
+						{#snippet children({ rowAttrs })}
+												<Table.Row {...rowAttrs} data-state={$selectedDataIds[row.id] && 'selected'}>
+								{#each row.cells as cell (cell.id)}
+									<Subscribe attrs={cell.attrs()} >
+										{#snippet children({ attrs })}
+																		<Table.Cell class="[&:has([role=checkbox])]:pl-3" {...attrs}>
+												{#if cell.id === 'lng' || cell.id === 'lat'}
+													<div class="text-right">
+														<Render of={cell.render()} />
+													</div>
+												{:else}
+													<Render of={cell.render()} />
+												{/if}
+											</Table.Cell>
+																											{/snippet}
+																</Subscribe>
+								{/each}
+							</Table.Row>
+																	{/snippet}
+										</Subscribe>
 				{/each}
 			</Table.Body>
 		</Table.Root>
@@ -279,27 +293,29 @@
 		</div>
 
 		<div>
-			<Pagination.Root count={total} {siblingCount} let:pages>
-				<Pagination.Content>
-					<Pagination.Item>
-						<Pagination.PrevButton on:click={() => ($pageIndex = $pageIndex - 1)} />
-					</Pagination.Item>
-					{#each pages as page (page.key)}
-						{#if page.type === 'ellipsis'}
-							<Pagination.Item>
-								<Pagination.Ellipsis />
-							</Pagination.Item>
-						{:else}
-							<Pagination.Item isVisible={$pageIndex + 1 == page.value}>
-								<Pagination.Link {page} isActive={$pageIndex + 1 == page.value} on:click={() => ($pageIndex = page.value - 1)}></Pagination.Link>
-							</Pagination.Item>
-						{/if}
-					{/each}
-					<Pagination.Item>
-						<Pagination.NextButton on:click={() => ($pageIndex = $pageIndex + 1)} />
-					</Pagination.Item>
-				</Pagination.Content>
-			</Pagination.Root>
+			<Pagination.Root count={total} {siblingCount} >
+				{#snippet children({ pages })}
+								<Pagination.Content>
+						<Pagination.Item>
+							<Pagination.PrevButton on:click={() => ($pageIndex = $pageIndex - 1)} />
+						</Pagination.Item>
+						{#each pages as page (page.key)}
+							{#if page.type === 'ellipsis'}
+								<Pagination.Item>
+									<Pagination.Ellipsis />
+								</Pagination.Item>
+							{:else}
+								<Pagination.Item isVisible={$pageIndex + 1 == page.value}>
+									<Pagination.Link {page} isActive={$pageIndex + 1 == page.value} on:click={() => ($pageIndex = page.value - 1)}></Pagination.Link>
+								</Pagination.Item>
+							{/if}
+						{/each}
+						<Pagination.Item>
+							<Pagination.NextButton on:click={() => ($pageIndex = $pageIndex + 1)} />
+						</Pagination.Item>
+					</Pagination.Content>
+											{/snippet}
+						</Pagination.Root>
 		</div>
 	</div>
 </div>

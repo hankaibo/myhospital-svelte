@@ -1,9 +1,10 @@
 <script>
 	import { cn } from '$lib/utils.js';
-	let className = undefined;
-	export { className as class };
+	/** @type {{class?: any, children?: import('svelte').Snippet, [key: string]: any}} */
+	let { class: className = undefined, children, ...rest } = $props();
+	
 </script>
 
-<tbody class={cn('[&_tr:last-child]:border-0', className)} {...$$restProps}>
-	<slot />
+<tbody class={cn('[&_tr:last-child]:border-0', className)} {...rest}>
+	{@render children?.()}
 </tbody>

@@ -2,9 +2,9 @@
 	import { DropdownMenu as DropdownMenuPrimitive } from 'bits-ui';
 	import Circle from 'lucide-svelte/icons/circle';
 	import { cn } from '$lib/utils.js';
-	let className = undefined;
-	export let value;
-	export { className as class };
+	/** @type {{class?: any, value: any, children?: import('svelte').Snippet, [key: string]: any}} */
+	let { class: className = undefined, value, children, ...rest } = $props();
+	
 </script>
 
 <DropdownMenuPrimitive.RadioItem
@@ -13,7 +13,7 @@
 		className
 	)}
 	{value}
-	{...$$restProps}
+	{...rest}
 	on:click
 	on:keydown
 	on:focusin
@@ -27,5 +27,5 @@
 			<Circle class="h-2 w-2 fill-current" />
 		</DropdownMenuPrimitive.RadioIndicator>
 	</span>
-	<slot />
+	{@render children?.()}
 </DropdownMenuPrimitive.RadioItem>

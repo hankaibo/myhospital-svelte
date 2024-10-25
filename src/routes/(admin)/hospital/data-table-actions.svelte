@@ -7,18 +7,19 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Sheet from '$lib/components/ui/sheet';
 
-	/** @type {number} */
-	export let id;
+	
+	/** @type {{id: number}} */
+	let { id } = $props();
 
-	let dialogOpen = false;
+	let dialogOpen = $state(false);
 	/**	@type {AMap.Map} */
 	let map;
 	/** @type {AMap.Marker} */
 	let marker;
 	/** @type {number | undefined} */
-	let lng;
+	let lng = $state();
 	/** @type {number | undefined} */
-	let lat;
+	let lat = $state();
 
 	async function handleInitMap() {
 		console.log('111 :>> ', id);
@@ -95,12 +96,14 @@
 </script>
 
 <DropdownMenu.Root>
-	<DropdownMenu.Trigger asChild let:builder>
-		<Button variant="ghost" builders={[builder]} size="icon" class="relative h-8 w-8 p-0">
-			<span class="sr-only">Open menu</span>
-			<Ellipsis class="h-4 w-4" />
-		</Button>
-	</DropdownMenu.Trigger>
+	<DropdownMenu.Trigger asChild >
+		{#snippet children({ builder })}
+				<Button variant="ghost" builders={[builder]} size="icon" class="relative h-8 w-8 p-0">
+				<span class="sr-only">Open menu</span>
+				<Ellipsis class="h-4 w-4" />
+			</Button>
+					{/snippet}
+		</DropdownMenu.Trigger>
 	<DropdownMenu.Content>
 		<DropdownMenu.Group>
 			<DropdownMenu.Label>Actions</DropdownMenu.Label>
@@ -123,9 +126,11 @@
 		<div class="absolute bottom-20 right-10 rounded bg-slate-400 p-2">经度: <span>{lng || 'N/A'}</span>, 纬度: <span>{lat || 'N/A'}</span></div>
 
 		<Sheet.Footer>
-			<Sheet.Close asChild let:builder>
-				<Button builders={[builder]} type="submit">保存</Button>
-			</Sheet.Close>
+			<Sheet.Close asChild >
+				{#snippet children({ builder })}
+								<Button builders={[builder]} type="submit">保存</Button>
+											{/snippet}
+						</Sheet.Close>
 		</Sheet.Footer>
 	</Sheet.Content>
 </Sheet.Root>

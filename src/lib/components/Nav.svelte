@@ -4,13 +4,15 @@
 	import * as Menubar from '$lib/components/ui/menubar';
 	import { Button } from '$lib/components/ui/button';
 	import NavAvatar from './NavAvatar.svelte';
+	/** @type {{brand?: import('svelte').Snippet}} */
+	let { brand } = $props();
 
-	$: activeUrl = $page.url.pathname;
+	let activeUrl = $derived($page.url.pathname);
 </script>
 
 <nav class="flex flex-wrap items-center justify-between border-b bg-background p-4">
 	<div class="flex items-center">
-		<slot name="brand" />
+		{@render brand?.()}
 	</div>
 
 	<Menubar.Root>

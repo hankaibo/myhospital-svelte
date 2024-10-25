@@ -1,8 +1,9 @@
 <script>
 	import { Menubar as MenubarPrimitive } from 'bits-ui';
 	import { cn } from '$lib/utils.js';
-	let className = undefined;
-	export { className as class };
+	/** @type {{class?: any, children?: import('svelte').Snippet, [key: string]: any}} */
+	let { class: className = undefined, children, ...rest } = $props();
+	
 </script>
 
 <MenubarPrimitive.Trigger
@@ -13,7 +14,7 @@
 	on:click
 	on:keydown
 	on:pointerenter
-	{...$$restProps}
+	{...rest}
 >
-	<slot />
+	{@render children?.()}
 </MenubarPrimitive.Trigger>

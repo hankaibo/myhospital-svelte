@@ -3,6 +3,8 @@
 	import { navigating } from '$app/stores';
 	import PreloadingIndicator from '$lib/components/PreloadingIndicator.svelte';
 	import '../app.css';
+	/** @type {{children?: import('svelte').Snippet}} */
+	let { children } = $props();
 </script>
 
 {#if $navigating}
@@ -10,4 +12,4 @@
 {/if}
 
 <ModeWatcher />
-<slot />
+{@render children?.()}

@@ -4,19 +4,24 @@
 	import { fly } from 'svelte/transition';
 	import { SheetOverlay, SheetPortal, sheetTransitions, sheetVariants } from './index.js';
 	import { cn } from '$lib/utils.js';
-	let className = undefined;
-	export let side = 'right';
-	export { className as class };
-	export let inTransition = fly;
-	export let inTransitionConfig = sheetTransitions[side ?? 'right'].in;
-	export let outTransition = fly;
-	export let outTransitionConfig = sheetTransitions[side ?? 'right'].out;
+	
+	/** @type {{class?: any, side?: string, inTransition?: any, inTransitionConfig?: any, outTransition?: any, outTransitionConfig?: any, children?: import('svelte').Snippet, [key: string]: any}} */
+	let {
+		class: className = undefined,
+		side = 'right',
+		inTransition = fly,
+		inTransitionConfig = sheetTransitions[side ?? 'right'].in,
+		outTransition = fly,
+		outTransitionConfig = sheetTransitions[side ?? 'right'].out,
+		children,
+		...rest
+	} = $props();
 </script>
 
 <SheetPortal>
 	<SheetOverlay />
-	<SheetPrimitive.Content {inTransition} {inTransitionConfig} {outTransition} {outTransitionConfig} class={cn(sheetVariants({ side }), className)} {...$$restProps}>
-		<slot />
+	<SheetPrimitive.Content {inTransition} {inTransitionConfig} {outTransition} {outTransitionConfig} class={cn(sheetVariants({ side }), className)} {...rest}>
+		{@render children?.()}
 		<SheetPrimitive.Close
 			class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary"
 		>

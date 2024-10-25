@@ -2,10 +2,13 @@
 	import { AlertDialog as AlertDialogPrimitive } from 'bits-ui';
 	import { buttonVariants } from '$lib/components/ui/button/index.js';
 	import { cn } from '$lib/utils.js';
-	let className = undefined;
-	export { className as class };
+	/** @type {{class?: any, children?: import('svelte').Snippet<[any]>, [key: string]: any}} */
+	let { class: className = undefined, children, ...rest } = $props();
+	
 </script>
 
-<AlertDialogPrimitive.Action class={cn(buttonVariants(), className)} {...$$restProps} on:click on:keydown let:builder>
-	<slot {builder} />
+<AlertDialogPrimitive.Action class={cn(buttonVariants(), className)} {...rest} on:click on:keydown >
+	{#snippet children({ builder })}
+		{@render children?.({ builder, })}
+	{/snippet}
 </AlertDialogPrimitive.Action>

@@ -1,9 +1,10 @@
 <script>
 	import { cn } from '$lib/utils.js';
-	let className = undefined;
-	export { className as class };
+	/** @type {{class?: any, children?: import('svelte').Snippet, [key: string]: any}} */
+	let { class: className = undefined, children, ...rest } = $props();
+	
 </script>
 
-<span class={cn('ml-auto text-xs tracking-widest text-muted-foreground', className)} {...$$restProps}>
-	<slot />
+<span class={cn('ml-auto text-xs tracking-widest text-muted-foreground', className)} {...rest}>
+	{@render children?.()}
 </span>

@@ -1,7 +1,8 @@
 <script>
 	import * as Avatar from '$lib/components/ui/avatar/index.js';
 
-	export let src;
+	/** @type {{src: any}} */
+	let { src } = $props();
 </script>
 
 <Avatar.Root>

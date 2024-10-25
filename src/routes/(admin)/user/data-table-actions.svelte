@@ -5,8 +5,9 @@
 	import { Button } from '$lib/components/ui/button';
 	import { goto } from '$app/navigation';
 
-	/** @type {string} */
-	export let id;
+	
+	/** @type {{id: string}} */
+	let { id } = $props();
 
 	function handleEdit() {
 		// 跳转到用户详情页面
@@ -19,12 +20,14 @@
 </script>
 
 <DropdownMenu.Root>
-	<DropdownMenu.Trigger asChild let:builder>
-		<Button variant="ghost" builders={[builder]} size="icon" class="relative h-8 w-8 p-0">
-			<span class="sr-only">Open menu</span>
-			<Ellipsis class="h-4 w-4" />
-		</Button>
-	</DropdownMenu.Trigger>
+	<DropdownMenu.Trigger asChild >
+		{#snippet children({ builder })}
+				<Button variant="ghost" builders={[builder]} size="icon" class="relative h-8 w-8 p-0">
+				<span class="sr-only">Open menu</span>
+				<Ellipsis class="h-4 w-4" />
+			</Button>
+					{/snippet}
+		</DropdownMenu.Trigger>
 	<DropdownMenu.Content>
 		<DropdownMenu.Item on:click={handleEdit}>编辑</DropdownMenu.Item>
 		<DropdownMenu.Item on:click={handleDelete}>删除</DropdownMenu.Item>

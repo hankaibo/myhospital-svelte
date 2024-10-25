@@ -1,9 +1,9 @@
 <script>
 	import { Menubar as MenubarPrimitive } from 'bits-ui';
 	import { cn } from '$lib/utils.js';
-	let className = undefined;
-	export let inset = undefined;
-	export { className as class };
+	/** @type {{class?: any, inset?: any, children?: import('svelte').Snippet, [key: string]: any}} */
+	let { class: className = undefined, inset = undefined, children, ...rest } = $props();
+	
 </script>
 
 <MenubarPrimitive.Item
@@ -12,7 +12,7 @@
 		inset && 'pl-8',
 		className
 	)}
-	{...$$restProps}
+	{...rest}
 	on:click
 	on:keydown
 	on:focusin
@@ -21,5 +21,5 @@
 	on:pointermove
 	on:pointerdown
 >
-	<slot />
+	{@render children?.()}
 </MenubarPrimitive.Item>

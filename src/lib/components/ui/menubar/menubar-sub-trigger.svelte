@@ -2,9 +2,9 @@
 	import { Menubar as MenubarPrimitive } from 'bits-ui';
 	import ChevronRight from 'lucide-svelte/icons/chevron-right';
 	import { cn } from '$lib/utils.js';
-	let className = undefined;
-	export let inset = undefined;
-	export { className as class };
+	/** @type {{class?: any, inset?: any, children?: import('svelte').Snippet, [key: string]: any}} */
+	let { class: className = undefined, inset = undefined, children, ...rest } = $props();
+	
 </script>
 
 <MenubarPrimitive.SubTrigger
@@ -14,13 +14,13 @@
 		className
 	)}
 	on:click
-	{...$$restProps}
+	{...rest}
 	on:keydown
 	on:focusin
 	on:focusout
 	on:pointerleave
 	on:pointermove
 >
-	<slot />
+	{@render children?.()}
 	<ChevronRight class="ml-auto h-4 w-4" />
 </MenubarPrimitive.SubTrigger>

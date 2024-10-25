@@ -5,7 +5,7 @@
 	/** @type {string} */
 	let hash;
 
-	let confirmationMessage = '';
+	let confirmationMessage = $state('');
 
 	async function confirmEmail() {
 		try {

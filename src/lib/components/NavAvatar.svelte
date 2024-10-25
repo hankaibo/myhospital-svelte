@@ -82,7 +82,7 @@
 			<DropdownMenu.Separator />
 			<DropdownMenu.Item class="cursor-pointer">
 				<LogOut class="mr-2 h-4 w-4" />
-				<button on:click={handleLogout}>退出</button>
+				<button onclick={handleLogout}>退出</button>
 			</DropdownMenu.Item>
 		{/if}
 	</DropdownMenu.Content>

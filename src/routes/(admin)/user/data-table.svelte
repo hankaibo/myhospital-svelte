@@ -1,4 +1,6 @@
 <script>
+	import { run } from 'svelte/legacy';
+
 	import { readable } from 'svelte/store';
 	import { createTable, Render, Subscribe, createRender } from 'svelte-headless-table';
 	import { addPagination, addSortBy, addTableFilter, addHiddenColumns, addSelectedRows } from 'svelte-headless-table/plugins';
@@ -16,8 +18,9 @@
 	import DataTableCheckbox from './data-table-checkbox.svelte';
 	import { cn } from '$lib/utils.js';
 
-	/** @type {Array<import('./types').User>}*/
-	export let userList = [];
+	
+	/** @type {{userList?: Array<import('./types').User>}} */
+	let { userList = [] } = $props();
 
 	const table = createTable(readable(userList), {
 		page: addPagination(),
@@ -143,11 +146,13 @@
 	const { selectedDataIds } = pluginStates.select;
 
 	const ids = flatColumns.map((col) => col.id);
-	let hideForId = Object.fromEntries(ids.map((id) => [id, true]));
+	let hideForId = $state(Object.fromEntries(ids.map((id) => [id, true])));
 
-	$: $hiddenColumnIds = Object.entries(hideForId)
-		.filter(([_, hide]) => !hide)
-		.map(([id]) => id);
+	run(() => {
+		$hiddenColumnIds = Object.entries(hideForId)
+			.filter(([_, hide]) => !hide)
+			.map(([id]) => id);
+	});
 
 	const hideableCols = ['name', 'email', 'status'];
 </script>
@@ -156,11 +161,13 @@
 	<div class="flex items-center py-4">
 		<Input class="max-w-sm" placeholder="Filter emails..." type="text" bind:value={$filterValue} />
 		<DropdownMenu.Root>
-			<DropdownMenu.Trigger asChild let:builder>
-				<Button variant="outline" class="ml-auto" builders={[builder]}>
-					列 <ChevronDown class="ml-2 h-4 w-4" />
-				</Button>
-			</DropdownMenu.Trigger>
+			<DropdownMenu.Trigger asChild >
+				{#snippet children({ builder })}
+								<Button variant="outline" class="ml-auto" builders={[builder]}>
+						列 <ChevronDown class="ml-2 h-4 w-4" />
+					</Button>
+											{/snippet}
+						</DropdownMenu.Trigger>
 			<DropdownMenu.Content>
 				{#each flatColumns as col}
 					{#if hideableCols.includes(col.id)}
@@ -179,22 +186,24 @@
 					<Subscribe rowAttrs={headerRow.attrs()}>
 						<Table.Row>
 							{#each headerRow.cells as cell (cell.id)}
-								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
-									<Table.Head {...attrs} class={cn('[&:has([role=checkbox])]:pl-3')}>
-										{#if cell.id === 'amount'}
-											<div class="text-right">
+								<Subscribe attrs={cell.attrs()}  props={cell.props()} >
+									{#snippet children({ attrs, props })}
+																		<Table.Head {...attrs} class={cn('[&:has([role=checkbox])]:pl-3')}>
+											{#if cell.id === 'amount'}
+												<div class="text-right">
+													<Render of={cell.render()} />
+												</div>
+											{:else if cell.id === 'email'}
+												<Button variant="ghost" on:click={props.sort.toggle}>
+													<Render of={cell.render()} />
+													<ArrowUpDown class={cn($sortKeys[0]?.id === cell.id && 'text-foreground', 'ml-2 h-4 w-4')} />
+												</Button>
+											{:else}
 												<Render of={cell.render()} />
-											</div>
-										{:else if cell.id === 'email'}
-											<Button variant="ghost" on:click={props.sort.toggle}>
-												<Render of={cell.render()} />
-												<ArrowUpDown class={cn($sortKeys[0]?.id === cell.id && 'text-foreground', 'ml-2 h-4 w-4')} />
-											</Button>
-										{:else}
-											<Render of={cell.render()} />
-										{/if}
-									</Table.Head>
-								</Subscribe>
+											{/if}
+										</Table.Head>
+																										{/snippet}
+																</Subscribe>
 							{/each}
 						</Table.Row>
 					</Subscribe>
@@ -202,27 +211,31 @@
 			</Table.Header>
 			<Table.Body {...$tableBodyAttrs}>
 				{#each $pageRows as row (row.id)}
-					<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
-						<Table.Row {...rowAttrs} data-state={$selectedDataIds[row.id] && 'selected'}>
-							{#each row.cells as cell (cell.id)}
-								<Subscribe attrs={cell.attrs()} let:attrs>
-									<Table.Cell {...attrs} class="[&:has([role=checkbox])]:pl-3">
-										{#if cell.id === 'amount'}
-											<div class="text-right font-medium">
-												<Render of={cell.render()} />
-											</div>
-										{:else if cell.id === 'status'}
-											<div class="capitalize">
-												<Render of={cell.render()} />
-											</div>
-										{:else}
-											<Render of={cell.render()} />
-										{/if}
-									</Table.Cell>
-								</Subscribe>
-							{/each}
-						</Table.Row>
-					</Subscribe>
+					<Subscribe rowAttrs={row.attrs()} >
+						{#snippet children({ rowAttrs })}
+												<Table.Row {...rowAttrs} data-state={$selectedDataIds[row.id] && 'selected'}>
+								{#each row.cells as cell (cell.id)}
+									<Subscribe attrs={cell.attrs()} >
+										{#snippet children({ attrs })}
+																		<Table.Cell {...attrs} class="[&:has([role=checkbox])]:pl-3">
+												{#if cell.id === 'amount'}
+													<div class="text-right font-medium">
+														<Render of={cell.render()} />
+													</div>
+												{:else if cell.id === 'status'}
+													<div class="capitalize">
+														<Render of={cell.render()} />
+													</div>
+												{:else}
+													<Render of={cell.render()} />
+												{/if}
+											</Table.Cell>
+																											{/snippet}
+																</Subscribe>
+								{/each}
+							</Table.Row>
+																	{/snippet}
+										</Subscribe>
 				{/each}
 			</Table.Body>
 		</Table.Root>

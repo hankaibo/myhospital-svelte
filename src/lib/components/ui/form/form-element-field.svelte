@@ -1,16 +1,22 @@
-<script context="module"></script>
+<script module></script>
 
 <script>
 	import * as FormPrimitive from 'formsnap';
 	import { cn } from '$lib/utils.js';
-	export let form;
-	export let name;
-	let className = undefined;
-	export { className as class };
+	/** @type {{form: any, name: any, class?: any, children?: import('svelte').Snippet<[any]>}} */
+	let {
+		form,
+		name,
+		class: className = undefined,
+		children
+	} = $props();
+	
 </script>
 
-<FormPrimitive.ElementField {form} {name} let:constraints let:errors let:tainted let:value>
-	<div class={cn('space-y-2', className)}>
-		<slot {constraints} {errors} {tainted} {value} />
-	</div>
+<FormPrimitive.ElementField {form} {name}    >
+	{#snippet children({ constraints, errors, tainted, value })}
+		<div class={cn('space-y-2', className)}>
+			{@render children?.({ constraints, errors, tainted, value, })}
+		</div>
+	{/snippet}
 </FormPrimitive.ElementField>

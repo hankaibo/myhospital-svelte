@@ -1,8 +1,9 @@
 <script>
 	import { DropdownMenu as DropdownMenuPrimitive } from 'bits-ui';
-	export let value = undefined;
+	/** @type {{value?: any, children?: import('svelte').Snippet, [key: string]: any}} */
+	let { value = $bindable(undefined), children, ...rest } = $props();
 </script>
 
-<DropdownMenuPrimitive.RadioGroup {...$$restProps} bind:value>
-	<slot />
+<DropdownMenuPrimitive.RadioGroup {...rest} bind:value>
+	{@render children?.()}
 </DropdownMenuPrimitive.RadioGroup>

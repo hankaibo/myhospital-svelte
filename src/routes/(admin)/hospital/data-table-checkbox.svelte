@@ -2,7 +2,8 @@
 	import { Checkbox } from '$lib/components/ui/checkbox';
 	import { writable } from 'svelte/store';
 
-	export let checked = writable(false);
+	/** @type {{checked?: any}} */
+	let { checked = writable(false) } = $props();
 </script>
 
 <Checkbox bind:checked={$checked} />

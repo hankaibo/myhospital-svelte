@@ -8,13 +8,13 @@
 	import LoginAvatar from './index/avatar.svelte';
 
 	/** @type {import('./index/types').Hospital} */
-	let hospital;
+	let hospital = $state();
 	/** @type {Array<import('./index/types').Hospital>}*/
-	$: hospitalList = [];
+	let hospitalList = $derived([]);
 	/** @type {Array<number>} */
 	let allHospitalIds = [];
 	/** @type {HTMLElement | undefined}*/
-	let popupDetail;
+	let popupDetail = $state();
 
 	/**	@type {AMap.Map | undefined} */
 	let map;

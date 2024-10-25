@@ -1,14 +1,20 @@
 <script>
+	import { run } from 'svelte/legacy';
+
 	import { tick } from 'svelte';
 	import { page } from '$app/stores';
 	import SettingsForm from './form.svelte';
 
-	/** @type {import('./$types').PageData} */
-	export let data;
+	
+	/** @type {{data: import('./$types').PageData}} */
+	let { data } = $props();
 
-	let value = [];
+	let value = $state([]);
 	/** @type FileList | undefined  */
-	$: files = undefined;
+	let files;
+	run(() => {
+		files = undefined;
+	});
 
 	const dropHandle = (event) => {
 		value = [];
