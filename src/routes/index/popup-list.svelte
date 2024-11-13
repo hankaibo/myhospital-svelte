@@ -1,5 +1,4 @@
 <script>
-	
 	/** @type {{hospitalList: any}} */
 	let { hospitalList } = $props();
 
@@ -8,22 +7,24 @@
 	/** @type {string} */
 	let selectLvl = $state('');
 
-	let filteredHospitalList = $derived(hospitalList.filter(
-		/** @param {import('./types').Hospital} hospital */ (hospital) => {
-			if (selectType === '' && selectLvl === '') {
-				return true;
+	let filteredHospitalList = $derived(
+		hospitalList.filter(
+			/** @param {import('./types').Hospital} hospital */ (hospital) => {
+				if (selectType === '' && selectLvl === '') {
+					return true;
+				}
+				if (selectType !== '' && selectLvl !== '') {
+					return hospital.type === selectType && hospital.lvl === selectLvl;
+				}
+				if (selectType === '') {
+					return hospital.lvl === selectLvl;
+				}
+				if (selectLvl === '') {
+					return hospital.type === selectType;
+				}
 			}
-			if (selectType !== '' && selectLvl !== '') {
-				return hospital.type === selectType && hospital.lvl === selectLvl;
-			}
-			if (selectType === '') {
-				return hospital.lvl === selectLvl;
-			}
-			if (selectLvl === '') {
-				return hospital.type === selectType;
-			}
-		}
-	));
+		)
+	);
 
 	/**
 	 * 从医院名称跳转到官网详情页面
@@ -54,7 +55,9 @@
 
 {#if hospitalList.length > 0}
 	<div class="absolute bottom-4 left-4 top-4 w-96 space-y-2 bg-white p-2 shadow">
-		<div class="flex items-center justify-between border-b border-gray-200 pb-2 dark:border-gray-700">
+		<div
+			class="flex items-center justify-between border-b border-gray-200 pb-2 dark:border-gray-700"
+		>
 			<select name="type" placeholder="请选择医院类别" bind:value={selectType}>
 				<option value="">--请选择医院类别--</option>
 				<option value="对外综合">对外综合</option>
@@ -83,7 +86,9 @@
 			<ul class="space-y-4 text-xs text-gray-500 dark:text-gray-400">
 				{#each filteredHospitalList as hospital}
 					<li class="flex border-b border-gray-200 pb-2 dark:border-gray-700">
-						<button class="mr-2 flex-1 text-gray-900" onclick={() => handleDetail(hospital?.name)}>{hospital?.name}</button>
+						<button class="mr-2 flex-1 text-gray-900" onclick={() => handleDetail(hospital?.name)}
+							>{hospital?.name}</button
+						>
 						<span class="w-16">{hospital?.code}</span>
 						<span class="w-16">{hospital?.lvl}</span>
 						<span class="w-16">{hospital?.type}</span>

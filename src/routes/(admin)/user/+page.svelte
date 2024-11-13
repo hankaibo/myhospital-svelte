@@ -1,7 +1,6 @@
 <script>
 	import DataTable from './data-table.svelte';
 
-	
 	/** @type {{data: import('./$types').PageData}} */
 	let { data } = $props();
 </script>

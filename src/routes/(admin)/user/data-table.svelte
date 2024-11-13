@@ -3,7 +3,13 @@
 
 	import { readable } from 'svelte/store';
 	import { createTable, Render, Subscribe, createRender } from 'svelte-headless-table';
-	import { addPagination, addSortBy, addTableFilter, addHiddenColumns, addSelectedRows } from 'svelte-headless-table/plugins';
+	import {
+		addPagination,
+		addSortBy,
+		addTableFilter,
+		addHiddenColumns,
+		addSelectedRows
+	} from 'svelte-headless-table/plugins';
 	import ArrowUpDown from 'lucide-svelte/icons/arrow-up-down';
 	import ChevronDown from 'lucide-svelte/icons/chevron-down';
 
@@ -18,7 +24,6 @@
 	import DataTableCheckbox from './data-table-checkbox.svelte';
 	import { cn } from '$lib/utils.js';
 
-	
 	/** @type {{userList?: Array<import('./types').User>}} */
 	let { userList = [] } = $props();
 
@@ -137,7 +142,8 @@
 		})
 	]);
 
-	const { headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates, flatColumns, rows } = table.createViewModel(columns);
+	const { headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates, flatColumns, rows } =
+		table.createViewModel(columns);
 
 	const { hasNextPage, hasPreviousPage, pageIndex } = pluginStates.page;
 	const { sortKeys } = pluginStates.sort;
@@ -161,13 +167,13 @@
 	<div class="flex items-center py-4">
 		<Input class="max-w-sm" placeholder="Filter emails..." type="text" bind:value={$filterValue} />
 		<DropdownMenu.Root>
-			<DropdownMenu.Trigger asChild >
+			<DropdownMenu.Trigger asChild>
 				{#snippet children({ builder })}
-								<Button variant="outline" class="ml-auto" builders={[builder]}>
+					<Button variant="outline" class="ml-auto" builders={[builder]}>
 						列 <ChevronDown class="ml-2 h-4 w-4" />
 					</Button>
-											{/snippet}
-						</DropdownMenu.Trigger>
+				{/snippet}
+			</DropdownMenu.Trigger>
 			<DropdownMenu.Content>
 				{#each flatColumns as col}
 					{#if hideableCols.includes(col.id)}
@@ -186,9 +192,9 @@
 					<Subscribe rowAttrs={headerRow.attrs()}>
 						<Table.Row>
 							{#each headerRow.cells as cell (cell.id)}
-								<Subscribe attrs={cell.attrs()}  props={cell.props()} >
+								<Subscribe attrs={cell.attrs()} props={cell.props()}>
 									{#snippet children({ attrs, props })}
-																		<Table.Head {...attrs} class={cn('[&:has([role=checkbox])]:pl-3')}>
+										<Table.Head {...attrs} class={cn('[&:has([role=checkbox])]:pl-3')}>
 											{#if cell.id === 'amount'}
 												<div class="text-right">
 													<Render of={cell.render()} />
@@ -196,14 +202,19 @@
 											{:else if cell.id === 'email'}
 												<Button variant="ghost" on:click={props.sort.toggle}>
 													<Render of={cell.render()} />
-													<ArrowUpDown class={cn($sortKeys[0]?.id === cell.id && 'text-foreground', 'ml-2 h-4 w-4')} />
+													<ArrowUpDown
+														class={cn(
+															$sortKeys[0]?.id === cell.id && 'text-foreground',
+															'ml-2 h-4 w-4'
+														)}
+													/>
 												</Button>
 											{:else}
 												<Render of={cell.render()} />
 											{/if}
 										</Table.Head>
-																										{/snippet}
-																</Subscribe>
+									{/snippet}
+								</Subscribe>
 							{/each}
 						</Table.Row>
 					</Subscribe>
@@ -211,13 +222,13 @@
 			</Table.Header>
 			<Table.Body {...$tableBodyAttrs}>
 				{#each $pageRows as row (row.id)}
-					<Subscribe rowAttrs={row.attrs()} >
+					<Subscribe rowAttrs={row.attrs()}>
 						{#snippet children({ rowAttrs })}
-												<Table.Row {...rowAttrs} data-state={$selectedDataIds[row.id] && 'selected'}>
+							<Table.Row {...rowAttrs} data-state={$selectedDataIds[row.id] && 'selected'}>
 								{#each row.cells as cell (cell.id)}
-									<Subscribe attrs={cell.attrs()} >
+									<Subscribe attrs={cell.attrs()}>
 										{#snippet children({ attrs })}
-																		<Table.Cell {...attrs} class="[&:has([role=checkbox])]:pl-3">
+											<Table.Cell {...attrs} class="[&:has([role=checkbox])]:pl-3">
 												{#if cell.id === 'amount'}
 													<div class="text-right font-medium">
 														<Render of={cell.render()} />
@@ -230,12 +241,12 @@
 													<Render of={cell.render()} />
 												{/if}
 											</Table.Cell>
-																											{/snippet}
-																</Subscribe>
+										{/snippet}
+									</Subscribe>
 								{/each}
 							</Table.Row>
-																	{/snippet}
-										</Subscribe>
+						{/snippet}
+					</Subscribe>
 				{/each}
 			</Table.Body>
 		</Table.Root>
@@ -245,7 +256,17 @@
 			{Object.keys($selectedDataIds).length} of{' '}
 			{$rows.length} 行被选中。
 		</div>
-		<Button variant="outline" size="sm" on:click={() => ($pageIndex = $pageIndex - 1)} disabled={!$hasPreviousPage}>上一页</Button>
-		<Button variant="outline" size="sm" disabled={!$hasNextPage} on:click={() => ($pageIndex = $pageIndex + 1)}>下一页</Button>
+		<Button
+			variant="outline"
+			size="sm"
+			on:click={() => ($pageIndex = $pageIndex - 1)}
+			disabled={!$hasPreviousPage}>上一页</Button
+		>
+		<Button
+			variant="outline"
+			size="sm"
+			disabled={!$hasNextPage}
+			on:click={() => ($pageIndex = $pageIndex + 1)}>下一页</Button
+		>
 	</div>
 </div>

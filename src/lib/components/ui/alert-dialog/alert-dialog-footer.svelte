@@ -1,10 +1,13 @@
 <script>
 	import { cn } from '$lib/utils.js';
-	/** @type {{class?: any, children?: import('svelte').Snippet, [key: string]: any}} */
-	let { class: className = undefined, children, ...rest } = $props();
-	
+
+	let { ref = $bindable(null), class: className, children, ...restProps } = $props();
 </script>
 
-<div class={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', className)} {...rest}>
+<div
+	bind:this={ref}
+	class={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', className)}
+	{...restProps}
+>
 	{@render children?.()}
 </div>

@@ -1,10 +1,14 @@
 <script>
+	import {} from 'bits-ui';
 	import { cn } from '$lib/utils.js';
-	/** @type {{class?: any, children?: import('svelte').Snippet, [key: string]: any}} */
-	let { class: className = undefined, children, ...rest } = $props();
-	
+
+	let { ref = $bindable(null), class: className, children, ...restProps } = $props();
 </script>
 
-<span class={cn('ml-auto text-xs tracking-widest opacity-60', className)} {...rest}>
+<span
+	bind:this={ref}
+	class={cn('ml-auto text-xs tracking-widest opacity-60', className)}
+	{...restProps}
+>
 	{@render children?.()}
 </span>

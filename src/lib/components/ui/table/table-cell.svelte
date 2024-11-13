@@ -1,13 +1,13 @@
 <script>
-	import { createBubbler } from 'svelte/legacy';
-
-	const bubble = createBubbler();
 	import { cn } from '$lib/utils.js';
-	/** @type {{class?: any, children?: import('svelte').Snippet, [key: string]: any}} */
-	let { class: className = undefined, children, ...rest } = $props();
-	
+
+	let { ref = $bindable(null), class: className, children, ...restProps } = $props();
 </script>
 
-<td class={cn('p-4 align-middle [&:has([role=checkbox])]:pr-0', className)} {...rest} onclick={bubble('click')} onkeydown={bubble('keydown')}>
+<td
+	bind:this={ref}
+	class={cn('p-4 align-middle [&:has([role=checkbox])]:pr-0', className)}
+	{...restProps}
+>
 	{@render children?.()}
 </td>

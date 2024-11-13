@@ -297,7 +297,11 @@
 <div id="map" class="h-dvh"></div>
 
 <!-- 某个医院的详情弹框 -->
-<HospitalDetail {hospital} bind:domRef={popupDetail} on:closeDetail={() => (popupDetail = undefined)} />
+<HospitalDetail
+	{hospital}
+	bind:domRef={popupDetail}
+	on:closeDetail={() => (popupDetail = undefined)}
+/>
 
 <HospitalList {hospitalList} />
 

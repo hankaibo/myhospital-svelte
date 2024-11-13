@@ -1,10 +1,9 @@
 <script>
 	import { cn } from '$lib/utils.js';
-	/** @type {{class?: any, children?: import('svelte').Snippet, [key: string]: any}} */
-	let { class: className = undefined, children, ...rest } = $props();
-	
+
+	let { ref = $bindable(null), class: className, children, ...restProps } = $props();
 </script>
 
-<tfoot class={cn('bg-primary font-medium text-primary-foreground', className)} {...rest}>
+<tfoot bind:this={ref} class={cn('bg-muted/50 font-medium', className)} {...restProps}>
 	{@render children?.()}
 </tfoot>

@@ -1,28 +1,15 @@
 <script>
 	import { DropdownMenu as DropdownMenuPrimitive } from 'bits-ui';
-	import { cn, flyAndScale } from '$lib/utils.js';
-	/** @type {{class?: any, transition?: any, transitionConfig?: any, children?: import('svelte').Snippet, [key: string]: any}} */
-	let {
-		class: className = undefined,
-		transition = flyAndScale,
-		transitionConfig = {
-		x: -10,
-		y: 0
-	},
-		children,
-		...rest
-	} = $props();
-	
+	import { cn } from '$lib/utils.js';
+
+	let { ref = $bindable(null), class: className, ...restProps } = $props();
 </script>
 
 <DropdownMenuPrimitive.SubContent
-	{transition}
-	{transitionConfig}
-	class={cn('z-50 min-w-[8rem] rounded-md border bg-popover p-1 text-popover-foreground shadow-lg focus:outline-none', className)}
-	{...rest}
-	on:keydown
-	on:focusout
-	on:pointermove
->
-	{@render children?.()}
-</DropdownMenuPrimitive.SubContent>
+	bind:ref
+	class={cn(
+		'z-50 min-w-[8rem] rounded-md border bg-popover p-1 text-popover-foreground shadow-lg focus:outline-none',
+		className
+	)}
+	{...restProps}
+/>

@@ -1,10 +1,7 @@
 <script>
-	import { cn } from '$lib/utils.js';
-	/** @type {{class?: any, children?: import('svelte').Snippet, [key: string]: any}} */
-	let { class: className = undefined, children, ...rest } = $props();
-	
+	let { ref = $bindable(null), children, ...restProps } = $props();
 </script>
 
-<li class={cn('', className)} {...rest}>
+<li bind:this={ref} {...restProps}>
 	{@render children?.()}
 </li>

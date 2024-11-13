@@ -60,7 +60,8 @@ async function send({ method, url, data, headers = {}, cookies }) {
 
 	if (res.status === 401) {
 		try {
-			const { token: newToken, refreshToken: newRefreshToken } = await refreshAccessToken(refreshToken);
+			const { token: newToken, refreshToken: newRefreshToken } =
+				await refreshAccessToken(refreshToken);
 			const value = btoa(JSON.stringify({ token: newToken, refreshToken: newRefreshToken, user }));
 			cookies?.set('jwt', value, { path: '/' });
 

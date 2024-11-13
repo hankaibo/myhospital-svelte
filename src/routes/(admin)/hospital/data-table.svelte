@@ -4,7 +4,13 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { createTable, Render, Subscribe, createRender } from 'svelte-headless-table';
-	import { addPagination, addSortBy, addTableFilter, addHiddenColumns, addSelectedRows } from 'svelte-headless-table/plugins';
+	import {
+		addPagination,
+		addSortBy,
+		addTableFilter,
+		addHiddenColumns,
+		addSelectedRows
+	} from 'svelte-headless-table/plugins';
 	import { writable } from 'svelte/store';
 	import ArrowUpDown from 'lucide-svelte/icons/arrow-up-down';
 	import ChevronDown from 'lucide-svelte/icons/chevron-down';
@@ -22,8 +28,6 @@
 
 	let siblingCount = $derived($isDesktop ? 1 : 0);
 
-	
-	
 	/** @type {{hospitalList?: Array<import('./types').Hospital>, total?: number}} */
 	let { hospitalList = [], total = 0 } = $props();
 
@@ -176,7 +180,8 @@
 		})
 	]);
 
-	const { headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates, flatColumns, rows } = table.createViewModel(columns);
+	const { headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates, flatColumns, rows } =
+		table.createViewModel(columns);
 	const { pageIndex } = pluginStates.page;
 	const { sortKeys } = pluginStates.sort;
 	const { filterValue } = pluginStates.filter;
@@ -192,7 +197,16 @@
 			.map(([id]) => id);
 	});
 
-	const hideableCols = ['name', 'code', 'district', 'address', 'zipCode', 'introduction', 'lng', 'lat'];
+	const hideableCols = [
+		'name',
+		'code',
+		'district',
+		'address',
+		'zipCode',
+		'introduction',
+		'lng',
+		'lat'
+	];
 
 	/** @type {Function|undefined} unsubscribe */
 	let unsubscribe;
@@ -211,13 +225,13 @@
 	<div class="flex items-center py-4">
 		<Input class="max-w-sm" placeholder="Search" type="text" bind:value={$filterValue} />
 		<DropdownMenu.Root>
-			<DropdownMenu.Trigger asChild >
+			<DropdownMenu.Trigger asChild>
 				{#snippet children({ builder })}
-								<Button variant="outline" class="ml-auto" builders={[builder]}>
+					<Button variant="outline" class="ml-auto" builders={[builder]}>
 						Columns <ChevronDown class="ml-2 h-4 w-4" />
 					</Button>
-											{/snippet}
-						</DropdownMenu.Trigger>
+				{/snippet}
+			</DropdownMenu.Trigger>
 			<DropdownMenu.Content>
 				{#each flatColumns as col}
 					{#if hideableCols.includes(col.id)}
@@ -237,9 +251,9 @@
 					<Subscribe rowAttrs={headerRow.attrs()}>
 						<Table.Row>
 							{#each headerRow.cells as cell (cell.id)}
-								<Subscribe attrs={cell.attrs()}  props={cell.props()} >
+								<Subscribe attrs={cell.attrs()} props={cell.props()}>
 									{#snippet children({ attrs, props })}
-																		<Table.Head {...attrs} class={cn('[&:has([role=checkbox])]:pl-3')}>
+										<Table.Head {...attrs} class={cn('[&:has([role=checkbox])]:pl-3')}>
 											{#if cell.id === 'lngLat'}
 												<div class="text-right">
 													<Render of={cell.render()} />
@@ -247,14 +261,19 @@
 											{:else if cell.id === 'name'}
 												<Button variant="ghost" on:click={props.sort.toggle}>
 													<Render of={cell.render()} />
-													<ArrowUpDown class={cn($sortKeys[0]?.id === cell.id && 'text-foreground', 'ml-2 h-4 w-4')} />
+													<ArrowUpDown
+														class={cn(
+															$sortKeys[0]?.id === cell.id && 'text-foreground',
+															'ml-2 h-4 w-4'
+														)}
+													/>
 												</Button>
 											{:else}
 												<Render of={cell.render()} />
 											{/if}
 										</Table.Head>
-																										{/snippet}
-																</Subscribe>
+									{/snippet}
+								</Subscribe>
 							{/each}
 						</Table.Row>
 					</Subscribe>
@@ -262,13 +281,13 @@
 			</Table.Header>
 			<Table.Body {...$tableBodyAttrs}>
 				{#each $pageRows as row (row.id)}
-					<Subscribe rowAttrs={row.attrs()} >
+					<Subscribe rowAttrs={row.attrs()}>
 						{#snippet children({ rowAttrs })}
-												<Table.Row {...rowAttrs} data-state={$selectedDataIds[row.id] && 'selected'}>
+							<Table.Row {...rowAttrs} data-state={$selectedDataIds[row.id] && 'selected'}>
 								{#each row.cells as cell (cell.id)}
-									<Subscribe attrs={cell.attrs()} >
+									<Subscribe attrs={cell.attrs()}>
 										{#snippet children({ attrs })}
-																		<Table.Cell class="[&:has([role=checkbox])]:pl-3" {...attrs}>
+											<Table.Cell class="[&:has([role=checkbox])]:pl-3" {...attrs}>
 												{#if cell.id === 'lng' || cell.id === 'lat'}
 													<div class="text-right">
 														<Render of={cell.render()} />
@@ -277,12 +296,12 @@
 													<Render of={cell.render()} />
 												{/if}
 											</Table.Cell>
-																											{/snippet}
-																</Subscribe>
+										{/snippet}
+									</Subscribe>
 								{/each}
 							</Table.Row>
-																	{/snippet}
-										</Subscribe>
+						{/snippet}
+					</Subscribe>
 				{/each}
 			</Table.Body>
 		</Table.Root>
@@ -293,9 +312,9 @@
 		</div>
 
 		<div>
-			<Pagination.Root count={total} {siblingCount} >
+			<Pagination.Root count={total} {siblingCount}>
 				{#snippet children({ pages })}
-								<Pagination.Content>
+					<Pagination.Content>
 						<Pagination.Item>
 							<Pagination.PrevButton on:click={() => ($pageIndex = $pageIndex - 1)} />
 						</Pagination.Item>
@@ -306,7 +325,11 @@
 								</Pagination.Item>
 							{:else}
 								<Pagination.Item isVisible={$pageIndex + 1 == page.value}>
-									<Pagination.Link {page} isActive={$pageIndex + 1 == page.value} on:click={() => ($pageIndex = page.value - 1)}></Pagination.Link>
+									<Pagination.Link
+										{page}
+										isActive={$pageIndex + 1 == page.value}
+										on:click={() => ($pageIndex = page.value - 1)}
+									></Pagination.Link>
 								</Pagination.Item>
 							{/if}
 						{/each}
@@ -314,8 +337,8 @@
 							<Pagination.NextButton on:click={() => ($pageIndex = $pageIndex + 1)} />
 						</Pagination.Item>
 					</Pagination.Content>
-											{/snippet}
-						</Pagination.Root>
+				{/snippet}
+			</Pagination.Root>
 		</div>
 	</div>
 </div>

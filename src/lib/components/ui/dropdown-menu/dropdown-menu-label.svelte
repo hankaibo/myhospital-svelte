@@ -1,11 +1,13 @@
 <script>
-	import { DropdownMenu as DropdownMenuPrimitive } from 'bits-ui';
 	import { cn } from '$lib/utils.js';
-	/** @type {{class?: any, inset?: any, children?: import('svelte').Snippet, [key: string]: any}} */
-	let { class: className = undefined, inset = undefined, children, ...rest } = $props();
-	
+	import {} from 'bits-ui';
+	let { ref = $bindable(null), class: className, inset, children, ...restProps } = $props();
 </script>
 
-<DropdownMenuPrimitive.Label class={cn('px-2 py-1.5 text-sm font-semibold', inset && 'pl-8', className)} {...rest}>
+<div
+	bind:this={ref}
+	class={cn('px-2 py-1.5 text-sm font-semibold', inset && 'pl-8', className)}
+	{...restProps}
+>
 	{@render children?.()}
-</DropdownMenuPrimitive.Label>
+</div>

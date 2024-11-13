@@ -17,7 +17,9 @@
 
 	<Menubar.Root>
 		<Menubar.Menu>
-			<Menubar.Item href="{base}/" active={activeUrl === '/'}><Button variant="link">首页</Button></Menubar.Item>
+			<Menubar.Item href="{base}/" active={activeUrl === '/'}
+				><Button variant="link">首页</Button></Menubar.Item
+			>
 		</Menubar.Menu>
 
 		<Menubar.Menu>
