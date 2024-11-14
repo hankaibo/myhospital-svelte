@@ -1,5 +1,6 @@
 <script>
 	import DataTable from './data-table.svelte';
+	import { columns } from './columns.js';
 
 	/** @type {{data: import('./$types').PageData}} */
 	let { data } = $props();
@@ -9,4 +10,4 @@
 	<title>医院管理</title>
 </svelte:head>
 
-<DataTable hospitalList={data.hospitals} total={data.total} />
+<DataTable data={data.hospitals} {columns} total={data.total} />

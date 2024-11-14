@@ -1,272 +1,170 @@
 <script>
-	import { run } from 'svelte/legacy';
-
-	import { readable } from 'svelte/store';
-	import { createTable, Render, Subscribe, createRender } from 'svelte-headless-table';
 	import {
-		addPagination,
-		addSortBy,
-		addTableFilter,
-		addHiddenColumns,
-		addSelectedRows
-	} from 'svelte-headless-table/plugins';
-	import ArrowUpDown from 'lucide-svelte/icons/arrow-up-down';
-	import ChevronDown from 'lucide-svelte/icons/chevron-down';
+		getCoreRowModel,
+		getPaginationRowModel,
+		getSortedRowModel,
+		getFilteredRowModel
+	} from '@tanstack/table-core';
+	import { createSvelteTable, FlexRender } from '$lib/components/ui/data-table/index.js';
+	import * as Table from '$lib/components/ui/table/index.js';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import { Input } from '$lib/components/ui/input/index.js';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 
-	import * as Table from '$lib/components/ui/table';
-	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
-	import { Switch } from '$lib/components/ui/switch';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	let { data, columns, hasPreviousPage } = $props();
+	let pagination = $state({ pageIndex: 0, pageSize: 10 });
+	let sorting = $state([]);
+	let columnFilters = $state([]);
+	let columnVisibility = $state([]);
+	let rowSelection = $state({});
 
-	import DataTableAvator from './data-table-avatar.svelte';
-	import DataTableActions from './data-table-actions.svelte';
-	import DataTableCheckbox from './data-table-checkbox.svelte';
-	import { cn } from '$lib/utils.js';
-
-	/** @type {{userList?: Array<import('./types').User>}} */
-	let { userList = [] } = $props();
-
-	const table = createTable(readable(userList), {
-		page: addPagination(),
-		sort: addSortBy({ disableMultiSort: true }),
-		filter: addTableFilter({
-			fn: ({ filterValue, value }) => value.toLowerCase().includes(filterValue.toLowerCase())
-		}),
-		hide: addHiddenColumns(),
-		select: addSelectedRows()
+	const table = createSvelteTable({
+		get data() {
+			return data;
+		},
+		columns,
+		getCoreRowModel: getCoreRowModel(),
+		getPaginationRowModel: getPaginationRowModel(),
+		getSortedRowModel: getSortedRowModel(),
+		getFilteredRowModel: getFilteredRowModel(),
+		onPaginationChange: (updater) => {
+			if (typeof updater === 'function') {
+				pagination = updater(pagination);
+			} else {
+				pagination = updater;
+			}
+		},
+		onSortingChange: (updater) => {
+			if (typeof updater === 'function') {
+				sorting = updater(sorting);
+			} else {
+				sorting = updater;
+			}
+		},
+		onColumnFiltersChange: (updater) => {
+			if (typeof updater === 'function') {
+				columnFilters = updater(columnFilters);
+			} else {
+				columnFilters = updater;
+			}
+		},
+		onColumnVisibilityChange: (updater) => {
+			if (typeof updater === 'function') {
+				columnVisibility = updater(columnVisibility);
+			} else {
+				columnVisibility = updater;
+			}
+		},
+		onRowSelectionChange: (updater) => {
+			if (typeof updater === 'function') {
+				rowSelection = updater(rowSelection);
+			} else {
+				rowSelection = updater;
+			}
+		},
+		state: {
+			get pagination() {
+				return pagination;
+			},
+			get sorting() {
+				return sorting;
+			},
+			get columnFilters() {
+				return columnFilters;
+			},
+			get columnVisibility() {
+				return columnVisibility;
+			},
+			get rowSelection() {
+				return rowSelection;
+			}
+		}
 	});
-
-	const columns = table.createColumns([
-		table.column({
-			accessor: 'id',
-			header: (_, { pluginStates }) => {
-				const { allPageRowsSelected } = pluginStates.select;
-				return createRender(DataTableCheckbox, {
-					checked: allPageRowsSelected
-				});
-			},
-			cell: ({ row }, { pluginStates }) => {
-				const { getRowState } = pluginStates.select;
-				const { isSelected } = getRowState(row);
-
-				return createRender(DataTableCheckbox, {
-					checked: isSelected
-				});
-			},
-			plugins: {
-				sort: {
-					disable: true
-				},
-				filter: {
-					exclude: true
-				}
-			}
-		}),
-		table.column({
-			accessor: 'photo',
-			header: '头像',
-			cell: (dataCell, status) => {
-				return createRender(DataTableAvator, { src: dataCell.value });
-			},
-			plugins: {
-				sort: {
-					disable: true
-				},
-				filter: {
-					exclude: true
-				}
-			}
-		}),
-		table.column({
-			accessor: 'name',
-			header: '姓名',
-			cell: ({ row }) => {
-				const { original } = row;
-				const { firstName, lastName } = original;
-				return lastName + firstName;
-			},
-			plugins: {
-				sort: {
-					disable: true
-				},
-				filter: {
-					exclude: true
-				}
-			}
-		}),
-		table.column({
-			accessor: 'email',
-			header: 'Email'
-		}),
-		table.column({
-			accessor: 'status',
-			header: '状态',
-			cell: ({ value }) => {
-				return createRender(Switch, {
-					checked: value.name === 'Active',
-					id: value.id,
-					/**
-					 * 处理 Switch 组件的状态改变事件
-					 * @param {boolean} checked - 表示 Switch 组件的当前状态，true 表示开启，false 表示关闭
-					 */
-					onCheckedChange: (checked) => {
-						// 在这里处理 change 事件
-						console.log('Switch 状态改变:', checked, value.id);
-					}
-				});
-			},
-			plugins: {
-				sort: {
-					disable: true
-				},
-				filter: {
-					exclude: true
-				}
-			}
-		}),
-		table.column({
-			accessor: ({ id }) => id,
-			header: '操作',
-			cell: ({ value }) => {
-				return createRender(DataTableActions, { id: String(value) });
-			},
-			plugins: {
-				sort: {
-					disable: true
-				},
-				filter: {
-					exclude: true
-				}
-			}
-		})
-	]);
-
-	const { headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates, flatColumns, rows } =
-		table.createViewModel(columns);
-
-	const { hasNextPage, hasPreviousPage, pageIndex } = pluginStates.page;
-	const { sortKeys } = pluginStates.sort;
-	const { filterValue } = pluginStates.filter;
-	const { hiddenColumnIds } = pluginStates.hide;
-	const { selectedDataIds } = pluginStates.select;
-
-	const ids = flatColumns.map((col) => col.id);
-	let hideForId = $state(Object.fromEntries(ids.map((id) => [id, true])));
-
-	run(() => {
-		$hiddenColumnIds = Object.entries(hideForId)
-			.filter(([_, hide]) => !hide)
-			.map(([id]) => id);
-	});
-
-	const hideableCols = ['name', 'email', 'status'];
 </script>
 
 <div class="w-full">
 	<div class="flex items-center py-4">
-		<Input class="max-w-sm" placeholder="Filter emails..." type="text" bind:value={$filterValue} />
+		<Input
+			placeholder="Filter emails..."
+			value={table.getColumn('email')?.getFilterValue() ?? ''}
+			onchange={(e) => {
+				table.getColumn('email')?.setFilterValue(e.currentTarget.value);
+			}}
+			oninput={(e) => {
+				table.getColumn('email')?.setFilterValue(e.currentTarget.value);
+			}}
+			class="max-w-sm"
+		/>
 		<DropdownMenu.Root>
-			<DropdownMenu.Trigger asChild>
-				{#snippet children({ builder })}
-					<Button variant="outline" class="ml-auto" builders={[builder]}>
-						列 <ChevronDown class="ml-2 h-4 w-4" />
-					</Button>
+			<DropdownMenu.Trigger>
+				{#snippet child({ props })}
+					<Button {...props} variant="outline" class="ml-auto">Columns</Button>
 				{/snippet}
 			</DropdownMenu.Trigger>
-			<DropdownMenu.Content>
-				{#each flatColumns as col}
-					{#if hideableCols.includes(col.id)}
-						<DropdownMenu.CheckboxItem bind:checked={hideForId[col.id]}>
-							{col.header}
-						</DropdownMenu.CheckboxItem>
-					{/if}
+			<DropdownMenu.Content align="end">
+				{#each table.getAllColumns().filter((col) => col.getCanHide()) as column (column.id)}
+					<DropdownMenu.CheckboxItem
+						class="capitalize"
+						controlledChecked
+						checked={column.getIsVisible()}
+						onCheckedChange={(value) => column.toggleVisibility(!!value)}
+					>
+						{column.id}
+					</DropdownMenu.CheckboxItem>
 				{/each}
 			</DropdownMenu.Content>
 		</DropdownMenu.Root>
 	</div>
 	<div class="rounded-md border">
-		<Table.Root {...$tableAttrs}>
+		<Table.Root>
 			<Table.Header>
-				{#each $headerRows as headerRow}
-					<Subscribe rowAttrs={headerRow.attrs()}>
-						<Table.Row>
-							{#each headerRow.cells as cell (cell.id)}
-								<Subscribe attrs={cell.attrs()} props={cell.props()}>
-									{#snippet children({ attrs, props })}
-										<Table.Head {...attrs} class={cn('[&:has([role=checkbox])]:pl-3')}>
-											{#if cell.id === 'amount'}
-												<div class="text-right">
-													<Render of={cell.render()} />
-												</div>
-											{:else if cell.id === 'email'}
-												<Button variant="ghost" on:click={props.sort.toggle}>
-													<Render of={cell.render()} />
-													<ArrowUpDown
-														class={cn(
-															$sortKeys[0]?.id === cell.id && 'text-foreground',
-															'ml-2 h-4 w-4'
-														)}
-													/>
-												</Button>
-											{:else}
-												<Render of={cell.render()} />
-											{/if}
-										</Table.Head>
-									{/snippet}
-								</Subscribe>
-							{/each}
-						</Table.Row>
-					</Subscribe>
+				{#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
+					<Table.Row>
+						{#each headerGroup.headers as header (header.id)}
+							<Table.Head>
+								{#if !header.isPlaceholder}
+									<FlexRender
+										content={header.column.columnDef.header}
+										context={header.getContext()}
+									/>
+								{/if}
+							</Table.Head>
+						{/each}
+					</Table.Row>
 				{/each}
 			</Table.Header>
-			<Table.Body {...$tableBodyAttrs}>
-				{#each $pageRows as row (row.id)}
-					<Subscribe rowAttrs={row.attrs()}>
-						{#snippet children({ rowAttrs })}
-							<Table.Row {...rowAttrs} data-state={$selectedDataIds[row.id] && 'selected'}>
-								{#each row.cells as cell (cell.id)}
-									<Subscribe attrs={cell.attrs()}>
-										{#snippet children({ attrs })}
-											<Table.Cell {...attrs} class="[&:has([role=checkbox])]:pl-3">
-												{#if cell.id === 'amount'}
-													<div class="text-right font-medium">
-														<Render of={cell.render()} />
-													</div>
-												{:else if cell.id === 'status'}
-													<div class="capitalize">
-														<Render of={cell.render()} />
-													</div>
-												{:else}
-													<Render of={cell.render()} />
-												{/if}
-											</Table.Cell>
-										{/snippet}
-									</Subscribe>
-								{/each}
-							</Table.Row>
-						{/snippet}
-					</Subscribe>
+			<Table.Body>
+				{#each table.getRowModel().rows as row (row.id)}
+					<Table.Row data-state={row.getIsSelected() && 'selected'}>
+						{#each row.getVisibleCells() as cell (cell.id)}
+							<Table.Cell>
+								<FlexRender content={cell.column.columnDef.cell} context={cell.getContext()} />
+							</Table.Cell>
+						{/each}
+					</Table.Row>
+				{:else}
+					<Table.Row>
+						<Table.Cell colspan={columns.length} class="h-24 text-center">No results</Table.Cell>
+					</Table.Row>
 				{/each}
 			</Table.Body>
 		</Table.Root>
 	</div>
 	<div class="flex items-center justify-end space-x-2 py-4">
 		<div class="flex-1 text-sm text-muted-foreground">
-			{Object.keys($selectedDataIds).length} of{' '}
-			{$rows.length} 行被选中。
+			{table.getFilteredSelectedRowModel().rows.length} / {table.getFilteredRowModel().rows.length}
 		</div>
 		<Button
 			variant="outline"
 			size="sm"
-			on:click={() => ($pageIndex = $pageIndex - 1)}
-			disabled={!$hasPreviousPage}>上一页</Button
+			onclick={() => table.previousPage()}
+			disabled={!table.getCanPreviousPage()}>上一页</Button
 		>
 		<Button
 			variant="outline"
 			size="sm"
-			disabled={!$hasNextPage}
-			on:click={() => ($pageIndex = $pageIndex + 1)}>下一页</Button
+			onclick={() => table.nextPage()}
+			disabled={!table.getCanNextPage()}>下一页</Button
 		>
 	</div>
 </div>

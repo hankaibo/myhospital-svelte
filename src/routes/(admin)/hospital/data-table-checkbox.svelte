@@ -1,9 +1,8 @@
 <script>
-	import { Checkbox } from '$lib/components/ui/checkbox';
-	import { writable } from 'svelte/store';
+	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 
-	/** @type {{checked?: any}} */
-	let { checked = writable(false) } = $props();
+	/** @type {{checked?: boolean, controlledChecked: boolean,}} */
+	let { checked = false, controlledChecked = true, ...restProps } = $props();
 </script>
 
-<Checkbox bind:checked={$checked} />
+<Checkbox {checked} {controlledChecked} {...restProps} />

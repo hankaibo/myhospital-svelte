@@ -39,7 +39,7 @@
 </script>
 
 <form use:enhance method="post" class="w-full space-y-6">
-	<Form.Field {form} name="email" class=''>
+	<Form.Field {form} name="email" class="">
 		<Form.Control>
 			{#snippet children({ props })}
 				<Form.Label>邮箱</Form.Label>

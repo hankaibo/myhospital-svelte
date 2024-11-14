@@ -1,5 +1,6 @@
 <script>
 	import DataTable from './data-table.svelte';
+	import { columns } from './columns.js';
 
 	/** @type {{data: import('./$types').PageData}} */
 	let { data } = $props();
@@ -9,4 +10,4 @@
 	<title>用户管理</title>
 </svelte:head>
 
-<DataTable userList={data.users} isNextPage={data.hasNextPage} />
+<DataTable data={data.users} {columns} isNextPage={data.hasNextPage} />

@@ -62,6 +62,8 @@
 		if ($mode === 'dark') {
 			// 设置地图的显示样式
 			map.setMapStyle('amap://styles/dark');
+		} else {
+			map.setMapStyle('amap://styles/normal');
 		}
 
 		infoWindow = new AMap.InfoWindow({

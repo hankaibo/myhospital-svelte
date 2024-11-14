@@ -19,16 +19,19 @@
 </script>
 
 <DropdownMenu.Root>
-	<DropdownMenu.Trigger asChild>
-		{#snippet children({ builder })}
-			<Button variant="ghost" builders={[builder]} size="icon" class="relative h-8 w-8 p-0">
+	<DropdownMenu.Trigger>
+		{#snippet child({ props })}
+			<Button {...props} variant="ghost" size="icon" class="relative size-8 p-0">
 				<span class="sr-only">Open menu</span>
-				<Ellipsis class="h-4 w-4" />
+				<Ellipsis class="size-4" />
 			</Button>
 		{/snippet}
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content>
-		<DropdownMenu.Item on:click={handleEdit}>编辑</DropdownMenu.Item>
-		<DropdownMenu.Item on:click={handleDelete}>删除</DropdownMenu.Item>
+		<DropdownMenu.Group>
+			<DropdownMenu.GroupHeading>操作</DropdownMenu.GroupHeading>
+			<DropdownMenu.Item onclick={handleEdit}>编辑</DropdownMenu.Item>
+			<DropdownMenu.Item onclick={handleDelete}>删除</DropdownMenu.Item>
+		</DropdownMenu.Group>
 	</DropdownMenu.Content>
 </DropdownMenu.Root>

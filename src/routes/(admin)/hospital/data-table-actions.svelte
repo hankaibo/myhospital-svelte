@@ -95,23 +95,23 @@
 </script>
 
 <DropdownMenu.Root>
-	<DropdownMenu.Trigger asChild>
-		{#snippet children({ builder })}
-			<Button variant="ghost" builders={[builder]} size="icon" class="relative h-8 w-8 p-0">
+	<DropdownMenu.Trigger>
+		{#snippet child({ props })}
+			<Button {...props} variant="ghost" size="icon" class="relative size-8 p-0">
 				<span class="sr-only">Open menu</span>
-				<Ellipsis class="h-4 w-4" />
+				<Ellipsis class="size-4" />
 			</Button>
 		{/snippet}
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content>
 		<DropdownMenu.Group>
-			<DropdownMenu.Label>Actions</DropdownMenu.Label>
-			<DropdownMenu.Item on:click={() => navigator.clipboard.writeText(id + '')}
+			<DropdownMenu.Label>操作</DropdownMenu.Label>
+			<DropdownMenu.Item onclick={() => navigator.clipboard.writeText(id + '')}
 				>影分身</DropdownMenu.Item
 			>
 		</DropdownMenu.Group>
 		<DropdownMenu.Separator />
-		<DropdownMenu.Item on:click={handleInitMap}>地理编码</DropdownMenu.Item>
+		<DropdownMenu.Item onclick={handleInitMap}>地理编码</DropdownMenu.Item>
 		<DropdownMenu.Item>修改</DropdownMenu.Item>
 		<DropdownMenu.Item>删除</DropdownMenu.Item>
 	</DropdownMenu.Content>
@@ -121,7 +121,7 @@
 	<Sheet.Content class="md:max-w-full">
 		<Sheet.Header>
 			<Sheet.Title>请选择该医院的地点</Sheet.Title>
-			<Sheet.Description>使用鼠标选择正确的地址。</Sheet.Description>
+			<Sheet.Description>使用鼠标在地图上选择正确的地址。</Sheet.Description>
 		</Sheet.Header>
 		<div id="map" class="my-2 h-[calc(100%-100px)] w-full"></div>
 		<div class="absolute bottom-20 right-10 rounded bg-slate-400 p-2">
@@ -129,9 +129,9 @@
 		</div>
 
 		<Sheet.Footer>
-			<Sheet.Close asChild>
-				{#snippet children({ builder })}
-					<Button builders={[builder]} type="submit">保存</Button>
+			<Sheet.Close>
+				{#snippet child({ props })}
+					<Button {...props} type="submit">保存</Button>
 				{/snippet}
 			</Sheet.Close>
 		</Sheet.Footer>

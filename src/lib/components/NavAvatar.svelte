@@ -51,14 +51,18 @@
 			<DropdownMenu.Separator />
 			<DropdownMenu.Group>
 				{#if user.role.name === 'Admin'}
-					<DropdownMenu.Item class="cursor-pointer" href="{base}/user">
-						<User class="mr-2 h-4 w-4" />
-						<span>控制台</span>
+					<DropdownMenu.Item>
+						<a class="flex items-center gap-2" href="{base}/user">
+							<User class="mr-2 h-4 w-4" />
+							<span>控制台</span>
+						</a>
 					</DropdownMenu.Item>
 				{/if}
-				<DropdownMenu.Item class="cursor-pointer" href="{base}/settings">
-					<Settings class="mr-2 h-4 w-4" />
-					<span>个人中心</span>
+				<DropdownMenu.Item>
+					<a class="flex items-center gap-2" href="{base}/settings">
+						<Settings class="mr-2 h-4 w-4" />
+						<span>个人中心</span>
+					</a>
 				</DropdownMenu.Item>
 			</DropdownMenu.Group>
 			<DropdownMenu.Separator />
@@ -67,22 +71,22 @@
 				<span>支持</span>
 			</DropdownMenu.Item>
 			<DropdownMenu.Separator />
-			<DropdownMenu.Item on:click={() => setMode('light')}>
+			<DropdownMenu.Item class="cursor-pointer" onSelect={() => setMode('light')}>
 				<Sun class="mr-2 h-4 w-4" />
 				<span>浅色</span>
 			</DropdownMenu.Item>
-			<DropdownMenu.Item on:click={() => setMode('dark')}>
+			<DropdownMenu.Item class="cursor-pointer" onSelect={() => setMode('dark')}>
 				<MoonStar class="mr-2 h-4 w-4" />
 				<span>深色</span>
 			</DropdownMenu.Item>
-			<DropdownMenu.Item on:click={() => resetMode()}>
+			<DropdownMenu.Item class="cursor-pointer" onSelect={() => resetMode()}>
 				<Monitor class="mr-2 h-4 w-4" />
 				<span>自动</span>
 			</DropdownMenu.Item>
 			<DropdownMenu.Separator />
-			<DropdownMenu.Item class="cursor-pointer">
+			<DropdownMenu.Item class="cursor-pointer" onSelect={handleLogout}>
 				<LogOut class="mr-2 h-4 w-4" />
-				<button onclick={handleLogout}>退出</button>
+				<span>退出</span>
 			</DropdownMenu.Item>
 		{/if}
 	</DropdownMenu.Content>

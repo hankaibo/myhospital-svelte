@@ -14,7 +14,7 @@ export async function load({ locals, url, cookies }) {
 	params.set('page', '' + page);
 	params.set('limit', '' + limit);
 
-	const { data, total } = await api.get(`hospitals/all?${params}`, { cookies });
+	const { data, total } = await api.get(`hospitals/pagination?${params}`, { cookies });
 
 	return {
 		hospitals: data,
