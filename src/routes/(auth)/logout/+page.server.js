@@ -1,5 +1,5 @@
 import { fail, error, redirect } from '@sveltejs/kit';
-import { base } from '$app/paths';
+
 import * as api from '$lib/api.js';
 
 /** @type {import('./$types').Actions} */
@@ -17,6 +17,6 @@ export const actions = {
 		cookies.delete('jwt', { path: '/' });
 		locals.user = null;
 
-		throw redirect(307, `${base}/login`);
+		throw redirect(307, `/login`);
 	}
 };

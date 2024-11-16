@@ -1,5 +1,4 @@
 <script>
-	import { base } from '$app/paths';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { formSchema } from './schema';
@@ -62,11 +61,11 @@
 
 	<div class="flex items-center justify-between">
 		<Checkbox>记住我</Checkbox>
-		<a href="{base}/forgot" class="text-sm font-medium hover:underline">忘记密码</a>
+		<a href="/forgot" class="text-sm font-medium hover:underline">忘记密码</a>
 	</div>
 
 	<p class="text-md text-center">
 		<span>没有账号？</span>
-		<a href="{base}/register" class="font-medium hover:underline">注册</a>
+		<a href="/register" class="font-medium hover:underline">注册</a>
 	</p>
 </form>

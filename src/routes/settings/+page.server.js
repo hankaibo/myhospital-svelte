@@ -1,5 +1,5 @@
 import { fail, error, redirect } from '@sveltejs/kit';
-import { base } from '$app/paths';
+
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { formSchema } from './schema';
@@ -7,7 +7,7 @@ import * as api from '$lib/api.js';
 
 export async function load({ locals }) {
 	if (!locals.user) {
-		throw redirect(302, `${base}/login`);
+		throw redirect(302, `/login`);
 	}
 	return {
 		form: await superValidate(zod(formSchema))

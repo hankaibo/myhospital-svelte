@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import { base } from '$app/paths';
+
 	import { goto } from '$app/navigation';
 	import * as Avatar from '$lib/components/ui/avatar';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
@@ -16,10 +16,10 @@
 	import { resetMode, setMode } from 'mode-watcher';
 
 	const user = $page.data?.user;
-	const src = user?.photo || `${base}/defavatar.png`;
+	const src = user?.photo || `/defavatar.png`;
 
 	async function handleLogout() {
-		const response = await fetch(`${base}/logout?/logout`, {
+		const response = await fetch(`/logout?/logout`, {
 			method: 'POST',
 			body: Object.create({}),
 			headers: {
@@ -27,7 +27,7 @@
 			}
 		});
 		if (response.ok) {
-			goto(`${base}/login`);
+			goto(`/login`);
 		} else {
 			// 退出失败，你可以在这里处理错误
 		}
@@ -43,7 +43,7 @@
 			</Avatar.Root>
 		</DropdownMenu.Trigger>
 	{:else}
-		<Button variant="link" href="{base}/login">登录</Button>
+		<Button variant="link" href="/login">登录</Button>
 	{/if}
 	<DropdownMenu.Content class="w-56">
 		{#if user}
@@ -52,14 +52,14 @@
 			<DropdownMenu.Group>
 				{#if user.role.name === 'Admin'}
 					<DropdownMenu.Item>
-						<a class="flex items-center gap-2" href="{base}/user">
+						<a class="flex items-center gap-2" href="/user">
 							<User class="mr-2 h-4 w-4" />
 							<span>控制台</span>
 						</a>
 					</DropdownMenu.Item>
 				{/if}
 				<DropdownMenu.Item>
-					<a class="flex items-center gap-2" href="{base}/settings">
+					<a class="flex items-center gap-2" href="/settings">
 						<Settings class="mr-2 h-4 w-4" />
 						<span>个人中心</span>
 					</a>

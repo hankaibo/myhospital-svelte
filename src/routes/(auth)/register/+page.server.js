@@ -1,5 +1,5 @@
 import { fail, redirect } from '@sveltejs/kit';
-import { base } from '$app/paths';
+
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { formSchema } from './schema';
@@ -37,6 +37,6 @@ export const actions = {
 			return fail(401, body);
 		}
 
-		throw redirect(307, `${base}/login`);
+		throw redirect(307, `/login`);
 	}
 };
