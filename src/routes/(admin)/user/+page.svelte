@@ -10,4 +10,4 @@
 	<title>用户管理</title>
 </svelte:head>
 
-<DataTable data={data.users} {columns} isNextPage={data.hasNextPage} />
+<DataTable data={data.users} {columns} hasNextPage={data.hasNextPage} />

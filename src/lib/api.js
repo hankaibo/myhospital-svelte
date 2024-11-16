@@ -24,10 +24,10 @@ const baseURL = isServer ? import.meta.env.VITE_SERVER_BASE_URL : import.meta.en
  * @param {object} options The request options.
  * @param {string} options.method The HTTP method to use.
  * @param {string} options.url The path to the resource.
- * @param {object|null|undefined} [options.data] The request data.
+ * @param {object|null|undefined} [options.data] The requestdata.
  * @param {RequestHeaders} [options.headers] The HTTP headers.
  * @param {Record<string, any>} [options.cookies] The HTTP headers.
- * @returns {Promise<object>} - The response from the server, parsed as a JSON object.
+ * @returns {Promise<object|{errors:string}>} - The response from the server, parsed as a JSON object.
  * @throws {HttpError} This error instructs SvelteKit to initiate HTTP error handling.
  * @throws {Error} If the provided status is invalid (not between 400 and 599).
  */
@@ -114,7 +114,7 @@ export function del(url, options = {}) {
  * @param {object} [options]
  * @param {object} [options.headers]
  * @param {object} [options.cookies]
- * @returns {Promise<object>} - The response from the server, parsed as a JSON object.
+ * @returns {Promise<object|{errors:string}>} - The response from the server, parsed as a JSON object.
  * @throws {Error} If an HTTP error occurs.
  */
 export function post(url, data, options = {}) {

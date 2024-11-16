@@ -5,4 +5,4 @@
 	let { variant = 'ghost', ...restProps } = $props();
 </script>
 
-<Button {variant} {...restProps}>Email <ArrowUpDown class="ml-2 size-4" /></Button>
+<Button class="" {variant} {...restProps}>Email <ArrowUpDown class="ml-2 size-4" /></Button>

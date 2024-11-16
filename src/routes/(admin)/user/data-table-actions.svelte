@@ -26,11 +26,11 @@
 			</Button>
 		{/snippet}
 	</DropdownMenu.Trigger>
-	<DropdownMenu.Content>
+	<DropdownMenu.Content class="">
 		<DropdownMenu.Group>
-			<DropdownMenu.GroupHeading>操作</DropdownMenu.GroupHeading>
-			<DropdownMenu.Item onclick={handleEdit}>编辑</DropdownMenu.Item>
-			<DropdownMenu.Item onclick={handleDelete}>删除</DropdownMenu.Item>
+			<DropdownMenu.GroupHeading class="" inset>操作</DropdownMenu.GroupHeading>
+			<DropdownMenu.Item class="" inset onclick={handleEdit}>编辑</DropdownMenu.Item>
+			<DropdownMenu.Item class="" inset onclick={handleDelete}>删除</DropdownMenu.Item>
 		</DropdownMenu.Group>
 	</DropdownMenu.Content>
 </DropdownMenu.Root>

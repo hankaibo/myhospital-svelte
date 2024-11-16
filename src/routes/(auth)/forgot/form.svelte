@@ -6,23 +6,25 @@
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input';
 
-	/** @type {{data: import('./$types').PageData}} */
+	/**
+	 * @type {import('sveltekit-superforms').SuperValidated<import('sveltekit-superforms').Infer<import('./schema').FormSchema>>} data
+	 */
 	let { data } = $props();
 
-	const form = superForm(data.form, {
+	const form = superForm(data, {
 		validators: zodClient(formSchema)
 	});
 
 	const { form: formData, enhance } = form;
 </script>
 
-<form use:enhance method="post" class="space-y-6">
-	<Form.Field {form} name="email" class="mb-2">
+<form use:enhance method="post" class="space-y-2">
+	<Form.Field {form} name="email" class="space-y-2">
 		<Form.Control>
-			{#snippet children({ attrs })}
-				<Form.Label class="mb-2">邮箱</Form.Label>
-				<Input {...attrs} type="email" bind:value={$formData.email} required />
-				<Form.FieldErrors />
+			{#snippet children({ props })}
+				<Form.Label class="text-sm">邮箱</Form.Label>
+				<Input {...props} type="email" bind:value={$formData.email} required />
+				<Form.FieldErrors class="h-5" errorClasses="animate-bounce" />
 			{/snippet}
 		</Form.Control>
 	</Form.Field>

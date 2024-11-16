@@ -18,17 +18,17 @@
 	});
 </script>
 
-{#if $visible}
+{#if visible}
 	<!-- 使用 $state 来访问 store 值 -->
 	<div class="absolute left-0 top-0 z-50 h-1 w-full">
 		<div
 			class="absolute left-0 top-0 h-full bg-[#5cb85c] transition-all"
-			style="width: {$p * 100}%"
+			style="width: {p * 100}%"
 		></div>
 	</div>
 {/if}
 
-{#if $p >= 0.4}
+{#if p >= 0.4}
 	<!-- 根据 p 的值显示遮罩层 -->
 	<div
 		class="animate-fade pointer-events-none fixed z-40 h-full w-full bg-[rgba(255,255,255,0.3)]"

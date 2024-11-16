@@ -5,7 +5,7 @@
 	let { src } = $props();
 </script>
 
-<Avatar.Root>
-	<Avatar.Image {src} alt="用户头像缩略图" />
-	<Avatar.Fallback>CN</Avatar.Fallback>
+<Avatar.Root class="">
+	<Avatar.Image class="" {src} alt="用户头像缩略图" />
+	<Avatar.Fallback class="">CN</Avatar.Fallback>
 </Avatar.Root>
