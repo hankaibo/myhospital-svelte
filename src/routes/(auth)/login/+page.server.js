@@ -38,7 +38,7 @@ export const actions = {
 			return fail(401, body);
 		}
 
-		const value = btoa(JSON.stringify(body));
+		const value = JSON.stringify(body);
 		cookies.set('jwt', value, { path: '/' });
 
 		throw redirect(307, '/');

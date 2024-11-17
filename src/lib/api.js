@@ -48,7 +48,7 @@ async function send({ method, url, data, headers = {}, cookies }) {
 
 	if (cookies) {
 		const jwt = cookies.get('jwt');
-		({ token, refreshToken, user } = JSON.parse(atob(jwt)));
+		({ token, refreshToken, user } = JSON.parse(jwt));
 		opts.headers['Authorization'] = `Bearer ${token}`;
 	}
 
@@ -62,7 +62,7 @@ async function send({ method, url, data, headers = {}, cookies }) {
 		try {
 			const { token: newToken, refreshToken: newRefreshToken } =
 				await refreshAccessToken(refreshToken);
-			const value = btoa(JSON.stringify({ token: newToken, refreshToken: newRefreshToken, user }));
+			const value = JSON.stringify({ token: newToken, refreshToken: newRefreshToken, user });
 			cookies?.set('jwt', value, { path: '/' });
 
 			if (newToken) {

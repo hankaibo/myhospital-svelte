@@ -5,7 +5,7 @@ export const handle = async ({ event, resolve }) => {
 		user = undefined,
 		token = undefined,
 		refreshToken = undefined
-	} = jwt ? JSON.parse(atob(jwt)) : {};
+	} = jwt ? JSON.parse(jwt) : {};
 
 	event.locals.user = user;
 	event.locals.token = token;
