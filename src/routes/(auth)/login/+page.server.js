@@ -18,7 +18,7 @@ export async function load({ locals }) {
 
 	return {
 		url,
-		form,
+		form
 	};
 }
 

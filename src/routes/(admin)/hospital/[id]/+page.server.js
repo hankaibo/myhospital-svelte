@@ -1,6 +1,6 @@
 import { fail, error, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
-import { formSchema } from './schema';
+import { formSchema } from './schema.js';
 import { zod } from 'sveltekit-superforms/adapters';
 import * as api from '$lib/api.js';
 
@@ -8,10 +8,10 @@ import * as api from '$lib/api.js';
 export async function load({ locals, cookies, params }) {
 	if (!locals.user) redirect(302, `/login`);
 
-	/** @type {import('../types').User} */
-	const user = await api.get(`users/${params.id}`, { cookies });
+	/** @type {import('../types').Hospital} */
+	const hospital = await api.get(`hospitals/${params.id}`, { cookies });
 
-	const form = await superValidate(user, zod(formSchema));
+	const form = await superValidate(hospital, zod(formSchema));
 
 	return {
 		form

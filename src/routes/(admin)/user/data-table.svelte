@@ -104,7 +104,7 @@
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger>
 				{#snippet child({ props })}
-					<Button {...props} variant="outline" class="ml-auto">Columns</Button>
+					<Button {...props} variant="outline" class="ml-auto">列</Button>
 				{/snippet}
 			</DropdownMenu.Trigger>
 			<DropdownMenu.Content class="" align="end">

@@ -6,6 +6,5 @@ export const formSchema = z.object({
 });
 
 /**
-* @typedef {typeof formSchema} FormSchema
-*/
-
+ * @typedef {typeof formSchema} FormSchema
+ */

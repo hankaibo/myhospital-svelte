@@ -69,10 +69,10 @@ export const columns = [
 						}
 					}).then(() => {
 						invalidate(window.location.pathname);
-					})
+					});
 				}
 			});
-		},
+		}
 	},
 	{
 		id: '操作',

@@ -14,5 +14,5 @@ export const formSchema = z
 	});
 
 /**
-* @typedef {typeof formSchema} FormSchema
-*/
+ * @typedef {typeof formSchema} FormSchema
+ */

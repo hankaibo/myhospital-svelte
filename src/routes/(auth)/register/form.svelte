@@ -25,7 +25,7 @@
 				{#snippet children({ props })}
 					<Form.Label class="text-sm">名</Form.Label>
 					<Input {...props} type="text" bind:value={$formData.firstName} required />
-					<Form.FieldErrors class="h-5" errorClasses="animate-bounce"/>
+					<Form.FieldErrors class="h-5" errorClasses="animate-bounce" />
 				{/snippet}
 			</Form.Control>
 		</Form.Field>
@@ -34,7 +34,7 @@
 				{#snippet children({ props })}
 					<Form.Label class="text-sm">姓</Form.Label>
 					<Input {...props} type="text" bind:value={$formData.lastName} required />
-					<Form.FieldErrors class="h-5" errorClasses="animate-bounce"/>
+					<Form.FieldErrors class="h-5" errorClasses="animate-bounce" />
 				{/snippet}
 			</Form.Control>
 		</Form.Field>
@@ -45,7 +45,7 @@
 			{#snippet children({ props })}
 				<Form.Label class="text-sm">邮箱</Form.Label>
 				<Input {...props} type="email" bind:value={$formData.email} required />
-				<Form.FieldErrors class="h-5" errorClasses="animate-bounce"/>
+				<Form.FieldErrors class="h-5" errorClasses="animate-bounce" />
 			{/snippet}
 		</Form.Control>
 	</Form.Field>
@@ -55,7 +55,7 @@
 			{#snippet children({ props })}
 				<Form.Label class="text-sm">密码</Form.Label>
 				<Input {...props} type="password" bind:value={$formData.password} required />
-				<Form.FieldErrors class="h-5" errorClasses="animate-bounce"/>
+				<Form.FieldErrors class="h-5" errorClasses="animate-bounce" />
 			{/snippet}
 		</Form.Control>
 	</Form.Field>
@@ -65,7 +65,7 @@
 			{#snippet children({ props })}
 				<Form.Label class="text-sm">确认密码</Form.Label>
 				<Input {...props} type="password" bind:value={$formData.confirmPassword} required />
-				<Form.FieldErrors class="h-5" errorClasses="animate-bounce"/>
+				<Form.FieldErrors class="h-5" errorClasses="animate-bounce" />
 			{/snippet}
 		</Form.Control>
 	</Form.Field>

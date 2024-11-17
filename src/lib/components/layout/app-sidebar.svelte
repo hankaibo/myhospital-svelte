@@ -27,7 +27,6 @@
 		}
 	];
 
-	
 	const user = $page.data?.user;
 	let currentUrl = $derived($page.data?.pathname);
 	const currentMenuItem = items.find((item) => item.url === currentUrl);
