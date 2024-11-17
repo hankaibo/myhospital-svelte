@@ -27,7 +27,7 @@
 				<Breadcrumb.Root>
 					<Breadcrumb.List>
 						<Breadcrumb.Item>
-							<Breadcrumb.Page>{$selectedMenuItem.title}</Breadcrumb.Page>
+							<Breadcrumb.Page>{$selectedMenuItem?.title}</Breadcrumb.Page>
 						</Breadcrumb.Item>
 					</Breadcrumb.List>
 				</Breadcrumb.Root>
