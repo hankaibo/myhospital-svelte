@@ -6,6 +6,7 @@
 	import NavUser from '$lib/components/layout/nav-user.svelte';
 	import NavMenu from '$lib/components/layout/nav-menu.svelte';
 	import NavSecondary from '$lib/components/layout/nav-secondary.svelte';
+	import { selectedMenuItem } from '$lib/stores/menus.js';
 
 	// Menu items.
 	const items = [
@@ -16,17 +17,21 @@
 		},
 		{
 			title: '用户管理',
-			url: 'user',
+			url: '/user',
 			icon: Users
 		},
 		{
 			title: '医院管理',
-			url: 'hospital',
+			url: '/hospital',
 			icon: Hospital
 		}
 	];
 
+	
 	const user = $page.data?.user;
+	let currentUrl = $derived($page.data?.pathname);
+	const currentMenuItem = items.find((item) => item.url === currentUrl);
+	selectedMenuItem.set(currentMenuItem);
 </script>
 
 <Sidebar.Root class="" side="left" variant="sidebar" collapsible="icon">
@@ -36,7 +41,7 @@
 	<Sidebar.Separator class="" />
 
 	<Sidebar.Content class="">
-		<NavMenu {items} />
+		<NavMenu {items} {currentUrl} />
 		<NavSecondary class="mt-auto" />
 	</Sidebar.Content>
 

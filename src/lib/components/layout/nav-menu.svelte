@@ -1,7 +1,7 @@
 <script>
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 
-	let { items } = $props();
+	let { items, currentUrl } = $props();
 </script>
 
 <Sidebar.Group class="">
@@ -10,7 +10,7 @@
 		<Sidebar.Menu class="">
 			{#each items as item (item.title)}
 				<Sidebar.MenuItem class="">
-					<Sidebar.MenuButton class="">
+					<Sidebar.MenuButton class="" isActive={currentUrl === item.url}>
 						{#snippet child({ props })}
 							<a href={item.url} {...props}>
 								<item.icon />
