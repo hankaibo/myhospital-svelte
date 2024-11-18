@@ -6,64 +6,66 @@
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input';
 
-	/** @type {{data: import('./$types').PageData}} */
+	/**
+	 * @type {import('sveltekit-superforms').SuperValidated<import('sveltekit-superforms').Infer<import('./schema').FormSchema>>} data
+	 */
 	let { data } = $props();
 
-	const form = superForm(data.form, {
+	const form = superForm(data, {
 		validators: zodClient(formSchema)
 	});
 
 	const { form: formData, enhance } = form;
 </script>
 
-<form use:enhance method="post" class="space-y-6">
+<form use:enhance method="post" class="space-y-2">
 	<div class="grid grid-cols-2 gap-6">
-		<Form.Field {form} name="firstName">
+		<Form.Field {form} name="firstName" class="space-y-2">
 			<Form.Control>
-				{#snippet children({ attrs })}
-					<Form.Label>名</Form.Label>
-					<Input {...attrs} type="text" bind:value={$formData.firstName} required />
-					<Form.FieldErrors />
+				{#snippet children({ props })}
+					<Form.Label class="text-sm">名</Form.Label>
+					<Input {...props} type="text" bind:value={$formData.firstName} required />
+					<Form.FieldErrors class="h-5" errorClasses="animate-bounce" />
 				{/snippet}
 			</Form.Control>
 		</Form.Field>
-		<Form.Field {form} name="lastName">
+		<Form.Field {form} name="lastName" class="space-y-2">
 			<Form.Control>
-				{#snippet children({ attrs })}
-					<Form.Label>姓</Form.Label>
-					<Input {...attrs} type="text" bind:value={$formData.lastName} required />
-					<Form.FieldErrors />
+				{#snippet children({ props })}
+					<Form.Label class="text-sm">姓</Form.Label>
+					<Input {...props} type="text" bind:value={$formData.lastName} required />
+					<Form.FieldErrors class="h-5" errorClasses="animate-bounce" />
 				{/snippet}
 			</Form.Control>
 		</Form.Field>
 	</div>
 
-	<Form.Field {form} name="email">
+	<Form.Field {form} name="email" class="space-y-2">
 		<Form.Control>
-			{#snippet children({ attrs })}
-				<Form.Label>邮箱</Form.Label>
-				<Input {...attrs} type="email" bind:value={$formData.email} required />
-				<Form.FieldErrors />
+			{#snippet children({ props })}
+				<Form.Label class="text-sm">邮箱</Form.Label>
+				<Input {...props} type="email" bind:value={$formData.email} required />
+				<Form.FieldErrors class="h-5" errorClasses="animate-bounce" />
 			{/snippet}
 		</Form.Control>
 	</Form.Field>
 
-	<Form.Field {form} name="password">
+	<Form.Field {form} name="password" class="space-y-2">
 		<Form.Control>
-			{#snippet children({ attrs })}
-				<Form.Label>密码</Form.Label>
-				<Input {...attrs} type="password" bind:value={$formData.password} required />
-				<Form.FieldErrors />
+			{#snippet children({ props })}
+				<Form.Label class="text-sm">密码</Form.Label>
+				<Input {...props} type="password" bind:value={$formData.password} required />
+				<Form.FieldErrors class="h-5" errorClasses="animate-bounce" />
 			{/snippet}
 		</Form.Control>
 	</Form.Field>
 
-	<Form.Field {form} name="confirmPassword">
+	<Form.Field {form} name="confirmPassword" class="space-y-2">
 		<Form.Control>
-			{#snippet children({ attrs })}
-				<Form.Label>确认密码</Form.Label>
-				<Input {...attrs} type="password" bind:value={$formData.confirmPassword} required />
-				<Form.FieldErrors />
+			{#snippet children({ props })}
+				<Form.Label class="text-sm">确认密码</Form.Label>
+				<Input {...props} type="password" bind:value={$formData.confirmPassword} required />
+				<Form.FieldErrors class="h-5" errorClasses="animate-bounce" />
 			{/snippet}
 		</Form.Control>
 	</Form.Field>

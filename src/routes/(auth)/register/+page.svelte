@@ -21,7 +21,7 @@
 				<h2 class="mt-6 text-3xl font-bold">注册账号</h2>
 			</div>
 
-			<RegisterForm {data} />
+			<RegisterForm data={data.form} />
 		</div>
 	</div>
 </div>

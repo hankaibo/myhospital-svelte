@@ -12,3 +12,7 @@ export const formSchema = z
 		message: 'Passwords do not match',
 		path: ['confirmPassword'] // This will highlight the confirmPassword field in case of an error
 	});
+
+/**
+ * @typedef {typeof formSchema} FormSchema
+ */

@@ -2,10 +2,11 @@
 	import { tick } from 'svelte';
 	import { mode } from 'mode-watcher';
 	import '@amap/amap-jsapi-types';
-	import Ellipsis from 'lucide-svelte/icons/ellipsis';
+	import { Pencil, Trash2, Ellipsis } from 'lucide-svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Button } from '$lib/components/ui/button';
 	import * as Sheet from '$lib/components/ui/sheet';
+	import { goto } from '$app/navigation';
 
 	/** @type {{id: number}} */
 	let { id } = $props();
@@ -92,6 +93,19 @@
 		lng = e.lnglat ? e.lnglat.getLng() : marker.getPosition()?.getLng();
 		lat = e.lnglat ? e.lnglat.getLat() : marker.getPosition()?.getLat();
 	}
+
+	function handleCopy() {
+		// 跳转到用户详情页面
+		goto(`/user/${id}`);
+	}
+
+	function handleEdit() {
+		goto(`/hospital/${id}`);
+	}
+
+	function handleDelete() {
+		console.log('Delete');
+	}
 </script>
 
 <DropdownMenu.Root>
@@ -103,35 +117,40 @@
 			</Button>
 		{/snippet}
 	</DropdownMenu.Trigger>
-	<DropdownMenu.Content>
-		<DropdownMenu.Group>
-			<DropdownMenu.Label>操作</DropdownMenu.Label>
-			<DropdownMenu.Item onclick={() => navigator.clipboard.writeText(id + '')}
-				>影分身</DropdownMenu.Item
-			>
-		</DropdownMenu.Group>
-		<DropdownMenu.Separator />
-		<DropdownMenu.Item onclick={handleInitMap}>地理编码</DropdownMenu.Item>
-		<DropdownMenu.Item>修改</DropdownMenu.Item>
-		<DropdownMenu.Item>删除</DropdownMenu.Item>
+	<DropdownMenu.Content class="">
+		<DropdownMenu.Item class="" inset onclick={handleCopy}>影分身</DropdownMenu.Item>
+		<DropdownMenu.Separator class="" />
+		<DropdownMenu.Item class="" inset onclick={handleInitMap}>地理编码</DropdownMenu.Item>
+		<DropdownMenu.Item class="" inset>
+			<Button variant="ghost" size="icon" class="relative size-8 p-0" onclick={handleEdit}>
+				<Pencil class="size-4" />
+				编辑
+			</Button>
+		</DropdownMenu.Item>
+		<DropdownMenu.Item class="" inset>
+			<Button variant="ghost" size="icon" class="relative size-8 p-0">
+				<Trash2 class="size-4" />
+				删除
+			</Button>
+		</DropdownMenu.Item>
 	</DropdownMenu.Content>
 </DropdownMenu.Root>
 
 <Sheet.Root bind:open={dialogOpen}>
 	<Sheet.Content class="md:max-w-full">
-		<Sheet.Header>
-			<Sheet.Title>请选择该医院的地点</Sheet.Title>
-			<Sheet.Description>使用鼠标在地图上选择正确的地址。</Sheet.Description>
+		<Sheet.Header class="">
+			<Sheet.Title class="">请选择该医院的地点</Sheet.Title>
+			<Sheet.Description class="">使用鼠标在地图上选择正确的地址。</Sheet.Description>
 		</Sheet.Header>
 		<div id="map" class="my-2 h-[calc(100%-100px)] w-full"></div>
 		<div class="absolute bottom-20 right-10 rounded bg-slate-400 p-2">
 			经度: <span>{lng || 'N/A'}</span>, 纬度: <span>{lat || 'N/A'}</span>
 		</div>
 
-		<Sheet.Footer>
+		<Sheet.Footer class="">
 			<Sheet.Close>
 				{#snippet child({ props })}
-					<Button {...props} type="submit">保存</Button>
+					<Button class="" {...props} type="submit">保存</Button>
 				{/snippet}
 			</Sheet.Close>
 		</Sheet.Footer>

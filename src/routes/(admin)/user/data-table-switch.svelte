@@ -1,8 +1,10 @@
 <script>
-	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
+	import * as Switch from '$lib/components/ui/switch/index.js';
 
 	/** @type {{checked?: boolean, controlledChecked: boolean,}} */
 	let { checked = false, controlledChecked = true, ...restProps } = $props();
 </script>
 
-<Checkbox class="" {checked} {controlledChecked} {...restProps} />
+<Switch.Root {checked} {controlledChecked} {...restProps}>
+	<Switch.Thumb />
+</Switch.Root>

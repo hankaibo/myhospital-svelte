@@ -2,6 +2,7 @@ import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import DataTableActions from './data-table-actions.svelte';
 import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 
+/** @type {import('@tanstack/table-core').ColumnDef<import('./types').Hospital>[]} */
 export const columns = [
 	{
 		id: 'select',
@@ -9,6 +10,7 @@ export const columns = [
 			renderComponent(Checkbox, {
 				checked: table.getIsAllPageRowsSelected(),
 				indeterminate: table.getIsAllPageRowsSelected() && !table.getIsAllPageRowsSelected(),
+				/** @type {(value: boolean) => void} */
 				onCheckedChange: (value) => table.toggleAllPageRowsSelected(!!value),
 				controlledChecked: true,
 				'aria-label': '全选'
@@ -16,6 +18,7 @@ export const columns = [
 		cell: ({ row }) =>
 			renderComponent(Checkbox, {
 				checked: row.getIsSelected(),
+				/** @type {(value: boolean) => void} */
 				onCheckedChange: (value) => row.toggleSelected(!!value),
 				controlledChecked: true,
 				'aria-label': '当前行'
@@ -37,7 +40,8 @@ export const columns = [
 	},
 	{
 		accessorKey: 'address',
-		header: '单位地址'
+		header: '单位地址',
+		size: 300
 	},
 	{
 		accessorKey: 'zipCode',
@@ -57,6 +61,7 @@ export const columns = [
 	},
 	{
 		id: '操作',
+		header: '操作',
 		cell: ({ row }) => {
 			return renderComponent(DataTableActions, { id: row.original.id });
 		}

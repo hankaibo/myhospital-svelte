@@ -5,4 +5,4 @@
 	let { checked = false, controlledChecked = true, ...restProps } = $props();
 </script>
 
-<Checkbox {checked} {controlledChecked} {...restProps} />
+<Checkbox class="" {checked} {controlledChecked} {...restProps} />

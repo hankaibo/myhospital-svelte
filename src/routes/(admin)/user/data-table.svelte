@@ -11,11 +11,17 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 
-	let { data, columns, hasPreviousPage } = $props();
+	let { data, columns, hasNextPage } = $props();
+
+	/** @type {import('@tanstack/table-core').PaginationState} */
 	let pagination = $state({ pageIndex: 0, pageSize: 10 });
+	/** @type {import('@tanstack/table-core').SortingState} */
 	let sorting = $state([]);
+	/** @type {import('@tanstack/table-core').ColumnFiltersState} */
 	let columnFilters = $state([]);
-	let columnVisibility = $state([]);
+	/** @type {import('@tanstack/table-core').VisibilityState} */
+	let columnVisibility = $state({});
+	/** @type {import('@tanstack/table-core').RowSelectionState} */
 	let rowSelection = $state({});
 
 	const table = createSvelteTable({
@@ -98,10 +104,10 @@
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger>
 				{#snippet child({ props })}
-					<Button {...props} variant="outline" class="ml-auto">Columns</Button>
+					<Button {...props} variant="outline" class="ml-auto">列</Button>
 				{/snippet}
 			</DropdownMenu.Trigger>
-			<DropdownMenu.Content align="end">
+			<DropdownMenu.Content class="" align="end">
 				{#each table.getAllColumns().filter((col) => col.getCanHide()) as column (column.id)}
 					<DropdownMenu.CheckboxItem
 						class="capitalize"
@@ -116,12 +122,12 @@
 		</DropdownMenu.Root>
 	</div>
 	<div class="rounded-md border">
-		<Table.Root>
-			<Table.Header>
+		<Table.Root class="">
+			<Table.Header class="">
 				{#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
-					<Table.Row>
+					<Table.Row class="">
 						{#each headerGroup.headers as header (header.id)}
-							<Table.Head>
+							<Table.Head class="">
 								{#if !header.isPlaceholder}
 									<FlexRender
 										content={header.column.columnDef.header}
@@ -133,17 +139,17 @@
 					</Table.Row>
 				{/each}
 			</Table.Header>
-			<Table.Body>
+			<Table.Body class="">
 				{#each table.getRowModel().rows as row (row.id)}
-					<Table.Row data-state={row.getIsSelected() && 'selected'}>
+					<Table.Row class="" data-state={row.getIsSelected() && 'selected'}>
 						{#each row.getVisibleCells() as cell (cell.id)}
-							<Table.Cell>
+							<Table.Cell class="">
 								<FlexRender content={cell.column.columnDef.cell} context={cell.getContext()} />
 							</Table.Cell>
 						{/each}
 					</Table.Row>
 				{:else}
-					<Table.Row>
+					<Table.Row class="">
 						<Table.Cell colspan={columns.length} class="h-24 text-center">No results</Table.Cell>
 					</Table.Row>
 				{/each}
@@ -155,12 +161,14 @@
 			{table.getFilteredSelectedRowModel().rows.length} / {table.getFilteredRowModel().rows.length}
 		</div>
 		<Button
+			class=""
 			variant="outline"
 			size="sm"
 			onclick={() => table.previousPage()}
 			disabled={!table.getCanPreviousPage()}>上一页</Button
 		>
 		<Button
+			class=""
 			variant="outline"
 			size="sm"
 			onclick={() => table.nextPage()}

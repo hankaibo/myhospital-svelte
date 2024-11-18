@@ -1,8 +1,8 @@
 <script>
-	import UserForm from './user-form.svelte';
+	import HospitalForm from './hospital-form.svelte';
 
 	/** @type {{data: import('./$types').PageData}} */
 	let { data } = $props();
 </script>
 
-<UserForm data={data.form} />
+<HospitalForm data={data.form} />

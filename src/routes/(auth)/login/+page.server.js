@@ -14,9 +14,11 @@ export async function load({ locals }) {
 	const data = await response.json();
 	const url = `https://cn.bing.com${data.images[0].url}`;
 
+	const form = await superValidate(zod(formSchema));
+
 	return {
 		url,
-		form: await superValidate(zod(formSchema))
+		form
 	};
 }
 
@@ -32,11 +34,11 @@ export const actions = {
 
 		const body = await api.post('auth/email/login', form.data);
 
-		if (body.errors) {
+		if (body?.errors) {
 			return fail(401, body);
 		}
 
-		const value = btoa(JSON.stringify(body));
+		const value = JSON.stringify(body);
 		cookies.set('jwt', value, { path: '/' });
 
 		throw redirect(307, '/');

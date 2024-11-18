@@ -1,5 +1,5 @@
 <script>
-	import Ellipsis from 'lucide-svelte/icons/ellipsis';
+	import { Pencil, Trash2, Ellipsis } from 'lucide-svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Button } from '$lib/components/ui/button';
 	import { goto } from '$app/navigation';
@@ -26,11 +26,20 @@
 			</Button>
 		{/snippet}
 	</DropdownMenu.Trigger>
-	<DropdownMenu.Content>
+	<DropdownMenu.Content class="">
 		<DropdownMenu.Group>
-			<DropdownMenu.GroupHeading>操作</DropdownMenu.GroupHeading>
-			<DropdownMenu.Item onclick={handleEdit}>编辑</DropdownMenu.Item>
-			<DropdownMenu.Item onclick={handleDelete}>删除</DropdownMenu.Item>
+			<DropdownMenu.Item class="" inset onclick={handleEdit}>
+				<Button variant="ghost" size="icon" class="relative size-8 p-0">
+					<Pencil class="size-4" />
+					编辑
+				</Button>
+			</DropdownMenu.Item>
+			<DropdownMenu.Item class="" inset onclick={handleDelete}>
+				<Button variant="ghost" size="icon" class="relative size-8 p-0">
+					<Trash2 class="size-4" />
+					删除
+				</Button>
+			</DropdownMenu.Item>
 		</DropdownMenu.Group>
 	</DropdownMenu.Content>
 </DropdownMenu.Root>

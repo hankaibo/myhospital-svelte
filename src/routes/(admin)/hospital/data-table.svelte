@@ -2,7 +2,6 @@
 	import {
 		getCoreRowModel,
 		getPaginationRowModel,
-		getSortedRowModel,
 		getFilteredRowModel
 	} from '@tanstack/table-core';
 	import { createSvelteTable, FlexRender } from '$lib/components/ui/data-table/index.js';
@@ -12,12 +11,16 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import * as Pagination from '$lib/components/ui/pagination/index.js';
 
-	/** @type {{hospitalList?: Array<import('./types').Hospital>, total?: number}} */
+	/** @type {{data?: Array<import('./types').Hospital>, columns: import('@tanstack/table-core').ColumnDef<import('./types').Hospital>[], total?: number}} */
 	let { data, columns, total = 0 } = $props();
+
+	/** @type {import('@tanstack/table-core').PaginationState} */
 	let pagination = $state({ pageIndex: 0, pageSize: 10 });
-	let sorting = $state([]);
+	/** @type {import('@tanstack/table-core').ColumnFiltersState} */
 	let columnFilters = $state([]);
-	let columnVisibility = $state([]);
+	/** @type {import('@tanstack/table-core').VisibilityState} */
+	let columnVisibility = $state({});
+	/** @type {import('@tanstack/table-core').RowSelectionState} */
 	let rowSelection = $state({});
 
 	const table = createSvelteTable({
@@ -27,20 +30,12 @@
 		columns,
 		getCoreRowModel: getCoreRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
-		getSortedRowModel: getSortedRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		onPaginationChange: (updater) => {
 			if (typeof updater === 'function') {
 				pagination = updater(pagination);
 			} else {
 				pagination = updater;
-			}
-		},
-		onSortingChange: (updater) => {
-			if (typeof updater === 'function') {
-				sorting = updater(sorting);
-			} else {
-				sorting = updater;
 			}
 		},
 		onColumnFiltersChange: (updater) => {
@@ -67,9 +62,6 @@
 		state: {
 			get pagination() {
 				return pagination;
-			},
-			get sorting() {
-				return sorting;
 			},
 			get columnFilters() {
 				return columnFilters;
@@ -101,10 +93,10 @@
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger>
 				{#snippet child({ props })}
-					<Button {...props} variant="outline" class="ml-auto">Columns</Button>
+					<Button {...props} variant="outline" class="ml-auto">列</Button>
 				{/snippet}
 			</DropdownMenu.Trigger>
-			<DropdownMenu.Content align="end">
+			<DropdownMenu.Content class="" align="end">
 				{#each table.getAllColumns().filter((col) => col.getCanHide()) as column (column.id)}
 					<DropdownMenu.CheckboxItem
 						class="capitalize"
@@ -120,12 +112,12 @@
 	</div>
 
 	<div class="rounded-md border">
-		<Table.Root>
-			<Table.Header>
+		<Table.Root class="">
+			<Table.Header class="">
 				{#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
-					<Table.Row>
+					<Table.Row class="">
 						{#each headerGroup.headers as header (header.id)}
-							<Table.Head>
+							<Table.Head class="">
 								{#if !header.isPlaceholder}
 									<FlexRender
 										content={header.column.columnDef.header}
@@ -137,17 +129,17 @@
 					</Table.Row>
 				{/each}
 			</Table.Header>
-			<Table.Body>
+			<Table.Body class="">
 				{#each table.getRowModel().rows as row (row.id)}
-					<Table.Row data-state={row.getIsSelected() && 'selected'}>
+					<Table.Row class="" data-state={row.getIsSelected() && 'selected'}>
 						{#each row.getVisibleCells() as cell (cell.id)}
-							<Table.Cell>
+							<Table.Cell class="">
 								<FlexRender content={cell.column.columnDef.cell} context={cell.getContext()} />
 							</Table.Cell>
 						{/each}
 					</Table.Row>
 				{:else}
-					<Table.Row>
+					<Table.Row class="">
 						<Table.Cell colspan={columns.length} class="h-24 text-center">No results</Table.Cell>
 					</Table.Row>
 				{/each}
