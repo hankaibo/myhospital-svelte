@@ -51,38 +51,38 @@
 	<DropdownMenu.Group>
 		{#if user.role.name === 'Admin' && showDashboard}
 			<DropdownMenu.Item class="" inset={false}>
-				<a class="flex items-center gap-2" href="/user">
+				<a class="flex items-center gap-2 w-full" href="/user">
 					<User />
 					<span>控制台</span>
 				</a>
 			</DropdownMenu.Item>
 		{/if}
-		<DropdownMenu.Item class="" inset={false}>
+		<DropdownMenu.Item class="cursor-pointer" inset={false}>
 			<BadgeCheck />
 			个人中心
 		</DropdownMenu.Item>
-		<DropdownMenu.Item class="" inset={false}>
+		<DropdownMenu.Item class="cursor-pointer" inset={false}>
 			<Bell />
 			消息
 		</DropdownMenu.Item>
 	</DropdownMenu.Group>
 	<DropdownMenu.Separator class="" />
 	<DropdownMenu.Group>
-		<DropdownMenu.Item class="" inset={false} onclick={() => setMode('light')}>
+		<DropdownMenu.Item class="cursor-pointer" inset={false} onclick={() => setMode('light')}>
 			<Sun />
 			<span>浅色</span>
 		</DropdownMenu.Item>
-		<DropdownMenu.Item class="" inset={false} onclick={() => setMode('dark')}>
+		<DropdownMenu.Item class="cursor-pointer" inset={false} onclick={() => setMode('dark')}>
 			<MoonStar />
 			<span>深色</span>
 		</DropdownMenu.Item>
-		<DropdownMenu.Item class="" inset={false} onclick={() => resetMode()}>
+		<DropdownMenu.Item class="cursor-pointer" inset={false} onclick={() => resetMode()}>
 			<Monitor />
 			<span>自动</span>
 		</DropdownMenu.Item>
 	</DropdownMenu.Group>
 	<DropdownMenu.Separator class="" />
-	<DropdownMenu.Item class="" inset={false}>
+	<DropdownMenu.Item class="cursor-pointer" inset={false}>
 		<LogOut />
 		<button onclick={handleLogout}>退出</button>
 	</DropdownMenu.Item>

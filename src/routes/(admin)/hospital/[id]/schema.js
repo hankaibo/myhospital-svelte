@@ -8,7 +8,7 @@ export const formSchema = z.object({
 	type: z.string().optional(),
 	lvl: z.string().optional(),
 	address: z.string().max(200, { message: '地址不能超过200个字符' }).optional(),
-	zipCode: z.string().optional(),
+	zipCode: z.string().nullable().optional(),
 	introduction: z.string().optional(),
 	lng: z.string().optional(),
 	lat: z.string().optional()

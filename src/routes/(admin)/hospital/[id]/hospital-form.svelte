@@ -47,6 +47,24 @@
 			{/snippet}
 		</Form.Control>
 	</Form.Field>
+	<Form.Field {form} name="code" class="space-y-2">
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label class="text-sm">医院等级</Form.Label>
+				<Input class="" {...props} type="text" bind:value={$formData.lvl} required />
+				<Form.FieldErrors class="h-5" errorClasses="">{$errors.lvl}</Form.FieldErrors>
+			{/snippet}
+		</Form.Control>
+	</Form.Field>
+	<Form.Field {form} name="code" class="space-y-2">
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label class="text-sm">医院类型</Form.Label>
+				<Input class="" {...props} type="text" bind:value={$formData.type} required />
+				<Form.FieldErrors class="h-5" errorClasses="">{$errors.type}</Form.FieldErrors>
+			{/snippet}
+		</Form.Control>
+	</Form.Field>
 	<Form.Field {form} name="district" class="space-y-2">
 		<Form.Control>
 			{#snippet children({ props })}
@@ -60,7 +78,7 @@
 		<Form.Control>
 			{#snippet children({ props })}
 				<Form.Label class="text-sm">单位地址</Form.Label>
-				<Input class="" {...props} type="email" bind:value={$formData.address} />
+				<Input class="" {...props} type="text" bind:value={$formData.address} />
 				<Form.FieldErrors class="h-5" errorClasses="">{$errors.address}</Form.FieldErrors>
 			{/snippet}
 		</Form.Control>
@@ -69,7 +87,7 @@
 		<Form.Control>
 			{#snippet children({ props })}
 				<Form.Label class="text-sm">邮编</Form.Label>
-				<Input class="" {...props} type="email" bind:value={$formData.zipCode} />
+				<Input class="" {...props} type="text" bind:value={$formData.zipCode} />
 				<Form.FieldErrors class="h-5" errorClasses="">{$errors.zipCode}</Form.FieldErrors>
 			{/snippet}
 		</Form.Control>
