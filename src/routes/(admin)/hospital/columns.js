@@ -35,6 +35,14 @@ export const columns = [
 		header: '医院编码'
 	},
 	{
+		accessorKey: 'lvl',
+		header: '医院等级'
+	},
+	{
+		accessorKey: 'type',
+		header: '医院类型'
+	},
+	{
 		accessorKey: 'district',
 		header: '所属区'
 	},
@@ -63,7 +71,7 @@ export const columns = [
 		id: '操作',
 		header: '操作',
 		cell: ({ row }) => {
-			return renderComponent(DataTableActions, { id: row.original.id });
+			return renderComponent(DataTableActions, { id: row.original.id, longitude: row.original.lng, latitude: row.original.lat });
 		}
 	}
 ];

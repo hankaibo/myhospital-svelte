@@ -24,7 +24,7 @@
 	let contextMenu;
 	/** @type {Array<AMap.Circle>} */
 	let circles = [];
-	/** @type {Boolean}*/
+	/** @type {boolean}*/
 	let isDrawing = false;
 	/** @type {AMap.Circle | undefined} */
 	let circle;

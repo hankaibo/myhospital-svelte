@@ -1,4 +1,5 @@
 <script>
+	import { invalidate } from '$app/navigation';
 	import {
 		getCoreRowModel,
 		getPaginationRowModel,
@@ -74,10 +75,22 @@
 			}
 		}
 	});
+
+	const handlySync = () => {
+		fetch('/hospital', {
+			method: 'GET',
+			headers: {
+				'content-type': 'application/json'
+			}
+		}).then(() => {
+			invalidate(window.location.pathname);
+		});
+	};
 </script>
 
 <div class="w-full">
 	<div class="flex items-center py-4">
+		<Button class="" onclick={handlySync}>Button</Button>
 		<Input
 			placeholder="Filter name..."
 			value={table.getColumn('name')?.getFilterValue() ?? ''}

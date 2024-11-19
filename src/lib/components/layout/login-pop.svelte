@@ -51,7 +51,7 @@
 	<DropdownMenu.Group>
 		{#if user.role.name === 'Admin' && showDashboard}
 			<DropdownMenu.Item class="" inset={false}>
-				<a class="flex items-center gap-2 w-full" href="/user">
+				<a class="flex w-full items-center gap-2" href="/user">
 					<User />
 					<span>控制台</span>
 				</a>
