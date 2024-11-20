@@ -47,7 +47,7 @@
 			{/snippet}
 		</Form.Control>
 	</Form.Field>
-	<Form.Field {form} name="code" class="space-y-2">
+	<Form.Field {form} name="lvl" class="space-y-2">
 		<Form.Control>
 			{#snippet children({ props })}
 				<Form.Label class="text-sm">医院等级</Form.Label>
@@ -56,7 +56,7 @@
 			{/snippet}
 		</Form.Control>
 	</Form.Field>
-	<Form.Field {form} name="code" class="space-y-2">
+	<Form.Field {form} name="type" class="space-y-2">
 		<Form.Control>
 			{#snippet children({ props })}
 				<Form.Label class="text-sm">医院类型</Form.Label>

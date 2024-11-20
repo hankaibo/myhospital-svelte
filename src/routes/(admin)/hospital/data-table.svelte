@@ -1,5 +1,5 @@
 <script>
-	import { invalidate } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 	import {
 		getCoreRowModel,
 		getPaginationRowModel,
@@ -11,6 +11,7 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import * as Pagination from '$lib/components/ui/pagination/index.js';
+	import { ChevronLeft, ChevronRight } from 'lucide-svelte';
 
 	/** @type {{data?: Array<import('./types').Hospital>, columns: import('@tanstack/table-core').ColumnDef<import('./types').Hospital>[], total?: number}} */
 	let { data, columns, total = 0 } = $props();
@@ -85,6 +86,21 @@
 		}).then(() => {
 			invalidate(window.location.pathname);
 		});
+	};
+
+	/** @type {(currentPage: number) => void} */
+	const handlePrev = (currentPage) => {
+		goto(`?page=${currentPage - 1}`);
+	};
+
+	/** @type {(currentPage: number) => void} */
+	const handleNext = (currentPage) => {
+		goto(`?page=${currentPage + 1}`);
+	};
+
+	/** @type {(currentPage: number) => void} */
+	const handleGo = (currentPage) => {
+		goto(`?page=${currentPage}`);
 	};
 </script>
 
@@ -164,27 +180,36 @@
 			{table.getFilteredSelectedRowModel().rows.length} / {table.getFilteredRowModel().rows.length}
 		</div>
 
-		<Pagination.Root count={total} perPage={10}>
+		<Pagination.Root class="" count={total} perPage={10}>
 			{#snippet child({ pages, currentPage })}
-				<Pagination.Content>
+				<Pagination.Content class="">
 					<Pagination.Item>
-						<Pagination.PrevButton />
+						<Pagination.PrevButton class="" onclick={handlePrev}>
+							<ChevronLeft class="size-4" />
+							<span>上一页</span>
+						</Pagination.PrevButton>
 					</Pagination.Item>
 					{#each pages as page (page.key)}
 						{#if page.type === 'ellipsis'}
 							<Pagination.Item>
-								<Pagination.Ellipsis />
+								<Pagination.Ellipsis class="" />
 							</Pagination.Item>
 						{:else}
 							<Pagination.Item isVisible={currentPage == page.value}>
-								<Pagination.Link {page} isActive={currentPage == page.value}
-									>{page.value}</Pagination.Link
+								<Pagination.Link
+									class=""
+									{page}
+									isActive={currentPage == page.value}
+									onclick={() => handleGo(currentPage)}>{page.value}</Pagination.Link
 								>
 							</Pagination.Item>
 						{/if}
 					{/each}
 					<Pagination.Item>
-						<Pagination.NextButton />
+						<Pagination.NextButton class="" onclick={() => handleNext(currentPage)}>
+							<span>下一页</span>
+							<ChevronRight class="size-4" />
+						</Pagination.NextButton>
 					</Pagination.Item>
 				</Pagination.Content>
 			{/snippet}

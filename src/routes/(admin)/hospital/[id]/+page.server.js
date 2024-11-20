@@ -22,35 +22,26 @@ export async function load({ locals, cookies, params }) {
 export const actions = {
 	update: async ({ request, cookies }) => {
 		const data = await request.formData();
-		const oldEmail = data.get('oldEmail');
-		const newEmail = data.get('email');
 
-		/** @type {import('../types').User} */
-		const user = {
+		/** @type {import('../types').Hospital} */
+		const hospital = {
 			id: data.get('id'),
-			firstName: data.get('firstName'),
-			lastName: data.get('lastName')
+			name: data.get('name'),
+			code: data.get('code'),
+			lvl: data.get('lvl'),
+			type: data.get('type'),
+			district: data.get('district'),
+			address: data.get('address'),
+			introduction: data.get('introduction'),
+			zipCode: data.get('zipCode'),
 		};
 
-		if (oldEmail !== newEmail) {
-			user.email = newEmail;
-		}
-
-		const body = await api.patch(`users/${user.id}`, user, { cookies });
+		const body = await api.patch(`hospitals/${hospital.id}`, hospital, { cookies });
 
 		if (body.errors) {
 			return fail(401, body);
 		}
 
-		throw redirect(307, '/user');
+		throw redirect(307, '/hospital');
 	},
-	delete: async ({ locals, request, cookies }) => {
-		if (!locals.user) throw error(401);
-
-		const data = await request.formData();
-		const id = data.get('id');
-
-		await api.del(`users/${id}`, { cookies });
-		throw redirect(307, '/user');
-	}
 };

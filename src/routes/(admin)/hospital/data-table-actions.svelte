@@ -1,18 +1,23 @@
 <script>
-	import { MapPin, Pencil, Trash2, Ellipsis } from 'lucide-svelte';
+	import { Copy, MapPin, Pencil, Trash2, Ellipsis } from 'lucide-svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Button } from '$lib/components/ui/button';
-	import { goto } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 	import LocationMap from './location-map.svelte';
 
-	/** @type {{id: string, lng?:number, lat?:number}} */
-	let { id, lng, lat } = $props();
+	/** @type {{id: string, longitude?:number, latitude?:number}} */
+	let { id, longitude, latitude } = $props();
 	/** @type {boolean} */
 	let dialogOpen = $state(false);
 
 	function handleCopy() {
-		// 跳转到用户详情页面
-		goto(`/hospital/${id}`);
+		fetch('/hospital', {
+			method: 'POST',
+			body: JSON.stringify({ id }),
+			headers: {
+				'content-type': 'application/json'
+			}
+		}).then(() => {});
 	}
 
 	function handleEdit() {
@@ -20,7 +25,15 @@
 	}
 
 	function handleDelete() {
-		console.log('Delete');
+		fetch('/hospital', {
+			method: 'DELETE',
+			body: JSON.stringify({ id }),
+			headers: {
+				'content-type': 'application/json'
+			}
+		}).then(() => {
+			invalidate('/hospital');
+		});
 	}
 </script>
 
@@ -34,7 +47,12 @@
 		{/snippet}
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content class="">
-		<DropdownMenu.Item class="" inset onclick={handleCopy}>影分身</DropdownMenu.Item>
+		<DropdownMenu.Item class="" inset onclick={handleCopy}>
+			<Button variant="ghost" size="icon" class="relative size-8 p-0" onclick={handleCopy}>
+				<Copy class="size-4" />
+				复制
+			</Button>
+		</DropdownMenu.Item>
 		<DropdownMenu.Item class="" inset>
 			<Button
 				variant="ghost"
@@ -43,7 +61,7 @@
 				onclick={() => (dialogOpen = true)}
 			>
 				<MapPin class="size-4" />
-				地理编码
+				定位
 			</Button>
 		</DropdownMenu.Item>
 		<DropdownMenu.Item class="" inset>
@@ -53,7 +71,7 @@
 			</Button>
 		</DropdownMenu.Item>
 		<DropdownMenu.Item class="" inset>
-			<Button variant="ghost" size="icon" class="relative size-8 p-0">
+			<Button variant="ghost" size="icon" class="relative size-8 p-0" onclick={handleDelete}>
 				<Trash2 class="size-4" />
 				删除
 			</Button>
@@ -61,4 +79,4 @@
 	</DropdownMenu.Content>
 </DropdownMenu.Root>
 
-<LocationMap {id} {dialogOpen} {lng} {lat} />
+<LocationMap {id} {dialogOpen} {longitude} {latitude} />

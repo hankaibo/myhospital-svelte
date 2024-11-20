@@ -1,18 +1,25 @@
-import { json } from '@sveltejs/kit';
 import * as api from '$lib/api.js';
 
-/** @type {import('./$types').RequestHandler} */
+/** 
+ * 
+ * 同步医院
+ * @type {import('./$types').RequestHandler}
+ *
+ */
 export async function GET({ request, cookies }) {
 	const city = 'beijing';
 
 	const body = await api.get(`hospitals/sync/${city}`, { cookies });
 
-	return json({
-		body
-	});
+	return new Response(null, { status: 204 });
 }
 
-/** @type {import('./$types').RequestHandler} */
+/** 
+ * 
+ * 定位医院，修改医院的经纬度信息
+ * @type {import('./$types').RequestHandler}
+ *
+ */
 export async function PATCH({ request, cookies }) {
 	const { id, lng, lat } = await request.json();
 
@@ -25,7 +32,40 @@ export async function PATCH({ request, cookies }) {
 		{ cookies }
 	);
 
-	return json({
-		body
-	});
+	return new Response(null, { status: 204 });
+}
+
+/** 
+ * 
+ * 复制医院
+ * @type {import('./$types').RequestHandler}
+ *
+ */
+export async function POST({ request, cookies }) {
+	const { id } = await request.json();
+
+	const body = await api.post(
+		`hospitals/${id}`,
+		{},
+		{ cookies }
+	);
+
+	return new Response(null, { status: 204 });
+}
+
+/** 
+ * 
+ * 删除医院
+ * @type {import('./$types').RequestHandler}
+ *
+ */
+export async function DELETE({ request, cookies }) {
+	const { id } = await request.json();
+
+	await api.del(
+		`hospitals/${id}`,
+		{ cookies }
+	);
+
+	return new Response(null, { status: 204 });
 }

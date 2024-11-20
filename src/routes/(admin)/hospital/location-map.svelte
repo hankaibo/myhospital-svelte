@@ -1,11 +1,12 @@
 <script>
+	import { invalidate } from '$app/navigation';
 	import { tick } from 'svelte';
 	import { mode } from 'mode-watcher';
 	import '@amap/amap-jsapi-types';
-	import { Button } from '$lib/components/ui/button';
+	import { buttonVariants } from '$lib/components/ui/button';
 	import * as Sheet from '$lib/components/ui/sheet';
 
-	let { id, dialogOpen, longitude = 116.397861, latitude = 39.900401 } = $props();
+	let { id, dialogOpen = $bindable(), longitude = 116.397861, latitude = 39.900401 } = $props();
 	/**	@type {AMap.Map} */
 	let map;
 	/** @type {AMap.Marker} */
@@ -14,6 +15,10 @@
 	let lng = $state(longitude);
 	/** @type {number} */
 	let lat = $state(latitude);
+	/** @type {number} */
+	let newLng = $state(longitude);
+	/** @type {number} */
+	let newLat = $state(latitude);
 
 	async function handleInitMap() {
 		// 类似 nextTick 中初始化地图
@@ -43,7 +48,7 @@
 	async function initializeMap(AMap) {
 		map = new AMap.Map('map', {
 			viewMode: '2D',
-			zoom: 13,
+			zoom: 18,
 			center: [lng, lat]
 		});
 
@@ -56,8 +61,7 @@
 
 		if (lng && lat) {
 			marker = new AMap.Marker({
-				position: [lng, lat],
-				offset: new AMap.Pixel(-13, -30) //以 icon 的 [center bottom] 为原点
+				position: [lng, lat]
 			});
 			marker.on('dragend', updatePosition); // 监听拖动结束事件
 			map.add(marker);
@@ -70,42 +74,38 @@
 	function setupEventHandlers(AMap) {
 		// 监听地图点击事件
 		map.on('click', function (e) {
-			const lng = e.lnglat.getLng();
-			const lat = e.lnglat.getLat();
+			newLng = e.lnglat.getLng();
+			newLat = e.lnglat.getLat();
 
 			// 如果 marker 不存在，则创建 marker
 			if (!marker) {
 				marker = new AMap.Marker({
-					position: [lng, lat],
+					position: [newLng, newLat],
 					map: map,
 					draggable: true // 设置标记可拖拽
 				});
 				marker.on('dragend', updatePosition); // 监听拖动结束事件
 			} else {
 				// 如果 marker 已存在，则更新位置
-				marker.setPosition([lng, lat]);
+				marker.setPosition([newLng, newLat]);
 			}
-
-			// 更新经纬度信息
-			updatePosition(e);
 		});
 	}
 
-	/**
-	 *
-	 * @param {AMap.Event<'click'> & { lnglat: AMap.LngLat }} e
-	 */
-	function updatePosition(e) {
-		lng = e.lnglat ? e.lnglat.getLng() : marker.getPosition()?.getLng() || 116.397861;
-		lat = e.lnglat ? e.lnglat.getLat() : marker.getPosition()?.getLat() || 39.900401;
-
+	function updatePosition() {
 		fetch('/hospital', {
 			method: 'PATCH',
-			body: JSON.stringify({ id, lng, lat }),
+			body: JSON.stringify({ id, lng: newLng, lat: newLat }),
 			headers: {
 				'content-type': 'application/json'
 			}
-		}).then(() => {});
+		})
+			.then(() => {
+				invalidate(window.location.pathname);
+			})
+			.finally(() => {
+				dialogOpen = false;
+			});
 	}
 
 	$effect(() => {
@@ -127,10 +127,12 @@
 		</div>
 
 		<Sheet.Footer class="">
-			<Sheet.Close>
-				{#snippet child({ props })}
-					<Button class="" {...props} type="submit">保存</Button>
-				{/snippet}
+			<Sheet.Close
+				class={buttonVariants({ variant: 'outline' })}
+				type="submit"
+				onclick={updatePosition}
+			>
+				保存
 			</Sheet.Close>
 		</Sheet.Footer>
 	</Sheet.Content>
