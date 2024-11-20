@@ -5,8 +5,8 @@
 	import { goto, invalidate } from '$app/navigation';
 	import LocationMap from './location-map.svelte';
 
-	/** @type {{id: string, longitude?:number, latitude?:number}} */
-	let { id, longitude, latitude } = $props();
+	/** @type {{id: string, name: string, address: string, longitude?:number, latitude?:number}} */
+	let { id, name, address, longitude, latitude } = $props();
 	/** @type {boolean} */
 	let dialogOpen = $state(false);
 
@@ -31,7 +31,8 @@
 			headers: {
 				'content-type': 'application/json'
 			}
-		}).then(() => {
+		}).then((res) => {
+			debugger;
 			invalidate('/hospital');
 		});
 	}
@@ -79,4 +80,4 @@
 	</DropdownMenu.Content>
 </DropdownMenu.Root>
 
-<LocationMap {id} {dialogOpen} {longitude} {latitude} />
+<LocationMap {id} {name} {address} {dialogOpen} {longitude} {latitude} />

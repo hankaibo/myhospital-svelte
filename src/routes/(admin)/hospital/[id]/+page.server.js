@@ -36,6 +36,12 @@ export const actions = {
 			zipCode: data.get('zipCode'),
 		};
 
+		Object.keys(hospital).forEach((key) => {
+			if (hospital[key] === '') {
+				hospital[key] = null;
+			}
+		});
+
 		const body = await api.patch(`hospitals/${hospital.id}`, hospital, { cookies });
 
 		if (body.errors) {
