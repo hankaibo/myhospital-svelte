@@ -32,7 +32,6 @@
 				'content-type': 'application/json'
 			}
 		}).then((res) => {
-			debugger;
 			invalidate('/hospital');
 		});
 	}

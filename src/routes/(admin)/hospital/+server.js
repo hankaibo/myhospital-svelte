@@ -6,10 +6,10 @@ import * as api from '$lib/api.js';
  * @type {import('./$types').RequestHandler}
  *
  */
-export async function GET({ request, cookies }) {
+export async function GET({ cookies }) {
 	const city = 'beijing';
 
-	const body = await api.get(`hospitals/sync/${city}`, { cookies });
+	await api.get(`hospitals/sync/${city}`, { cookies });
 
 	return new Response(null, { status: 204 });
 }
@@ -23,7 +23,7 @@ export async function GET({ request, cookies }) {
 export async function PATCH({ request, cookies }) {
 	const { id, lng, lat } = await request.json();
 
-	const body = await api.patch(
+	await api.patch(
 		`hospitals/${id}`,
 		{
 			lng,
@@ -44,8 +44,13 @@ export async function PATCH({ request, cookies }) {
 export async function POST({ request, cookies }) {
 	const { id } = await request.json();
 
-	const body = await api.post(`hospitals/${id}`, {}, { cookies });
-
+	if (id) {
+		// 复制单个医院信息
+		await api.post(`hospitals/${id}/copy`, {}, { cookies });
+	} else {
+		// 复制单个医院信息
+		await api.post('hospitals/copy', {}, { cookies });
+	}
 	return new Response(null, { status: 204 });
 }
 

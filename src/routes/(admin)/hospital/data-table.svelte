@@ -88,14 +88,26 @@
 		});
 	};
 
+	const handlyCopyAll = () => {
+		fetch('/hospital', {
+			method: 'POST',
+			body: JSON.stringify({}),
+			headers: {
+				'content-type': 'application/json'
+			}
+		}).then(() => {
+			invalidate(window.location.pathname);
+		});
+	};
+
 	/** @type {(currentPage: number) => void} */
 	const handlePrev = (currentPage) => {
-		goto(`?page=${currentPage - 1}`);
+		goto(`?page=${currentPage}`);
 	};
 
 	/** @type {(currentPage: number) => void} */
 	const handleNext = (currentPage) => {
-		goto(`?page=${currentPage + 1}`);
+		goto(`?page=${currentPage}`);
 	};
 
 	/** @type {(currentPage: number) => void} */
@@ -106,18 +118,21 @@
 
 <div class="w-full">
 	<div class="flex items-center py-4">
-		<Button class="" onclick={handlySync}>Button</Button>
-		<Input
-			placeholder="Filter name..."
-			value={table.getColumn('name')?.getFilterValue() ?? ''}
-			onchange={(e) => {
-				table.getColumn('name')?.setFilterValue(e.currentTarget.value);
-			}}
-			oninput={(e) => {
-				table.getColumn('name')?.setFilterValue(e.currentTarget.value);
-			}}
-			class="max-w-sm"
-		/>
+		<div class="flex gap-2">
+			<Button class="" variant="outline" onclick={handlySync}>同步医院经纬度信息</Button>
+			<Button class="" variant="outline" onclick={handlyCopyAll}>复制多地址医院</Button>
+			<Input
+				placeholder="Filter name..."
+				value={table.getColumn('name')?.getFilterValue() ?? ''}
+				onchange={(e) => {
+					table.getColumn('name')?.setFilterValue(e.currentTarget.value);
+				}}
+				oninput={(e) => {
+					table.getColumn('name')?.setFilterValue(e.currentTarget.value);
+				}}
+				class="max-w-sm"
+			/>
+		</div>
 
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger>
@@ -184,7 +199,7 @@
 			{#snippet child({ pages, currentPage })}
 				<Pagination.Content class="">
 					<Pagination.Item>
-						<Pagination.PrevButton class="" onclick={handlePrev}>
+						<Pagination.PrevButton class="" onclick={() => handlePrev(currentPage)}>
 							<ChevronLeft class="size-4" />
 							<span>上一页</span>
 						</Pagination.PrevButton>
@@ -195,12 +210,12 @@
 								<Pagination.Ellipsis class="" />
 							</Pagination.Item>
 						{:else}
-							<Pagination.Item isVisible={currentPage == page.value}>
-								<Pagination.Link
-									class=""
-									{page}
-									isActive={currentPage == page.value}
-									onclick={() => handleGo(currentPage)}>{page.value}</Pagination.Link
+							<Pagination.Item
+								isVisible={currentPage === page.value}
+								onclick={() => handleGo(currentPage)}
+							>
+								<Pagination.Link class="" {page} isActive={currentPage === page.value}
+									>{page.value}</Pagination.Link
 								>
 							</Pagination.Item>
 						{/if}

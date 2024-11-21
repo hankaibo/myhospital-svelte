@@ -4,7 +4,7 @@
 	import { mode } from 'mode-watcher';
 	import '@amap/amap-jsapi-types';
 	import { buttonVariants } from '$lib/components/ui/button';
-	import * as Sheet from '$lib/components/ui/sheet';
+	import * as Drawer from '$lib/components/ui/drawer/index.js';
 
 	let {
 		id,
@@ -122,27 +122,27 @@
 	});
 </script>
 
-<Sheet.Root bind:open={dialogOpen}>
-	<Sheet.Content class="md:max-w-full">
-		<Sheet.Header class="">
-			<Sheet.Title class=""
-				>请为医院<span class="text-red-500">{name}</span>选择正确的地址: {address}</Sheet.Title
+<Drawer.Root bind:open={dialogOpen} direction="right">
+	<Drawer.Content class="md:w-2/3 md:h-full">
+		<Drawer.Header class="">
+			<Drawer.Title class=""
+				>请为医院<span class="text-red-500">{name}</span>选择正确的地址: {address}</Drawer.Title
 			>
-			<Sheet.Description class="">使用鼠标在地图上选择正确的地址。</Sheet.Description>
-		</Sheet.Header>
+			<Drawer.Description class="">使用鼠标在地图上选择正确的地址。</Drawer.Description>
+		</Drawer.Header>
 		<div id="map" class="my-2 h-[calc(100%-100px)] w-full"></div>
 		<div class="absolute bottom-20 right-10 rounded bg-slate-400 p-2">
 			经度: <span>{lng || 'N/A'}</span>, 纬度: <span>{lat || 'N/A'}</span>
 		</div>
 
-		<Sheet.Footer class="">
-			<Sheet.Close
+		<Drawer.Footer class="">
+			<Drawer.Close
 				class={buttonVariants({ variant: 'outline' })}
-				type="submit"
+				type="button"
 				onclick={updatePosition}
 			>
 				保存
-			</Sheet.Close>
-		</Sheet.Footer>
-	</Sheet.Content>
-</Sheet.Root>
+			</Drawer.Close>
+		</Drawer.Footer>
+	</Drawer.Content>
+</Drawer.Root>
