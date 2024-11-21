@@ -33,7 +33,7 @@ export const actions = {
 			district: data.get('district'),
 			address: data.get('address'),
 			introduction: data.get('introduction'),
-			zipCode: data.get('zipCode'),
+			zipCode: data.get('zipCode')
 		};
 
 		Object.keys(hospital).forEach((key) => {
@@ -49,5 +49,5 @@ export const actions = {
 		}
 
 		throw redirect(307, '/hospital');
-	},
+	}
 };

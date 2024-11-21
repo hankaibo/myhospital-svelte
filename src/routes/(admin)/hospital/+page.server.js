@@ -10,14 +10,14 @@ export async function load({ locals, url, cookies }) {
 	/** @type {string} */
 	const page = url.searchParams.get('page') ?? '1';
 	/** @type {string} */
-	const limit = url.searchParams.get('limit') ?? "10";
+	const limit = url.searchParams.get('limit') ?? '10';
 	/** @type {string} */
-	const sort = JSON.stringify([{ orderBy: 'code', order: 'ASC' }])
+	const sort = JSON.stringify([{ orderBy: 'code', order: 'ASC' }]);
 
 	const params = new URLSearchParams();
 	params.set('page', page);
 	params.set('limit', limit);
-	params.set('sort', sort)
+	params.set('sort', sort);
 
 	const { data, total } = await api.get(`hospitals/pagination?${params}`, { cookies });
 

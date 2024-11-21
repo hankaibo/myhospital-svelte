@@ -71,7 +71,13 @@ export const columns = [
 		id: '操作',
 		header: '操作',
 		cell: ({ row }) => {
-			return renderComponent(DataTableActions, { id: row.original.id, name: row.original.name, address: row.original.address, longitude: row.original.lng, latitude: row.original.lat });
+			return renderComponent(DataTableActions, {
+				id: row.original.id,
+				name: row.original.name,
+				address: row.original.address,
+				longitude: row.original.lng,
+				latitude: row.original.lat
+			});
 		}
 	}
 ];

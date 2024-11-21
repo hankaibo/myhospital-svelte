@@ -125,7 +125,9 @@
 <Sheet.Root bind:open={dialogOpen}>
 	<Sheet.Content class="md:max-w-full">
 		<Sheet.Header class="">
-			<Sheet.Title class="">请为医院<span class="text-red-500">{name}</span>选择正确的地址: {address}</Sheet.Title>
+			<Sheet.Title class=""
+				>请为医院<span class="text-red-500">{name}</span>选择正确的地址: {address}</Sheet.Title
+			>
 			<Sheet.Description class="">使用鼠标在地图上选择正确的地址。</Sheet.Description>
 		</Sheet.Header>
 		<div id="map" class="my-2 h-[calc(100%-100px)] w-full"></div>

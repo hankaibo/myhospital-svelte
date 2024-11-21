@@ -1,7 +1,7 @@
 import * as api from '$lib/api.js';
 
-/** 
- * 
+/**
+ *
  * 同步医院
  * @type {import('./$types').RequestHandler}
  *
@@ -14,8 +14,8 @@ export async function GET({ request, cookies }) {
 	return new Response(null, { status: 204 });
 }
 
-/** 
- * 
+/**
+ *
  * 定位医院，修改医院的经纬度信息
  * @type {import('./$types').RequestHandler}
  *
@@ -35,8 +35,8 @@ export async function PATCH({ request, cookies }) {
 	return new Response(null, { status: 204 });
 }
 
-/** 
- * 
+/**
+ *
  * 复制医院
  * @type {import('./$types').RequestHandler}
  *
@@ -44,17 +44,13 @@ export async function PATCH({ request, cookies }) {
 export async function POST({ request, cookies }) {
 	const { id } = await request.json();
 
-	const body = await api.post(
-		`hospitals/${id}`,
-		{},
-		{ cookies }
-	);
+	const body = await api.post(`hospitals/${id}`, {}, { cookies });
 
 	return new Response(null, { status: 204 });
 }
 
-/** 
- * 
+/**
+ *
  * 删除医院
  * @type {import('./$types').RequestHandler}
  *
@@ -62,10 +58,7 @@ export async function POST({ request, cookies }) {
 export async function DELETE({ request, cookies }) {
 	const { id } = await request.json();
 
-	await api.del(
-		`hospitals/${id}`,
-		{ cookies }
-	);
+	await api.del(`hospitals/${id}`, { cookies });
 
 	return new Response(null, { status: 204 });
 }
