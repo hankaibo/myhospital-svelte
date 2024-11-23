@@ -1,8 +1,7 @@
 // place files you want to import through the `$lib` alias in this folder.
 import { error } from '@sveltejs/kit';
 
-const isServer = typeof window === 'undefined';
-const baseURL = isServer ? import.meta.env.VITE_SERVER_BASE_URL : import.meta.env.VITE_BASE_URL;
+const baseURL = import.meta.env.VITE_BASE_URL;
 
 /**
  * @typedef {object} RequestHeaders
