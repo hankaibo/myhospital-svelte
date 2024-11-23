@@ -2,7 +2,6 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { mode } from 'mode-watcher';
 	import '@amap/amap-jsapi-types';
-	import * as api from '$lib/api.js';
 	import HospitalDetail from './index/popup-detail.svelte';
 	import HospitalList from './index/popup-list.svelte';
 	import LoginAvatar from './index/avatar.svelte';
@@ -264,18 +263,19 @@
 	 * @param {number} params.radius - 半径
 	 */
 	async function handleFetch({ lng, lat, radius }) {
-		const q = new URLSearchParams();
-		q.set('longitude', lng.toString());
-		q.set('latitude', lat.toString());
-		q.set('radius', radius.toString());
-		const response = await api.get(`hospitals/circle?${q}`, {
+		const response = await fetch('/', {
+			method: 'POST',
+			body: JSON.stringify({ lng, lat, radius }),
 			headers: {
-				'Content-Type': 'application/json'
+				'content-type': 'application/json'
 			}
 		});
-		if (Array.isArray(response)) {
-			addMarker(response);
-		}
+
+		if (!response.ok) return;
+
+		const hospitals = await response.json();
+
+		addMarker(hospitals);
 	}
 
 	onMount(() => {

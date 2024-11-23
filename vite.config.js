@@ -9,19 +9,6 @@ export default defineConfig(({ mode }) => {
 		plugins: [sveltekit()],
 		server: {
 			proxy: {
-				'/api/v1': {
-					target: 'http://localhost:3000',
-					changeOrigin: true,
-					configure: (proxy, options) => {
-						// proxy 是 'http-proxy' 的实例
-						proxy.on('proxyReq', (proxyReq, req, res) => {
-							// proxyReq is the proxy request object from 'http-proxy'
-							// req and res are the original request and response objects from the client
-							// You can modify proxyReq here if needed
-							// console.log('proxyReq:', options);
-						});
-					}
-				},
 				'/_AMapService/': {
 					target: 'https://restapi.amap.com/',
 					changeOrigin: true,
