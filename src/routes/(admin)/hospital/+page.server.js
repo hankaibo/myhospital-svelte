@@ -7,25 +7,51 @@ export async function load({ locals, url, cookies }) {
 		throw error(401);
 	}
 
-	/** @type {string} */
-	const page = url.searchParams.get('page') ?? '1';
-	/** @type {string} */
-	const limit = url.searchParams.get('limit') ?? '10';
-	/** @type {string} */
-	const sort = JSON.stringify([{ orderBy: 'code', order: 'ASC' }]);
+	/** @type {{page:string, limit:string, type:string, lvl:string}} */
+	const { page = '1', limit = '10', type = '', lvl = '' } = Object.fromEntries(url.searchParams);
 
-	const params = new URLSearchParams();
-	params.set('page', page);
-	params.set('limit', limit);
-	params.set('sort', sort);
-
+	const params = createParams({
+		page,
+		limit,
+		sort: [{ orderBy: 'code', order: 'ASC' }],
+		filter: {
+			type,
+			lvl
+		}
+	});
 	const { data, total } = await api.get(`hospitals/pagination?${params}`, { cookies });
 
 	return {
 		hospitals: data,
-		total: total
+		total: total,
+		page: parseInt(page),
+		limit: parseInt(limit),
+		type,
+		lvl
 	};
 }
 
 /** @type {import('./$types').Actions} */
 export const actions = {};
+
+/**
+ * 创建 URLSearchParams 对象
+ * @param {{ page: string, limit: string, sort: object[], filter: object }} options
+ * @returns {URLSearchParams}
+ */
+function createParams({ page, limit, sort, filter }) {
+	const params = new URLSearchParams();
+	params.set('page', page);
+	params.set('limit', limit);
+	params.set('sort', JSON.stringify(sort));
+
+	// 如果 filter 存在有效属性，则添加到参数中
+	const cleanedFilter = Object.fromEntries(
+		Object.entries(filter).filter(([_, value]) => value !== '')
+	);
+	if (Object.keys(cleanedFilter).length > 0) {
+		params.set('filter', JSON.stringify(cleanedFilter));
+	}
+
+	return params;
+}

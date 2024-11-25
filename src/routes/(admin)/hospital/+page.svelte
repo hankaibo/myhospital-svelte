@@ -10,4 +10,12 @@
 	<title>医院管理</title>
 </svelte:head>
 
-<DataTable data={data.hospitals} {columns} total={data.total} />
+<DataTable
+	data={data.hospitals}
+	{columns}
+	total={data.total}
+	pageIndex={data.page}
+	pageSize={data.limit}
+	type={data.type}
+	lvl={data.lvl}
+/>

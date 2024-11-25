@@ -1,5 +1,5 @@
 <script>
-	import { goto, invalidate } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import {
 		getCoreRowModel,
 		getPaginationRowModel,
@@ -11,19 +11,24 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import * as Pagination from '$lib/components/ui/pagination/index.js';
+	import * as Select from '$lib/components/ui/select/index.js';
 	import { ChevronLeft, ChevronRight } from 'lucide-svelte';
 
-	/** @type {{data?: Array<import('./types').Hospital>, columns: import('@tanstack/table-core').ColumnDef<import('./types').Hospital>[], total?: number}} */
-	let { data, columns, total = 0 } = $props();
+	/** @type {{data?: Array<import('./types').Hospital>, columns: import('@tanstack/table-core').ColumnDef<import('./types').Hospital>[], total?: number, pageIndex?: number, pageSize?: number, type?: string, lvl?: string}} */
+	let { data, columns, total = 0, pageIndex = 1, pageSize = 10, type = '', lvl = '' } = $props();
 
 	/** @type {import('@tanstack/table-core').PaginationState} */
-	let pagination = $state({ pageIndex: 0, pageSize: 10 });
+	let pagination = $state({ pageIndex: pageIndex - 1, pageSize });
 	/** @type {import('@tanstack/table-core').ColumnFiltersState} */
 	let columnFilters = $state([]);
 	/** @type {import('@tanstack/table-core').VisibilityState} */
 	let columnVisibility = $state({});
 	/** @type {import('@tanstack/table-core').RowSelectionState} */
 	let rowSelection = $state({});
+	/** @type {string} */
+	let hospitalType = $state(type);
+	/** @type {string} */
+	let hospitalLvl = $state(lvl);
 
 	const table = createSvelteTable({
 		get data() {
@@ -100,6 +105,13 @@
 		});
 	};
 
+	/** @type {(value: string) => void} */
+	const handleTypeChange = (value) => {
+		// goto(`?tye=${value}`);
+		// invalidate('/hospitals/pagination');
+		invalidateAll();
+	};
+
 	/** @type {(currentPage: number) => void} */
 	const handlePrev = (currentPage) => {
 		goto(`?page=${currentPage}`);
@@ -132,6 +144,38 @@
 				}}
 				class="max-w-sm"
 			/>
+			<Select.Root type="single" bind:value={hospitalType} onValueChange={handleTypeChange}>
+				<Select.Trigger
+					class="h-input rounded-9px border-border-input placeholder:text-foreground-alt/50 inline-flex w-[296px] select-none items-center border bg-background px-[11px] text-sm transition-colors"
+					aria-label="请选择医院类型"
+				>
+					{hospitalType}
+				</Select.Trigger>
+
+				<Select.Content>
+					<Select.Item value="对内">对内</Select.Item>
+					<Select.Item value="对外综合">对外综合</Select.Item>
+					<Select.Item value="对外中医">对外中医</Select.Item>
+					<Select.Item value="对外专科">对外专科</Select.Item>
+					<Select.Item value="社区卫生站">社区卫生站</Select.Item>
+					<Select.Item value="村卫生室">村卫生室</Select.Item>
+				</Select.Content>
+			</Select.Root>
+			<Select.Root type="single" bind:value={hospitalLvl}>
+				<Select.Trigger
+					class="h-input rounded-9px border-border-input placeholder:text-foreground-alt/50 inline-flex w-[296px] select-none items-center border bg-background px-[11px] text-sm transition-colors"
+					aria-label="请选择医院评级"
+				>
+					{hospitalLvl}
+				</Select.Trigger>
+
+				<Select.Content>
+					<Select.Item value="未评级">未评级</Select.Item>
+					<Select.Item value="一级">一级</Select.Item>
+					<Select.Item value="二级">二级</Select.Item>
+					<Select.Item value="三级">三级</Select.Item>
+				</Select.Content>
+			</Select.Root>
 		</div>
 
 		<DropdownMenu.Root>
@@ -195,8 +239,9 @@
 			{table.getFilteredSelectedRowModel().rows.length} / {table.getFilteredRowModel().rows.length}
 		</div>
 
-		<Pagination.Root class="" count={total} perPage={10}>
+		<Pagination.Root class="" count={total} perPage={100}>
 			{#snippet child({ pages, currentPage })}
+				{@debug pages, currentPage}
 				<Pagination.Content class="">
 					<Pagination.Item>
 						<Pagination.PrevButton class="" onclick={() => handlePrev(currentPage)}>
