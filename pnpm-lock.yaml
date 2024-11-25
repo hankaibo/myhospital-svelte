@@ -29,10 +29,10 @@ importers:
     devDependencies:
       '@sveltejs/adapter-node':
         specifier: ^5.2.9
-        version: 5.2.9(@sveltejs/kit@2.8.1(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))
+        version: 5.2.9(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))
       '@sveltejs/kit':
-        specifier: ^2.7.7
-        version: 2.8.1(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12))
+        specifier: ^2.8.3
+        version: 2.8.3(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12))
       '@sveltejs/vite-plugin-svelte':
         specifier: ^4.0.0
         version: 4.0.0(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12))
@@ -71,7 +71,7 @@ importers:
         version: 2.46.0(eslint@9.14.0(jiti@1.21.6))(svelte@5.2.0)
       formsnap:
         specifier: 2.0.0-next.1
-        version: 2.0.0-next.1(svelte@5.2.0)(sveltekit-superforms@2.20.0(@sveltejs/kit@2.8.1(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(@types/json-schema@7.0.15)(svelte@5.2.0)(typescript@5.6.3))
+        version: 2.0.0-next.1(svelte@5.2.0)(sveltekit-superforms@2.20.0(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(@types/json-schema@7.0.15)(svelte@5.2.0)(typescript@5.6.3))
       globals:
         specifier: ^15.0.0
         version: 15.12.0
@@ -98,7 +98,7 @@ importers:
         version: 4.0.7(picomatch@4.0.2)(svelte@5.2.0)(typescript@5.6.3)
       sveltekit-superforms:
         specifier: ^2.20.0
-        version: 2.20.0(@sveltejs/kit@2.8.1(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(@types/json-schema@7.0.15)(svelte@5.2.0)(typescript@5.6.3)
+        version: 2.20.0(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(@types/json-schema@7.0.15)(svelte@5.2.0)(typescript@5.6.3)
       tailwind-merge:
         specifier: ^2.5.4
         version: 2.5.4
@@ -557,8 +557,8 @@ packages:
     peerDependencies:
       '@sveltejs/kit': ^2.4.0
 
-  '@sveltejs/kit@2.8.1':
-    resolution: {integrity: sha512-uuOfFwZ4xvnfPsiTB6a4H1ljjTUksGhWnYq5X/Y9z4x5+3uM2Md8q/YVeHL+7w+mygAwoEFdgKZ8YkUuk+VKww==}
+  '@sveltejs/kit@2.8.3':
+    resolution: {integrity: sha512-DVBVwugfzzn0SxKA+eAmKqcZ7aHZROCHxH7/pyrOi+HLtQ721eEsctGb9MkhEuqj6q/9S/OFYdn37vdxzFPdvw==}
     engines: {node: '>=18.13'}
     hasBin: true
     peerDependencies:
@@ -946,9 +946,6 @@ packages:
     peerDependenciesMeta:
       jiti:
         optional: true
-
-  esm-env@1.0.0:
-    resolution: {integrity: sha512-Cf6VksWPsTuW01vU9Mk/3vRue91Zevka5SjyNf3nEpokFRuqt/KjUQoGAwq9qMmhpLTHmXzSIrFRw8zxWzmFBA==}
 
   esm-env@1.1.4:
     resolution: {integrity: sha512-oO82nKPHKkzIj/hbtuDYy/JHqBHFlMIW36SDiPCVsj87ntDLcWN+sJ1erdVryd4NxODacFTsdrIE3b7IamqbOg==}
@@ -2242,21 +2239,21 @@ snapshots:
   '@sinclair/typebox@0.32.35':
     optional: true
 
-  '@sveltejs/adapter-node@5.2.9(@sveltejs/kit@2.8.1(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))':
+  '@sveltejs/adapter-node@5.2.9(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))':
     dependencies:
       '@rollup/plugin-commonjs': 28.0.1(rollup@4.24.0)
       '@rollup/plugin-json': 6.1.0(rollup@4.24.0)
       '@rollup/plugin-node-resolve': 15.3.0(rollup@4.24.0)
-      '@sveltejs/kit': 2.8.1(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12))
+      '@sveltejs/kit': 2.8.3(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12))
       rollup: 4.24.0
 
-  '@sveltejs/kit@2.8.1(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12))':
+  '@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12))':
     dependencies:
       '@sveltejs/vite-plugin-svelte': 4.0.0(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12))
       '@types/cookie': 0.6.0
       cookie: 0.6.0
       devalue: 5.1.1
-      esm-env: 1.0.0
+      esm-env: 1.1.4
       import-meta-resolve: 4.1.0
       kleur: 4.1.5
       magic-string: 0.30.12
@@ -2699,8 +2696,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  esm-env@1.0.0: {}
-
   esm-env@1.1.4: {}
 
   espree@10.3.0:
@@ -2790,11 +2785,11 @@ snapshots:
       cross-spawn: 7.0.5
       signal-exit: 4.1.0
 
-  formsnap@2.0.0-next.1(svelte@5.2.0)(sveltekit-superforms@2.20.0(@sveltejs/kit@2.8.1(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(@types/json-schema@7.0.15)(svelte@5.2.0)(typescript@5.6.3)):
+  formsnap@2.0.0-next.1(svelte@5.2.0)(sveltekit-superforms@2.20.0(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(@types/json-schema@7.0.15)(svelte@5.2.0)(typescript@5.6.3)):
     dependencies:
       svelte: 5.2.0
       svelte-toolbelt: 0.4.6(svelte@5.2.0)
-      sveltekit-superforms: 2.20.0(@sveltejs/kit@2.8.1(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(@types/json-schema@7.0.15)(svelte@5.2.0)(typescript@5.6.3)
+      sveltekit-superforms: 2.20.0(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(@types/json-schema@7.0.15)(svelte@5.2.0)(typescript@5.6.3)
 
   fraction.js@4.3.7: {}
 
@@ -3371,9 +3366,9 @@ snapshots:
       magic-string: 0.30.12
       zimmerframe: 1.1.2
 
-  sveltekit-superforms@2.20.0(@sveltejs/kit@2.8.1(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(@types/json-schema@7.0.15)(svelte@5.2.0)(typescript@5.6.3):
+  sveltekit-superforms@2.20.0(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(@types/json-schema@7.0.15)(svelte@5.2.0)(typescript@5.6.3):
     dependencies:
-      '@sveltejs/kit': 2.8.1(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12))
+      '@sveltejs/kit': 2.8.3(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12)))(svelte@5.2.0)(vite@5.4.11(@types/node@20.14.12))
       devalue: 5.1.1
       just-clone: 6.2.0
       memoize-weak: 1.0.2
