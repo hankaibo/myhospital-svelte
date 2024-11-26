@@ -6,6 +6,7 @@
 	import HospitalList from './index/popup-list.svelte';
 	import LoginAvatar from './index/avatar.svelte';
 
+	let AMapLoader = null;
 	/** @type {import('./index/types').Hospital} */
 	let hospital = $state();
 	/** @type {Array<import('./index/types').Hospital>}*/
@@ -32,6 +33,12 @@
 
 	async function initMap() {
 		try {
+			AMapLoader = await import('@amap/amap-jsapi-loader');
+
+			window._AMapSecurityConfig = {
+				serviceHost: 'http://localhost:3000/_AMapService'
+			};
+
 			const AMap = await loadAMap();
 			initializeMap(AMap);
 			setupEventHandlers(AMap);
@@ -41,7 +48,7 @@
 	}
 
 	async function loadAMap() {
-		return await window.AMapLoader.load({
+		return await AMapLoader.load({
 			key: import.meta.env.VITE_KEY,
 			version: '2.0',
 			plugins: ['AMap.Scale', 'AMap.Geolocation', 'AMap.Circle', 'AMap.CircleEditor']
