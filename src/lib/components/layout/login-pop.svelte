@@ -57,7 +57,11 @@
 				</a>
 			</DropdownMenu.Item>
 		{/if}
-		<DropdownMenu.Item class="cursor-pointer" inset={false}>
+		<DropdownMenu.Item
+			class="cursor-pointer"
+			inset={false}
+			onSelect={() => goto('/settings')}
+		>
 			<BadgeCheck />
 			个人中心
 		</DropdownMenu.Item>

@@ -2,7 +2,9 @@ import { fail, error, redirect } from '@sveltejs/kit';
 
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { formSchema } from './schema';
+import { formSchema as basicFormSchema } from './basic-schema';
+import { formSchema as passwordFormSchema } from './password-schema';
+
 import * as api from '$lib/api.js';
 
 export async function load({ locals }) {
@@ -10,7 +12,8 @@ export async function load({ locals }) {
 		throw redirect(302, `/login`);
 	}
 	return {
-		form: await superValidate(zod(formSchema))
+		basicForm: await superValidate(zod(basicFormSchema)),
+		passwordForm: await superValidate(zod(passwordFormSchema))
 	};
 }
 

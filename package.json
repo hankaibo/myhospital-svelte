@@ -22,7 +22,7 @@
 		"@tailwindcss/typography": "^0.5.15",
 		"@types/eslint": "^9.6.0",
 		"autoprefixer": "^10.4.20",
-		"bits-ui": "1.0.0-next.64",
+		"bits-ui": "1.0.0-next.74",
 		"clsx": "^2.1.1",
 		"eslint": "^9.7.0",
 		"eslint-config-prettier": "^9.1.0",
@@ -49,6 +49,7 @@
 		"@amap/amap-jsapi-loader": "^1.0.1",
 		"@amap/amap-jsapi-types": "^0.0.15",
 		"@tanstack/table-core": "^8.20.5",
+		"echarts": "^5.5.1",
 		"mode-watcher": "^0.4.1",
 		"ol": "^10.2.1",
 		"proj4": "^2.14.0"
