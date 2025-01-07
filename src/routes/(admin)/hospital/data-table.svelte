@@ -234,6 +234,7 @@
 			</Table.Body>
 		</Table.Root>
 	</div>
+
 	<div class="flex items-center justify-end space-x-2 py-4">
 		<div class="flex-1 text-sm text-muted-foreground">
 			{table.getFilteredSelectedRowModel().rows.length} / {table.getFilteredRowModel().rows.length}
@@ -241,7 +242,6 @@
 
 		<Pagination.Root class="" count={total} perPage={100}>
 			{#snippet child({ pages, currentPage })}
-				{@debug pages, currentPage}
 				<Pagination.Content class="">
 					<Pagination.Item>
 						<Pagination.PrevButton class="" onclick={() => handlePrev(currentPage)}>

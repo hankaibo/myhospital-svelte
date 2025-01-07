@@ -7,7 +7,14 @@ export async function load({ locals, url, cookies }) {
 		throw error(401);
 	}
 
-	/** @type {{page:string, limit:string, type:string, lvl:string}} */
+	/**
+	 * @typedef {Object} QueryParams
+	 * @property {string} [page]
+	 * @property {string} [limit]
+	 * @property {string} [type]
+	 * @property {string} [lvl]
+	 */
+	/** @type {QueryParams} */
 	const { page = '1', limit = '10', type = '', lvl = '' } = Object.fromEntries(url.searchParams);
 
 	const params = createParams({
