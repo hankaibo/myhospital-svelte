@@ -1,6 +1,6 @@
 <script>
 	import { ModeWatcher } from 'mode-watcher';
-	import { navigating } from '$app/stores';
+	import { navigating } from '$app/state';
 	import PreloadingIndicator from '$lib/components/PreloadingIndicator.svelte';
 	import '../app.css';
 
@@ -8,7 +8,7 @@
 	let { children } = $props();
 </script>
 
-{#if $navigating}
+{#if navigating}
 	<PreloadingIndicator />
 {/if}
 

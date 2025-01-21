@@ -79,4 +79,6 @@
 	</DropdownMenu.Content>
 </DropdownMenu.Root>
 
-<LocationMap {id} {name} {address} bind:dialogOpen {longitude} {latitude} />
+{#if dialogOpen}
+	<LocationMap {id} {name} {address} bind:dialogOpen {longitude} {latitude} />
+{/if}

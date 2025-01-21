@@ -85,14 +85,15 @@ async function handleTokenRefreshAndRetry({ method, url, data, headers, cookies 
 
 	const { refreshToken, user } = JSON.parse(jwt);
 	try {
-		const { token: newToken, refreshToken: newRefreshToken } = await refreshAccessToken(refreshToken);
+		const { token: newToken, refreshToken: newRefreshToken } =
+			await refreshAccessToken(refreshToken);
 
 		// Update cookies with new tokens
 		const updatedJwt = JSON.stringify({ token: newToken, refreshToken: newRefreshToken, user });
 		cookies?.set('jwt', updatedJwt, { path: '/' });
 
 		// Retry the original request with new token
-		setAuthorizationHeader(headers = {}, newToken);
+		setAuthorizationHeader((headers = {}), newToken);
 
 		return send({ method, url, data, headers, cookies });
 	} catch (err) {
@@ -235,7 +236,6 @@ export function put(url, data, options = {}) {
 export function patch(url, data, options = {}) {
 	return send({ method: 'PATCH', url, data, ...options });
 }
-
 
 /** @type {boolean} */
 let refreshingToken = false;

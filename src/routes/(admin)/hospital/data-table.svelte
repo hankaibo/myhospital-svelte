@@ -240,8 +240,8 @@
 			{table.getFilteredSelectedRowModel().rows.length} / {table.getFilteredRowModel().rows.length}
 		</div>
 
-		<Pagination.Root class="" count={total} perPage={100}>
-			{#snippet child({ pages, currentPage })}
+		<Pagination.Root class="" count={total} perPage={pageSize}>
+			{#snippet children({ pages, currentPage })}
 				<Pagination.Content class="">
 					<Pagination.Item>
 						<Pagination.PrevButton class="" onclick={() => handlePrev(currentPage)}>
@@ -259,9 +259,9 @@
 								isVisible={currentPage === page.value}
 								onclick={() => handleGo(currentPage)}
 							>
-								<Pagination.Link class="" {page} isActive={currentPage === page.value}
-									>{page.value}</Pagination.Link
-								>
+								<Pagination.Link class="" {page} isActive={currentPage === page.value}>
+									{page.value}
+								</Pagination.Link>
 							</Pagination.Item>
 						{/if}
 					{/each}
