@@ -48,6 +48,6 @@ export const actions = {
 			return fail(401, body);
 		}
 
-		throw redirect(307, '/hospital');
+		redirect(307, '/hospital');
 	}
 };

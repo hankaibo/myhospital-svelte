@@ -1,11 +1,9 @@
-import { error } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 import * as api from '$lib/api';
 
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ locals, url, cookies }) {
-	if (!locals.user) {
-		throw error(401);
-	}
+	if (!locals.user) redirect(302, `/login`);
 
 	/**
 	 * @typedef {Object} QueryParams
@@ -54,7 +52,7 @@ function createParams({ page, limit, sort, filter }) {
 
 	// 如果 filter 存在有效属性，则添加到参数中
 	const cleanedFilter = Object.fromEntries(
-		Object.entries(filter).filter(([_, value]) => value !== '')
+		Object.entries(filter).filter(([, value]) => value !== '')
 	);
 	if (Object.keys(cleanedFilter).length > 0) {
 		params.set('filter', JSON.stringify(cleanedFilter));

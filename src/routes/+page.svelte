@@ -7,23 +7,21 @@
 	import LoginAvatar from './index/avatar.svelte';
 
 	let AMapLoader = null;
-	/** @type {import('./index/types').Hospital} */
+	/** @type {import('./index/types').Hospital | undefined} */
 	let hospital = $state();
 	/** @type {Array<import('./index/types').Hospital>}*/
 	let hospitalList = $derived([]);
 	/** @type {Array<number>} */
-	let allHospitalIds = [];
+	let allHospitalIds = $state([]); // 用于保存已绘制的医院 id,避免重复绘制[];
 	/** @type {HTMLElement | undefined}*/
 	let popupDetail = $state();
 
-	/**	@type {AMap.Map | undefined} */
+	/**	@type {AMap.Map} */
 	let map;
 	/** @type {AMap.InfoWindow}*/
 	let infoWindow;
 	/** @type {AMap.ContextMenu} */
 	let contextMenu;
-	/** @type {Array<AMap.Circle>} */
-	let circles = [];
 	/** @type {boolean}*/
 	let isDrawing = false;
 	/** @type {AMap.Circle | undefined} */
@@ -31,53 +29,65 @@
 	/** @type {AMap.Circle} */
 	let selectedCircle; // 用于保存当前右键选中的 Circle
 
+	/**
+	 * 初始化地图
+	 */
 	async function initMap() {
 		try {
+			// 引入高德 jsapi-loader
 			AMapLoader = await import('@amap/amap-jsapi-loader');
 
+			// 配置高德密钥
 			window._AMapSecurityConfig = {
-				serviceHost: 'http://localhost:3000/_AMapService'
+				serviceHost: import.meta.env.VITE_AMAP_SERVICE_HOST
 			};
 
-			const AMap = await loadAMap();
-			initializeMap(AMap);
+			// 加载高德地图相关脚本
+			const AMap = await AMapLoader.load({
+				key: import.meta.env.VITE_KEY,
+				version: '2.0',
+				plugins: ['AMap.Scale', 'AMap.Geolocation', 'AMap.Circle', 'AMap.CircleEditor']
+			});
+
+			// 初始化地图
+			map = new AMap.Map('map', {
+				viewMode: '2D',
+				zoom: 13,
+				center: [116.397428, 39.90923]
+			});
+
+			toggleTheme();
+			createPopup(AMap);
 			setupEventHandlers(AMap);
 		} catch (error) {
 			console.error(error);
 		}
 	}
 
-	async function loadAMap() {
-		return await AMapLoader.load({
-			key: import.meta.env.VITE_KEY,
-			version: '2.0',
-			plugins: ['AMap.Scale', 'AMap.Geolocation', 'AMap.Circle', 'AMap.CircleEditor']
-		});
+	/**
+	 * 切换主题样式
+	 */
+	function toggleTheme() {
+		if ($mode === 'dark') {
+			// 设置地图的显示样式
+			map?.setMapStyle('amap://styles/dark');
+		} else {
+			map?.setMapStyle('amap://styles/normal');
+		}
 	}
 
 	/**
+	 * 创建弹窗
 	 * @param {AMap} AMap - 参数对象
 	 */
-	async function initializeMap(AMap) {
-		map = new AMap.Map('map', {
-			viewMode: '2D',
-			zoom: 13,
-			center: [116.397428, 39.90923]
-		});
-
-		if ($mode === 'dark') {
-			// 设置地图的显示样式
-			map.setMapStyle('amap://styles/dark');
-		} else {
-			map.setMapStyle('amap://styles/normal');
-		}
-
+	function createPopup(AMap) {
 		infoWindow = new AMap.InfoWindow({
 			content: popupDetail
 		});
 	}
 
 	/**
+	 * 设置地图相关事件
 	 * @param {AMap} AMap - 参数对象
 	 */
 	function setupEventHandlers(AMap) {
@@ -89,6 +99,7 @@
 	}
 
 	/**
+	 * 创建右键菜单
 	 * @param {AMap} AMap - 参数对象
 	 */
 	function createContextMenu(AMap) {
@@ -104,6 +115,7 @@
 	}
 
 	/**
+	 * 地图点击事件
 	 * @param {AMap} AMap - 参数对象
 	 * @param {AMap.Event<'click'> & { lnglat: AMap.LngLat }} event - 参数对象
 	 */
@@ -116,6 +128,20 @@
 	}
 
 	/**
+	 * 地图鼠标移动事件
+	 * @param {AMap} AMap - 参数对象
+	 * @param {AMap.Event<'click'> & { lnglat: AMap.LngLat }} event - 参数对象
+	 */
+	function handleMapMouseMove(AMap, event) {
+		if (isDrawing && circle) {
+			const movePoint = event.lnglat;
+			const radius = AMap.GeometryUtil.distance(circle.getCenter(), movePoint);
+			circle.setRadius(radius);
+		}
+	}
+
+	/**
+	 * 开始绘制圆形
 	 * @param {AMap} AMap - 参数对象
 	 * @param {AMap.LngLat} point - 参数对象
 	 */
@@ -155,6 +181,9 @@
 		}
 	}
 
+	/**
+	 * 结束绘制圆形
+	 */
 	function finishDrawingCircle() {
 		isDrawing = false;
 		if (circle) {
@@ -166,18 +195,7 @@
 	}
 
 	/**
-	 * @param {AMap} AMap - 参数对象
-	 * @param {AMap.Event<'click'> & { lnglat: AMap.LngLat }} event - 参数对象
-	 */
-	function handleMapMouseMove(AMap, event) {
-		if (isDrawing && circle) {
-			const movePoint = event.lnglat;
-			const radius = AMap.GeometryUtil.distance(circle.getCenter(), movePoint);
-			circle.setRadius(radius);
-		}
-	}
-
-	/**
+	 * 处理圆形点击事件
 	 * @param {AMap.Circle} circle - 参数对象
 	 */
 	function handleCircleClick(circle) {
@@ -210,32 +228,23 @@
 		/** @type {Array<AMap.Marker>} */
 		const markerList = [];
 		newList.forEach((item) => {
-			const marker = createMarker(item);
+			const { lng, lat, name } = item;
+
+			const marker = new AMap.Marker({
+				position: new AMap.LngLat(lng, lat), //经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
+				title: name,
+				extData: item
+			});
+			marker.on('click', () => {
+				hospital = item;
+				infoWindow.open(map, marker.getPosition());
+			});
 			markerList.push(marker);
 		});
 		//将创建的点标记添加到已有的地图实例：
 		if (markerList.length) {
 			map?.add(markerList);
 		}
-	}
-
-	/**
-	 *
-	 * @param {import('./index/types').Hospital} item
-	 */
-	function createMarker(item) {
-		const { lng, lat, name } = item;
-
-		const marker = new AMap.Marker({
-			position: new AMap.LngLat(lng, lat), //经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
-			title: name,
-			extData: item
-		});
-		marker.on('click', () => {
-			hospital = item;
-			infoWindow.open(map, marker.getPosition());
-		});
-		return marker;
 	}
 
 	/**
@@ -285,16 +294,19 @@
 		addMarker(hospitals);
 	}
 
+	function handleCloseDetail() {
+		popupDetail = undefined;
+	}
+
 	onMount(() => {
 		initMap();
 	});
+
 	onDestroy(() => {
 		//解绑地图的点击事件
 		map?.off('click', () => handleMapClick);
 		//销毁地图，并清空地图容器
 		map?.destroy();
-		//地图对象赋值为null
-		map = undefined;
 	});
 </script>
 
@@ -305,11 +317,7 @@
 <div id="map" class="h-dvh"></div>
 
 <!-- 某个医院的详情弹框 -->
-<HospitalDetail
-	{hospital}
-	bind:domRef={popupDetail}
-	on:closeDetail={() => (popupDetail = undefined)}
-/>
+<HospitalDetail {hospital} bind:domRef={popupDetail} on:closeDetail={handleCloseDetail} />
 
 <HospitalList {hospitalList} />
 
