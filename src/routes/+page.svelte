@@ -9,8 +9,8 @@
 	let AMapLoader = null;
 	/** @type {import('./index/types').Hospital | undefined} */
 	let hospital = $state();
-	/** @type {Array<import('./index/types').Hospital>}*/
-	let hospitalList = $derived([]);
+	/** @type {import('./index/types').Hospital[]} */
+	let hospitalList = $state([]);
 	/** @type {Array<number>} */
 	let allHospitalIds = $state([]); // 用于保存已绘制的医院 id,避免重复绘制[];
 	/** @type {HTMLElement | undefined}*/
@@ -46,7 +46,7 @@
 			const AMap = await AMapLoader.load({
 				key: import.meta.env.VITE_KEY,
 				version: '2.0',
-				plugins: ['AMap.Scale', 'AMap.Geolocation', 'AMap.Circle', 'AMap.CircleEditor']
+				plugins: ['AMap.Scale', 'AMap.CitySearch', 'AMap.Circle', 'AMap.CircleEditor']
 			});
 
 			// 初始化地图
@@ -59,6 +59,7 @@
 			toggleTheme();
 			createPopup(AMap);
 			setupEventHandlers(AMap);
+			showCityInfo(AMap);
 		} catch (error) {
 			console.error(error);
 		}
@@ -84,6 +85,7 @@
 		infoWindow = new AMap.InfoWindow({
 			content: popupDetail
 		});
+		infoWindow.on('close', handleCloseInfoWindow);
 	}
 
 	/**
@@ -107,6 +109,7 @@
 		contextMenu.addItem(
 			'删除',
 			() => {
+				removeMarker(selectedCircle);
 				removeCircle(selectedCircle);
 			},
 			0
@@ -150,32 +153,18 @@
 		circle = new AMap.Circle({
 			center: point,
 			radius: 0, // 初始半径为0
-			bubble: true,
+			bubble: false,
 			strokeColor: '#FF33FF',
-			strokeWeight: 6,
+			strokeWeight: 3,
 			strokeOpacity: 0.2,
-			fillOpacity: 0.4,
-			strokeStyle: 'dashed',
-			strokeDasharray: [10, 10],
+			fillOpacity: 0.35,
 			fillColor: '#1791fc',
 			draggable: true,
 			zIndex: 50
 		});
-		circle.on('click', (event) => handleCircleClick(event.target));
-		circle.on('rightclick', (event) => {
-			selectedCircle = event.target;
-			if (map) {
-				contextMenu.open(map, event.lnglat);
-			}
-		});
-		circle.on('dragend', (event) => {
-			// 删除旧的不在当前圆形范围内的 marker
-			removeCircle(event.target);
-			// 发送请求，获取新的医院数据
-			const { lng, lat } = event.target.getCenter();
-			const radius = event.target.getRadius();
-			handleFetch({ lng, lat, radius });
-		});
+		circle.on('click', handleCircleClick);
+		circle.on('rightclick', handleCircleRightClick);
+		circle.on('dragend', handleCircleDragEnd);
 		if (map) {
 			circle.setMap(map);
 		}
@@ -196,14 +185,40 @@
 
 	/**
 	 * 处理圆形点击事件
-	 * @param {AMap.Circle} circle - 参数对象
+	 * @param {any} e - 事件对象
 	 */
-	function handleCircleClick(circle) {
+	function handleCircleClick(e) {
+		const circle = e.target;
+		hospitalList = [];
 		map?.getAllOverlays('marker').forEach((marker) => {
 			if (circle.contains(marker.getPosition())) {
 				hospitalList.push(marker.getExtData());
 			}
 		});
+	}
+
+	/**
+	 * 处理圆形右键点击事件
+	 * @param {any} e - 事件对象
+	 */
+	function handleCircleRightClick(e) {
+		selectedCircle = e.target;
+		if (map) {
+			contextMenu.open(map, e.lnglat);
+		}
+	}
+
+	/**
+	 * 处理圆形拖动结束事件
+	 * @param {any} e - 事件对象
+	 */
+	function handleCircleDragEnd(e) {
+		// 删除旧的不在当前圆形范围内的 marker
+		removeMarker(e.target);
+		// 发送请求，获取新的医院数据
+		const { lng, lat } = e.target.getCenter();
+		const radius = e.target.getRadius();
+		handleFetch({ lng, lat, radius });
 	}
 
 	/**
@@ -225,33 +240,27 @@
 				newList.push(item);
 			});
 
-		/** @type {Array<AMap.Marker>} */
-		const markerList = [];
-		newList.forEach((item) => {
+		newList.forEach((item, i) => {
 			const { lng, lat, name } = item;
 
 			const marker = new AMap.Marker({
-				position: new AMap.LngLat(lng, lat), //经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
+				map,
+				position: new AMap.LngLat(lng, lat),
 				title: name,
 				extData: item
 			});
 			marker.on('click', () => {
 				hospital = item;
-				infoWindow.open(map, marker.getPosition());
+				infoWindow.open(map, [lng, lat]);
 			});
-			markerList.push(marker);
 		});
-		//将创建的点标记添加到已有的地图实例：
-		if (markerList.length) {
-			map?.add(markerList);
-		}
 	}
 
 	/**
-	 * 删除地图标记
+	 * 删除圆形内的标记
 	 * @param {AMap.Circle} circle - 圆形对象
 	 */
-	function removeCircle(circle) {
+	function removeMarker(circle) {
 		// 创建一个数组来保存 Circle 内的 Marker
 		/** @type {Array<AMap.Marker>} */
 		const markersInCircle = [];
@@ -265,10 +274,21 @@
 		});
 		markersInCircle.forEach((marker) => {
 			allHospitalIds.splice(allHospitalIds.indexOf(marker.getExtData().id), 1);
+			hospitalList = hospitalList.filter((item) => item.id !== marker.getExtData().id);
 			marker.setMap(null);
 		});
-		// 或者
-		// map?.remove(markersInCircle);
+	}
+
+	/**
+	 * 删除圆形
+	 * @param {AMap.Circle} circle - 圆形对象
+	 */
+	function removeCircle(circle) {
+		circle.off('click', handleCircleClick);
+		circle.off('rightclick', handleCircleRightClick);
+		circle.off('dragend', handleCircleDragEnd);
+		// 从地图上删除 Circle
+		map?.remove(circle);
 	}
 
 	/**
@@ -294,8 +314,30 @@
 		addMarker(hospitals);
 	}
 
-	function handleCloseDetail() {
-		popupDetail = undefined;
+	function handleCloseInfoWindow() {
+		if (infoWindow) {
+			hospital = undefined;
+			infoWindow.close();
+		}
+	}
+
+	/**
+	 * 显示当前城市
+	 * @param {AMap} AMap - 参数对象
+	 */
+	function showCityInfo(AMap) {
+		//实例化城市查询类
+		const citysearch = new AMap.CitySearch();
+		//自动获取用户IP，返回当前城市
+		citysearch.getLocalCity(function (status, result) {
+			if (status === 'complete' && result.info === 'OK') {
+				if (result && result.city && result.bounds) {
+					const citybounds = result.bounds;
+					//地图显示当前城市
+					map.setBounds(citybounds);
+				}
+			}
+		});
 	}
 
 	onMount(() => {
@@ -317,8 +359,10 @@
 <div id="map" class="h-dvh"></div>
 
 <!-- 某个医院的详情弹框 -->
-<HospitalDetail {hospital} bind:domRef={popupDetail} on:closeDetail={handleCloseDetail} />
+<HospitalDetail {hospital} bind:domRef={popupDetail} />
 
-<HospitalList {hospitalList} />
+{#if hospitalList.length > 0}
+	<HospitalList {hospitalList} />
+{/if}
 
 <LoginAvatar class="absolute right-4 top-4 z-10" />
