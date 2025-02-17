@@ -3,7 +3,7 @@ import * as api from '$lib/api.js';
 
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ locals, url, cookies }) {
-	if (!locals.user) redirect(302, `/login`);
+	if (!locals.user) redirect(302, '/login');
 
 	const page = url.searchParams.get('page') ?? 1;
 	const limit = url.searchParams.get('limit') || 10;

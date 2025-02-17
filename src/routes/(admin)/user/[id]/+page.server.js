@@ -6,7 +6,7 @@ import * as api from '$lib/api.js';
 
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ locals, cookies, params }) {
-	if (!locals.user) redirect(302, `/login`);
+	if (!locals.user) redirect(302, '/login');
 
 	/** @type {import('../types').User} */
 	const user = await api.get(`users/${params.id}`, { cookies });

@@ -22,7 +22,7 @@
 			}
 		});
 		if (response.ok) {
-			goto(`/login`);
+			goto('/login');
 		} else {
 			// 退出失败，你可以在这里处理错误
 		}

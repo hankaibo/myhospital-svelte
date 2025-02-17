@@ -53,7 +53,7 @@
 	}
 </script>
 
-<div class="absolute bottom-4 left-4 top-4 w-90 space-y-2 bg-white p-2 shadow">
+<div class="w-90 absolute bottom-4 left-4 top-4 space-y-2 bg-white p-2 shadow">
 	<div class="flex items-center justify-between border-b border-gray-200 pb-2 dark:border-gray-700">
 		<select name="type" placeholder="请选择医院类别" bind:value={selectType}>
 			<option value="">--请选择医院类别--</option>

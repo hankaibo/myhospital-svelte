@@ -15,6 +15,6 @@ export const actions = {
 		cookies.delete('jwt', { path: '/' });
 		locals.user = null;
 
-		redirect(307, `/login`);
+		redirect(307, '/login');
 	}
 };

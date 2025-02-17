@@ -3,7 +3,7 @@ import * as api from '$lib/api';
 
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ locals, url, cookies }) {
-	if (!locals.user) redirect(302, `/login`);
+	if (!locals.user) redirect(302, '/login');
 
 	/**
 	 * @typedef {Object} QueryParams
@@ -11,14 +11,26 @@ export async function load({ locals, url, cookies }) {
 	 * @property {string} [limit]
 	 * @property {string} [type]
 	 * @property {string} [lvl]
+	 * @property {string} [sort]
 	 */
 	/** @type {QueryParams} */
-	const { page = '1', limit = '10', type = '', lvl = '' } = Object.fromEntries(url.searchParams);
+	const {
+		page = '1',
+		limit = '10',
+		type = '',
+		lvl = '',
+		sort = 'zipCode,asc'
+	} = Object.fromEntries(url.searchParams);
+
+	const sortParam = sort.split('&').map((param) => {
+		const [id, order] = param.split(',');
+		return { orderBy: id, order: order || 'asc' };
+	});
 
 	const params = createParams({
 		page,
 		limit,
-		sort: [{ orderBy: 'code', order: 'ASC' }],
+		sort: sortParam,
 		filter: {
 			type,
 			lvl
@@ -29,8 +41,8 @@ export async function load({ locals, url, cookies }) {
 	return {
 		hospitals: data,
 		total: total,
-		page: parseInt(page),
-		limit: parseInt(limit),
+		page: parseInt(page, 10),
+		limit: parseInt(limit, 10),
 		type,
 		lvl
 	};

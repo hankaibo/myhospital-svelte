@@ -32,6 +32,6 @@ export const actions = {
 			return fail(401, body);
 		}
 
-		redirect(307, `/login`);
+		redirect(307, '/login');
 	}
 };
