@@ -48,12 +48,15 @@ async function send({ method, url, data, headers = {}, cookies }) {
 		}
 	}
 
-	const res = await fetch(`${baseURL}/${url}`, opts);
+	// 修复双斜杠问题
+	const cleanBaseURL = baseURL.replace(/\/$/, '');
+	const cleanUrl = url.replace(/^\//, '');
+	const res = await fetch(`${cleanBaseURL}/${cleanUrl}`, opts);
 
 	// Handle successful response
 	if (res.ok || res.status === 422) {
 		const text = await res.text();
-		return text ? JSON.parse(text) : {};
+		return text ? JSON.parse(text) : null;
 	}
 
 	// Handle token expiration (401)
@@ -85,8 +88,7 @@ async function handleTokenRefreshAndRetry({ method, url, data, headers, cookies 
 
 	const { refreshToken, user } = JSON.parse(jwt);
 	try {
-		const { token: newToken, refreshToken: newRefreshToken } =
-			await refreshAccessToken(refreshToken);
+		const { token: newToken, refreshToken: newRefreshToken } = await refreshAccessToken(refreshToken);
 
 		// Update cookies with new tokens
 		const updatedJwt = JSON.stringify({ token: newToken, refreshToken: newRefreshToken, user });
@@ -133,7 +135,9 @@ async function refreshAccessToken(refreshToken) {
 	refreshingToken = true;
 
 	try {
-		const res = await fetch(`${baseURL}/auth/refresh`, {
+		// 修复双斜杠问题
+		const cleanBaseURL = baseURL.replace(/\/$/, '');
+		const res = await fetch(`${cleanBaseURL}/auth/refresh`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -182,14 +186,15 @@ export function get(url, options = {}) {
  * Sends a DELETE request to the specified URL.
  *
  * @param {string} url - The endpoint to send the DELETE request to.
+ * @param {object|null|undefined} data - The payload to include in the DELETE request.
  * @param {object} [options] - Additional request options.
  * @param {object} [options.headers] - Headers to include in the request.
  * @param {object} [options.cookies] - Cookies to include in the request.
  * @returns {Promise<object|{errors: string}>} - The server's response, parsed as JSON.
  * @throws {Error} If an HTTP error occurs.
  */
-export function del(url, options = {}) {
-	return send({ method: 'DELETE', url, ...options });
+export function del(url, data, options = {}) {
+	return send({ method: 'DELETE', data, url, ...options });
 }
 
 /**
