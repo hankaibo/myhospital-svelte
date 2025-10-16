@@ -8,7 +8,7 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import * as Pagination from '$lib/components/ui/pagination/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
-	import { ChevronLeft, ChevronRight } from 'lucide-svelte';
+	import { ChevronLeft, ChevronRight } from '@lucide/svelte';
 
 	// 常量
 	const HOSPITAL_TYPES = [
@@ -104,9 +104,7 @@
 					`?page=${newPagination.pageIndex}&limit=${newPagination.pageSize}&type=${hospitalType}&lvl=${hospitalLvl}`
 				);
 			} else {
-				goto(
-					`?page=${updater.pageIndex}&limit=${updater.pageSize}&type=${hospitalType}&lvl=${hospitalLvl}`
-				);
+				goto(`?page=${updater.pageIndex}&limit=${updater.pageSize}&type=${hospitalType}&lvl=${hospitalLvl}`);
 			}
 		},
 		onSortingChange: (updater) => {
@@ -117,9 +115,7 @@
 			}
 
 			// Construct the new URL with sorting parameters
-			const sortParams = sorting
-				.map((sort) => `${sort.id},${sort.desc ? 'desc' : 'asc'}`)
-				.join('&');
+			const sortParams = sorting.map((sort) => `${sort.id},${sort.desc ? 'desc' : 'asc'}`).join('&');
 
 			const newUrl = `?page=${pageIndex}&limit=${pageSize}&sort=${sortParams}&type=${hospitalType}&lvl=${hospitalLvl}`;
 
@@ -193,9 +189,7 @@
 <div class="w-full">
 	<div class="flex items-center py-4">
 		<div class="flex gap-2">
-			<Button class="" variant="outline" onclick={handlySync}
-				>{isLoading ? '同步中...' : '同步医院经纬度信息'}</Button
-			>
+			<Button class="" variant="outline" onclick={handlySync}>{isLoading ? '同步中...' : '同步医院经纬度信息'}</Button>
 			<Button class="" variant="outline" onclick={handlyCopyAll}>复制多地址医院</Button>
 			<Input
 				placeholder="Filter name..."
@@ -210,7 +204,7 @@
 			/>
 			<Select.Root type="single" bind:value={hospitalType} onValueChange={handleTypeChange}>
 				<Select.Trigger
-					class="h-input rounded-9px border-border-input placeholder:text-foreground-alt/50 inline-flex w-[296px] select-none items-center border bg-background px-[11px] text-sm transition-colors"
+					class="h-input rounded-9px border-border-input placeholder:text-foreground-alt/50 bg-background inline-flex w-[296px] items-center border px-[11px] text-sm transition-colors select-none"
 					aria-label="请选择医院类型"
 				>
 					{hospitalType}
@@ -224,7 +218,7 @@
 			</Select.Root>
 			<Select.Root type="single" bind:value={hospitalLvl}>
 				<Select.Trigger
-					class="h-input rounded-9px border-border-input placeholder:text-foreground-alt/50 inline-flex w-[296px] select-none items-center border bg-background px-[11px] text-sm transition-colors"
+					class="h-input rounded-9px border-border-input placeholder:text-foreground-alt/50 bg-background inline-flex w-[296px] items-center border px-[11px] text-sm transition-colors select-none"
 					aria-label="请选择医院评级"
 				>
 					{hospitalLvl}
@@ -267,10 +261,7 @@
 						{#each headerGroup.headers as header (header.id)}
 							<Table.Head class="">
 								{#if !header.isPlaceholder}
-									<FlexRender
-										content={header.column.columnDef.header}
-										context={header.getContext()}
-									/>
+									<FlexRender content={header.column.columnDef.header} context={header.getContext()} />
 								{/if}
 							</Table.Head>
 						{/each}
@@ -296,7 +287,7 @@
 	</div>
 
 	<div class="flex items-center justify-between py-4">
-		<div class="flex-1 text-sm text-muted-foreground">
+		<div class="text-muted-foreground flex-1 text-sm">
 			{table.getFilteredSelectedRowModel().rows.length} / {table.getFilteredRowModel().rows.length}
 		</div>
 
@@ -315,10 +306,7 @@
 								<Pagination.Ellipsis class="" />
 							</Pagination.Item>
 						{:else}
-							<Pagination.Item
-								isVisible={currentPage === page.value}
-								onclick={() => table.setPageIndex(page.value)}
-							>
+							<Pagination.Item isVisible={currentPage === page.value} onclick={() => table.setPageIndex(page.value)}>
 								<Pagination.Link class="" {page} isActive={currentPage === page.value}>
 									{page.value}
 								</Pagination.Link>

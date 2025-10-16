@@ -3,13 +3,13 @@
 	import { resetMode, setMode } from 'mode-watcher';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import * as Avatar from '$lib/components/ui/avatar';
-	import BadgeCheck from 'lucide-svelte/icons/badge-check';
-	import Bell from 'lucide-svelte/icons/bell';
-	import LogOut from 'lucide-svelte/icons/log-out';
-	import Sun from 'lucide-svelte/icons/sun';
-	import MoonStar from 'lucide-svelte/icons/moon-star';
-	import Monitor from 'lucide-svelte/icons/monitor';
-	import User from 'lucide-svelte/icons/user';
+	import BadgeCheck from '@lucide/svelte/icons/badge-check';
+	import Bell from '@lucide/svelte/icons/bell';
+	import LogOut from '@lucide/svelte/icons/log-out';
+	import Sun from '@lucide/svelte/icons/sun';
+	import MoonStar from '@lucide/svelte/icons/moon-star';
+	import Monitor from '@lucide/svelte/icons/monitor';
+	import User from '@lucide/svelte/icons/user';
 
 	let { user, isMobile, showDashboard = false } = $props();
 

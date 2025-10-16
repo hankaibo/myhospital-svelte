@@ -2,14 +2,7 @@
 	import * as FormPrimitive from 'formsnap';
 	import { cn } from '$lib/utils.js';
 
-	let {
-		ref = $bindable(null),
-		class: className,
-		form,
-		name,
-		children: childrenProp,
-		...restProps
-	} = $props();
+	let { ref = $bindable(null), class: className, form, name, children: childrenProp, ...restProps } = $props();
 </script>
 
 <FormPrimitive.ElementField {form} {name}>

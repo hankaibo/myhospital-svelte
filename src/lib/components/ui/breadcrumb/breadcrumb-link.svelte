@@ -1,16 +1,10 @@
 <script>
 	import { cn } from '$lib/utils.js';
 
-	let {
-		ref = $bindable(null),
-		class: className,
-		href = undefined,
-		child,
-		children,
-		...restProps
-	} = $props();
+	let { ref = $bindable(null), class: className, href = undefined, child, children, ...restProps } = $props();
 
 	const attrs = $derived({
+		'data-slot': 'breadcrumb-link',
 		class: cn('hover:text-foreground transition-colors', className),
 		href,
 		...restProps

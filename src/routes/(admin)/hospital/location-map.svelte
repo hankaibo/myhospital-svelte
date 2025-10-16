@@ -7,14 +7,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Sheet from '$lib/components/ui/sheet/index.js';
 
-	let {
-		id,
-		dialogOpen = $bindable(),
-		name,
-		address,
-		longitude = 116.397861,
-		latitude = 39.900401
-	} = $props();
+	let { id, dialogOpen = $bindable(), name, address, longitude = 116.397861, latitude = 39.900401 } = $props();
 	/**	@type {AMap.Map} */
 	let map;
 	/** @type {AMap.Marker} */
@@ -178,7 +171,7 @@
 			<Sheet.Description class="">使用鼠标在地图上选择正确的地址。</Sheet.Description>
 		</Sheet.Header>
 		<div id="map" class="my-2 h-[calc(100%-100px)] w-full"></div>
-		<div class="absolute bottom-20 right-10 rounded bg-slate-400 p-2">
+		<div class="absolute right-10 bottom-20 rounded bg-slate-400 p-2">
 			经度: <span>{newLng || lng || 'N/A'}</span>, 纬度: <span>{newLat || lat || 'N/A'}</span>
 		</div>
 

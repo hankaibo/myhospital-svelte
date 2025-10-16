@@ -1,6 +1,6 @@
 <script>
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
-	import Command from 'lucide-svelte/icons/command';
+	import Command from '@lucide/svelte/icons/command';
 </script>
 
 <Sidebar.Menu class="">
@@ -9,7 +9,7 @@
 			{#snippet child({ props })}
 				<a href="##" {...props}>
 					<div
-						class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground"
+						class="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg"
 					>
 						<Command class="size-4" />
 					</div>

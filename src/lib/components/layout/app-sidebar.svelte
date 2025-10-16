@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/state';
-	import { Users, House, Hospital } from 'lucide-svelte';
+	import { Users, House, Hospital } from '@lucide/svelte';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import NavLogo from '$lib/components/layout/nav-logo.svelte';
 	import NavUser from '$lib/components/layout/nav-user.svelte';
