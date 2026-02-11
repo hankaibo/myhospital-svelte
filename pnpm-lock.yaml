@@ -624,9 +624,12 @@ packages:
       '@sveltejs/vite-plugin-svelte': ^3.0.0 || ^4.0.0-next.1 || ^5.0.0 || ^6.0.0-next.0
       svelte: ^4.0.0 || ^5.0.0-next.0
       typescript: ^5.3.3
+      typescript: ^5.3.3
       vite: ^5.0.3 || ^6.0.0 || ^7.0.0-beta.0
     peerDependenciesMeta:
       '@opentelemetry/api':
+        optional: true
+      typescript:
         optional: true
       typescript:
         optional: true
@@ -2190,6 +2193,7 @@ snapshots:
       fdir: 6.5.0(picomatch@4.0.3)
       is-reference: 1.2.1
       magic-string: 0.30.21
+      magic-string: 0.30.21
       picomatch: 4.0.3
     optionalDependencies:
       rollup: 4.57.1
@@ -2327,8 +2331,10 @@ snapshots:
       acorn: 8.15.0
       cookie: 0.6.0
       devalue: 5.6.2
+      devalue: 5.6.2
       esm-env: 1.2.2
       kleur: 4.1.5
+      magic-string: 0.30.21
       magic-string: 0.30.21
       mrmime: 2.0.1
       sade: 1.8.1
@@ -2711,6 +2717,7 @@ snapshots:
 
   effect@3.19.16:
     dependencies:
+      '@standard-schema/spec': 1.1.0
       '@standard-schema/spec': 1.1.0
       fast-check: 3.23.2
     optional: true
