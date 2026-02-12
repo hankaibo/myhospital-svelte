@@ -26,8 +26,15 @@
 	let isDrawing = false;
 	/** @type {AMap.Circle | undefined} */
 	let circle;
-	/** @type {AMap.Circle} */
+	/** @type {AMap.Circle | undefined} */
 	let selectedCircle; // 用于保存当前右键选中的 Circle
+
+	/** @type {((e: any) => void) | undefined} */
+	let handleMapClickHandler;
+	/** @type {((e: any) => void) | undefined} */
+	let handleMapMouseMoveHandler;
+	/** @type {(() => void) | undefined} */
+	let handleMapRightClickHandler;
 
 	/**
 	 * 初始化地图
@@ -69,7 +76,7 @@
 	 * 切换主题样式
 	 */
 	function toggleTheme() {
-		if ($mode === 'dark') {
+		if (mode.current === 'dark') {
 			// 设置地图的显示样式
 			map?.setMapStyle('amap://styles/dark');
 		} else {
@@ -95,9 +102,13 @@
 	function setupEventHandlers(AMap) {
 		contextMenu = createContextMenu(AMap);
 
-		map?.on('click', handleMapClick.bind(null, AMap));
-		map?.on('mousemove', handleMapMouseMove.bind(null, AMap));
-		map?.on('rightclick', () => contextMenu.close());
+		handleMapClickHandler = handleMapClick.bind(null, AMap);
+		handleMapMouseMoveHandler = handleMapMouseMove.bind(null, AMap);
+		handleMapRightClickHandler = () => contextMenu && contextMenu.close();
+
+		map?.on('click', handleMapClickHandler);
+		map?.on('mousemove', handleMapMouseMoveHandler);
+		map?.on('rightclick', handleMapRightClickHandler);
 	}
 
 	/**
@@ -109,8 +120,11 @@
 		contextMenu.addItem(
 			'删除',
 			() => {
-				removeMarker(selectedCircle);
-				removeCircle(selectedCircle);
+				if (selectedCircle) {
+					removeMarker(selectedCircle);
+					removeCircle(selectedCircle);
+					selectedCircle = undefined;
+				}
 			},
 			0
 		);
@@ -179,7 +193,7 @@
 			const { lng, lat } = circle.getCenter();
 			const radius = circle.getRadius();
 			handleFetch({ lng, lat, radius });
-			circle = undefined; // 重置圆形对象
+			// circle = undefined; // 重置圆形对象
 		}
 	}
 
@@ -273,7 +287,10 @@
 			}
 		});
 		markersInCircle.forEach((marker) => {
-			allHospitalIds.splice(allHospitalIds.indexOf(marker.getExtData().id), 1);
+			const idx = allHospitalIds.indexOf(marker.getExtData().id);
+			if (idx !== -1) {
+				allHospitalIds.splice(idx, 1);
+			}
 			hospitalList = hospitalList.filter((item) => item.id !== marker.getExtData().id);
 			marker.setMap(null);
 		});
@@ -346,7 +363,9 @@
 
 	onDestroy(() => {
 		//解绑地图的点击事件
-		map?.off('click', () => handleMapClick);
+		handleMapClickHandler && map.off('click', handleMapClickHandler);
+		handleMapMouseMoveHandler && map.off('mousemove', handleMapMouseMoveHandler);
+		handleMapRightClickHandler && map.off('rightclick', handleMapRightClickHandler);
 		//销毁地图，并清空地图容器
 		map?.destroy();
 	});
